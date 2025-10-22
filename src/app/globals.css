@@ -1,0 +1,47 @@
+/* Import Tailwind's base resets and utilities */
+@import "tailwindcss/preflight";
+@import "tailwindcss";
+
+/* Hide scrollbar: Chrome, Edge, Safari */
+body::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar: Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Global font for the site */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #171f2e;
+  color: #16191c;
+}
+
+/* --- Animate in on section view --- */
+.section-animate {
+  opacity: 0;
+  transform: translateY(58px) scale(.98);
+  transition: opacity 0.68s cubic-bezier(.41,.72,.59,1), 
+    transform 0.68s cubic-bezier(.41,.72,.59,1);
+  will-change: opacity, transform;
+}
+
+.section-animate.bounce-in {
+  opacity: 1;
+  transform: translateY(0) scale(1.04);
+  animation: jump 0.48s cubic-bezier(.5,1.36,.47,1.01) 1;
+}
+
+.section-animate.hidden {
+  opacity: 0;
+  transform: translateY(40px) scale(.97);
+  pointer-events: none;
+}
+
+@keyframes jump {
+  0%   { transform: translateY(54px) scale(.98);}
+  72%  { transform: translateY(-19px) scale(1.055);}
+  85%  { transform: translateY(7px) scale(1.018);}
+  100% { transform: translateY(0) scale(1.028);}
+}

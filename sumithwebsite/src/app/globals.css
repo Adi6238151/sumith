@@ -1,0 +1,3 @@
+/* Import Tailwind's base resets and utilities */
+@import "tailwindcss/preflight";
+@import "tailwindcss";
