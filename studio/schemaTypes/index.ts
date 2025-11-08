@@ -5,12 +5,15 @@ import sumithBenefits from './sumithBenefits'
 import itmssServiceGrid from './itmssServiceGrid'
 import customerLogoGrid from './customerLogoGrid'
 import customSectionHeader from './customSectionHeader'
+import qualityOfLifeTechnology from './qualityOfLifeTechnology';
 import itsBusHero from './itsBusHero'  // <--- Add this if you need the header CMS type
 import busSolutionImageRow from './busSolutionImageRow'
 import metroRailSectionHeader from './metro-rail/metroRailSectionHeader'
 import scopeOfWorkTiles from "./metro-rail/scopeOfWorkTiles"
 import safetyTabSection from './metro-rail/safetyTabSection'
 import passengerDisplaySection from './metro-rail/passengerDisplaySection'
+import AirportSectionHeader from './Airport/AirportSectionHeader'
+
 
 
 
@@ -22,11 +25,13 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     itmssServiceGrid,
     customerLogoGrid,
     customSectionHeader,
+    qualityOfLifeTechnology,
     itsBusHero,
     busSolutionImageRow,
     metroRailSectionHeader, // <--- Add this line if you have the CMS header component
     scopeOfWorkTiles,
     safetyTabSection,
     passengerDisplaySection,
+    AirportSectionHeader,
   ],
 }

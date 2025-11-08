@@ -10,7 +10,8 @@ const dropdownSections = [
     items: [
       { label: "Bus", icon: "/icons/bullet-bus.png" },
       { label: "Metro/Rail", icon: "/icons/bullet-metro.png" },
-      { label: "Airport", icon: "/icons/bullet-airport.png" },
+      // Changed here: set Airport link to /solutions/AirportSolutions
+      { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
     ],
   },
   {
@@ -158,6 +159,17 @@ export default function Navigation() {
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
                           </Link>
+                        ) : item.label === "Airport" && item.href ? (
+                          // Airport links to /solutions/AirportSolutions
+                          <Link
+                            href={item.href}
+                            tabIndex={accordion ? 0 : -1}
+                            onClick={() => setSidebar(false)}
+                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                          >
+                            <Image src={item.icon} alt="" width={14} height={14} />
+                            <span>{item.label}</span>
+                          </Link>
                         ) : (
                           <>
                             <Image src={item.icon} alt="" width={14} height={14} />
@@ -254,6 +266,16 @@ export default function Navigation() {
                     ) : item.label === "Metro/Rail" ? (
                       <Link
                         href="/solutions/metro-rail"
+                        onClick={() => setOpen(false)}
+                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                      >
+                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ) : item.label === "Airport" && item.href ? (
+                      // Airport links to /solutions/AirportSolutions
+                      <Link
+                        href="/solutions/Airport"
                         onClick={() => setOpen(false)}
                         style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
                       >
