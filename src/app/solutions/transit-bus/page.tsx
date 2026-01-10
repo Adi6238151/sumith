@@ -1,8 +1,11 @@
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import CustomSectionHeader from "@/components/transit-bus/CustomSectionHeader";
 import ITSBusHero from "@/components/transit-bus/ITSBusHero";
 import BusSolutionImageRow from "@/components/transit-bus/BusSolutionTilesRow";
+import QualityOfLifeTechnology from "@/components/transit-bus/QualityOfLifeTechnology";
 import { sanity } from "@/lib/sanity.client";
+
 
 const customSectionHeaderQuery = `
   *[_type=="customSectionHeader"][0]{
@@ -13,6 +16,7 @@ const customSectionHeaderQuery = `
   }
 `;
 
+
 const itsBusHeroQuery = `
   *[_type=="itsBusHero"][0]{
     tilesTitle,
@@ -21,6 +25,7 @@ const itsBusHeroQuery = `
     seo
   }
 `;
+
 
 const busSolutionImageRowQuery = `
   *[_type=="busSolutionImageRow"][0]{
@@ -34,10 +39,25 @@ const busSolutionImageRowQuery = `
   }
 `;
 
+
+const qualityOfLifeTechnologyQuery = `
+  *[_type == "qualityOfLifeTechnology"][0]{
+    title,
+    tabs[]{
+      tabTitle,
+      image,
+      listItems
+    }
+  }
+`;
+
+
 export default async function TransitBusITSPage() {
   const sectionHeaderData = await sanity.fetch(customSectionHeaderQuery);
   const itsBusHeroData = await sanity.fetch(itsBusHeroQuery);
   const busSolutionImageRowData = await sanity.fetch(busSolutionImageRowQuery);
+  const qualityOfLifeTechnologyData = await sanity.fetch(qualityOfLifeTechnologyQuery);
+
 
   return (
     <>
@@ -59,7 +79,26 @@ export default async function TransitBusITSPage() {
           images={busSolutionImageRowData?.images || []}
           seo={busSolutionImageRowData?.seo}
         />
+
+
+        {/* Add the new QualityOfLifeTechnology section */}
+        {qualityOfLifeTechnologyData && (
+          <div style={{
+            background: "#fff",
+            margin: "0 auto",
+            marginTop: "36px",
+            borderRadius: "18px",
+            maxWidth: "1300px",
+            padding: "2.5rem 2rem"
+          }}>
+            <QualityOfLifeTechnology
+              title={qualityOfLifeTechnologyData.title}
+              tabs={qualityOfLifeTechnologyData.tabs}
+            />
+          </div>
+        )}
       </main>
+      <Footer />
     </>
   );
 }

@@ -1,5 +1,7 @@
-"use client"
+'use client'
+
 import { useState, useEffect, type CSSProperties } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 
@@ -23,8 +25,8 @@ type HeroData = {
   stats?: HeroStat[]
 }
 
-// Accepts heroData as a prop (content from Sanity)
 export default function HeroSection({ heroData }: { heroData?: HeroData }) {
+  const router = useRouter()
   const solutions = heroData?.solutions || []
   const [currentSolution, setCurrentSolution] = useState(0)
 
@@ -168,7 +170,6 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
     }
   }
 
-  // Get image URL from Sanity, fallback to local if missing
   const backgroundImgUrl =
     heroData?.backgroundImage?.asset?.url ||
     "/backgrounds/hero-bg.jpg"
@@ -269,6 +270,7 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           </div>
           <div className="button-container" style={styles.buttonContainer}>
             <button
+              onClick={() => router.push('/solutions/products')}
               className="modern-btn modern-btn-primary"
               style={{
                 background: '#fb7e19',

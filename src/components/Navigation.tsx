@@ -10,7 +10,8 @@ const dropdownSections = [
     items: [
       { label: "Bus", icon: "/icons/bullet-bus.png" },
       { label: "Metro/Rail", icon: "/icons/bullet-metro.png" },
-      { label: "Airport", icon: "/icons/bullet-airport.png" },
+      // Changed here: set Airport link to /solutions/AirportSolutions
+      { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
     ],
   },
   {
@@ -21,22 +22,7 @@ const dropdownSections = [
       { label: "ETA", icon: "/icons/bullet-eta.png" },
     ],
   },
-  {
-    title: "SMART CITY SOLUTIONS",
-    icon: "/icons/smart-city-icon.png",
-    items: [
-      { label: "Smart (IOT) Waste Collection", icon: "/icons/bullet-waste.png" },
-    ],
-  },
-  {
-    title: "SMART WAREHOUSING",
-    icon: "/icons/warehouse-icon.png",
-    items: [
-      { label: "Collision Avoidance System", icon: "/icons/bullet-collision.png" },
-      { label: "Column Protection", icon: "/icons/bullet-column.png" },
-      { label: "Rack Protection", icon: "/icons/bullet-rack.png" },
-    ],
-  },
+
   {
     title: "R&D",
     icon: "/icons/rd-icon.png",
@@ -48,11 +34,11 @@ const dropdownSections = [
 ];
 
 const navLinks = [
-  { label: "ABOUT US", href: "/about" },
-  { label: "OUR SUPPORT", href: "/our-support" },
-  { label: "INSIGHTS", href: "/insights" },
-  { label: "CAREERS", href: "/careers" },
-  { label: "CONTACT US", href: "/contact" },
+  { label: "About us", href: "/about-us" },
+  { label: "Products", href: "/solutions/products" },
+  { label: "Insights", href: "/insights" },
+  { label: "Careers", href: "/careers" },
+  { label: "Contact us", href: "/contact-us" },
 ];
 
 export default function Navigation() {
@@ -158,6 +144,17 @@ export default function Navigation() {
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
                           </Link>
+                        ) : item.label === "Airport" && item.href ? (
+                          // Airport links to /solutions/AirportSolutions
+                          <Link
+                            href={item.href}
+                            tabIndex={accordion ? 0 : -1}
+                            onClick={() => setSidebar(false)}
+                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                          >
+                            <Image src={item.icon} alt="" width={14} height={14} />
+                            <span>{item.label}</span>
+                          </Link>
                         ) : (
                           <>
                             <Image src={item.icon} alt="" width={14} height={14} />
@@ -209,7 +206,7 @@ export default function Navigation() {
               aria-expanded={open}
               aria-label="Solutions"
             >
-              SOLUTIONS
+              Solutions
               <span className="down-arrow" />
             </span>
             {navLinks.map((item) => (
@@ -254,6 +251,16 @@ export default function Navigation() {
                     ) : item.label === "Metro/Rail" ? (
                       <Link
                         href="/solutions/metro-rail"
+                        onClick={() => setOpen(false)}
+                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                      >
+                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ) : item.label === "Airport" && item.href ? (
+                      // Airport links to /solutions/AirportSolutions
+                      <Link
+                        href="/solutions/Airport"
                         onClick={() => setOpen(false)}
                         style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
                       >
@@ -472,7 +479,7 @@ export default function Navigation() {
           font-weight: 700;
           color: #142241;
           letter-spacing: 0.02em;
-          text-transform: uppercase;
+          text-transform: upperlowercase;
           background: none;
           border: none;
           cursor: pointer;

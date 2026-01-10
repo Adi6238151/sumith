@@ -1,4 +1,5 @@
 import Navigation from '@/components/Navigation'
+import Footer from '@/components/Footer'
 import HeroSection from '@/components/homepage/HeroSection'
 import WhiteGradientTransition from '@/components/homepage/WhiteGradientTransition'
 import SolutionCarousel from '@/components/homepage/SolutionCarousel'
@@ -7,6 +8,7 @@ import ITMSServicesGrid from "@/components/homepage/ITMSServicesGrid"
 import CustomerLogoGrid from "@/components/homepage/CustomerLogoGrid"
 import StickySidebar from "@/components/StickySidebar"
 import { sanity } from '@/lib/sanity.client'
+
 
 const heroSectionQuery = `
   *[_type=="heroSection"][0]{
@@ -56,6 +58,7 @@ const servicesGridQuery = `
   }
 `
 
+
 const customerLogoGridQuery = `
   *[_type=="customerLogoGrid"][0]{
     heading,
@@ -73,12 +76,14 @@ const customerLogoGridQuery = `
 
 
 
+
 export default async function Home() {
   const heroData = await sanity.fetch(heroSectionQuery)
   const carouselData = await sanity.fetch(carouselQuery)
   const benefitsData = await sanity.fetch(benefitsQuery)
   const servicesGridData = await sanity.fetch(servicesGridQuery)
   const customerLogoGridData = await sanity.fetch(customerLogoGridQuery)
+
 
 
   return (
@@ -93,6 +98,7 @@ export default async function Home() {
         <CustomerLogoGrid customerLogoGridData={customerLogoGridData} />
         <StickySidebar />
       </div>
+      <Footer />
     </div>
   )
 }
