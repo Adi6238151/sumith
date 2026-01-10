@@ -8,7 +8,7 @@ import ProductCard from '@/components/products/ProductCard'
 import ProductDetail from '@/components/products/ProductDetail'
 import type { Product } from '@/types/products'
 
-export const revalidate = 60 // Revalidate every 60 seconds
+
 
 
 export default function ProductListing() {

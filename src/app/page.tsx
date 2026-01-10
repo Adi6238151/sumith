@@ -9,6 +9,7 @@ import CustomerLogoGrid from "@/components/homepage/CustomerLogoGrid"
 import StickySidebar from "@/components/StickySidebar"
 import { sanity } from '@/lib/sanity.client'
 
+export const revalidate = 600 // Revalidate every 10 minutes
 
 const heroSectionQuery = `
   *[_type=="heroSection"][0]{
