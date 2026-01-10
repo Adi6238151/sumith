@@ -1,7 +1,8 @@
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import AirportSectionHeader from "@/components/Airport/AirportSectionHeader";
- // <-- Case corrected!
 import { sanity } from "@/lib/sanity.client";
+
 
 const AirportSectionHeaderQuery = `
   *[_type=="AirportSectionHeader"][0]{
@@ -31,7 +32,6 @@ export default async function AirportSolutionsPage() {
           overflowX: "hidden"
         }}
       >
-        {/* */}
         <AirportSectionHeader
           seo={headerData?.seo}
           heading={headerData?.heading}
@@ -42,7 +42,7 @@ export default async function AirportSolutionsPage() {
 
         {/* Add further CMS-powered sections/components below */}
       </main>
-      {/* Use app/globals.css or CSS Modules for global styles if needed */}
+      <Footer />
     </>
   );
 }

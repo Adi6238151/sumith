@@ -1,29 +1,36 @@
 "use client";
 import React, { useState } from "react";
 
+
 type Tab = {
   tabTitle: string;
   image: { asset?: { url?: string } } | string; // Handles Sanity image object OR direct string
   listItems: string[];
 };
 
+
 type Props = {
   title: string;
   tabs: Tab[];
 };
 
+
 const getImageUrl = (img: Tab["image"]): string => {
+  if (!img) return ""; // ← Added null check
   if (typeof img === "string") return img;
   if (img && typeof img === "object" && "asset" in img && img.asset?.url) return img.asset.url;
   return "";
 };
 
+
 const QualityOfLifeTechnology: React.FC<Props> = ({ title, tabs }) => {
   const [active, setActive] = useState(0);
+
 
   if (!tabs || tabs.length === 0) {
     return <div>No tabs available.</div>;
   }
+
 
   return (
     <div style={{ width: "100%", margin: "0 auto", marginTop: 32 }}>
@@ -91,18 +98,41 @@ const QualityOfLifeTechnology: React.FC<Props> = ({ title, tabs }) => {
             alignItems: "center",
           }}
         >
-          <img
-            src={getImageUrl(tabs[active].image)}
-            alt={tabs[active].tabTitle}
-            style={{
-              width: 460,
-              maxWidth: "90%",
-              height: 340,
-              borderRadius: "20px 0 0 20px",
-              objectFit: "cover",
-              boxShadow: "0 12px 60px rgba(0,0,0,.21)",
-            }}
-          />
+          {getImageUrl(tabs[active]?.image) ? (
+            <img
+              src={getImageUrl(tabs[active].image)}
+              alt={tabs[active]?.tabTitle || "Technology"}
+              onError={(e) => {
+                // Hide image if it fails to load
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+              style={{
+                width: 460,
+                maxWidth: "90%",
+                height: 340,
+                borderRadius: "20px 0 0 20px",
+                objectFit: "cover",
+                boxShadow: "0 12px 60px rgba(0,0,0,.21)",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 460,
+                maxWidth: "90%",
+                height: 340,
+                borderRadius: "20px 0 0 20px",
+                backgroundColor: "#f0f0f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#999",
+                fontSize: "1rem",
+              }}
+            >
+              No image available
+            </div>
+          )}
         </div>
         {/* Right: glassy card */}
         <div
@@ -142,12 +172,17 @@ const QualityOfLifeTechnology: React.FC<Props> = ({ title, tabs }) => {
                 minWidth: "250px",
               }}
             >
-              {tabs[active].listItems &&
+              {tabs[active]?.listItems && tabs[active].listItems.length > 0 ? (
                 tabs[active].listItems.map((item, i) => (
                   <li key={i} style={{ marginBottom: "1.3rem", lineHeight: 1.4 }}>
                     {item}
                   </li>
-                ))}
+                ))
+              ) : (
+                <li style={{ marginBottom: "1.3rem", lineHeight: 1.4, color: "#999" }}>
+                  No items available
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -167,5 +202,6 @@ const QualityOfLifeTechnology: React.FC<Props> = ({ title, tabs }) => {
     </div>
   );
 };
+
 
 export default QualityOfLifeTechnology;

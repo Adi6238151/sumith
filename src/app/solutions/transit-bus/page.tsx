@@ -1,9 +1,11 @@
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import CustomSectionHeader from "@/components/transit-bus/CustomSectionHeader";
 import ITSBusHero from "@/components/transit-bus/ITSBusHero";
 import BusSolutionImageRow from "@/components/transit-bus/BusSolutionTilesRow";
-import QualityOfLifeTechnology from "@/components/transit-bus/QualityOfLifeTechnology"; // <-- Adjust the path if your structure differs
+import QualityOfLifeTechnology from "@/components/transit-bus/QualityOfLifeTechnology";
 import { sanity } from "@/lib/sanity.client";
+
 
 const customSectionHeaderQuery = `
   *[_type=="customSectionHeader"][0]{
@@ -14,6 +16,7 @@ const customSectionHeaderQuery = `
   }
 `;
 
+
 const itsBusHeroQuery = `
   *[_type=="itsBusHero"][0]{
     tilesTitle,
@@ -22,6 +25,7 @@ const itsBusHeroQuery = `
     seo
   }
 `;
+
 
 const busSolutionImageRowQuery = `
   *[_type=="busSolutionImageRow"][0]{
@@ -35,6 +39,7 @@ const busSolutionImageRowQuery = `
   }
 `;
 
+
 const qualityOfLifeTechnologyQuery = `
   *[_type == "qualityOfLifeTechnology"][0]{
     title,
@@ -46,11 +51,13 @@ const qualityOfLifeTechnologyQuery = `
   }
 `;
 
+
 export default async function TransitBusITSPage() {
   const sectionHeaderData = await sanity.fetch(customSectionHeaderQuery);
   const itsBusHeroData = await sanity.fetch(itsBusHeroQuery);
   const busSolutionImageRowData = await sanity.fetch(busSolutionImageRowQuery);
   const qualityOfLifeTechnologyData = await sanity.fetch(qualityOfLifeTechnologyQuery);
+
 
   return (
     <>
@@ -73,6 +80,7 @@ export default async function TransitBusITSPage() {
           seo={busSolutionImageRowData?.seo}
         />
 
+
         {/* Add the new QualityOfLifeTechnology section */}
         {qualityOfLifeTechnologyData && (
           <div style={{
@@ -90,6 +98,7 @@ export default async function TransitBusITSPage() {
           </div>
         )}
       </main>
+      <Footer />
     </>
   );
 }

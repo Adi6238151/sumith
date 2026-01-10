@@ -1,9 +1,11 @@
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import MetroRailSectionHeader from "@/components/metro-rail/MetroRailSectionHeader";
 import ScopeOfWorkTiles from "@/components/metro-rail/ScopeOfWorkTiles";
 import SafetyTabsSection from "@/components/metro-rail/SafetyTabsSection";
-import PassengerDisplaySection from "@/components/metro-rail/PassengerDisplaySection"; // <-- Case corrected!
+import PassengerDisplaySection from "@/components/metro-rail/PassengerDisplaySection";
 import { sanity } from "@/lib/sanity.client";
+
 
 const metroRailSectionHeaderQuery = `
   *[_type=="metroRailSectionHeader"][0]{
@@ -22,6 +24,7 @@ const scopeOfWorkTilesQuery = `
   }
 `;
 
+
 const safetyTabsSectionQuery = `
   *[_type=="safetyTabSection"][0]{
     tabs[]{
@@ -33,6 +36,7 @@ const safetyTabsSectionQuery = `
     seo
   }
 `;
+
 
 const passengerDisplaySectionQuery = `
   *[_type=="passengerDisplaySection"][0]{
@@ -46,11 +50,13 @@ const passengerDisplaySectionQuery = `
   }
 `;
 
+
 export default async function MetroRailSolutionPage() {
   const headerData = await sanity.fetch(metroRailSectionHeaderQuery);
   const scopeOfWorkData = await sanity.fetch(scopeOfWorkTilesQuery);
   const safetyTabsData = await sanity.fetch(safetyTabsSectionQuery);
   const passengerDisplaySectionData = await sanity.fetch(passengerDisplaySectionQuery);
+
 
   return (
     <>
@@ -74,6 +80,7 @@ export default async function MetroRailSolutionPage() {
           image={headerData?.image}
         />
 
+
         {/* ScopeOfWorkTiles */}
         <ScopeOfWorkTiles
           heading={scopeOfWorkData?.heading}
@@ -87,6 +94,7 @@ export default async function MetroRailSolutionPage() {
           seo={safetyTabsData?.seo}
         />
 
+
         {/* PassengerDisplaySection */}
         <PassengerDisplaySection
           heading={passengerDisplaySectionData?.heading}
@@ -95,9 +103,10 @@ export default async function MetroRailSolutionPage() {
           seo={passengerDisplaySectionData?.seo}
         />
 
+
         {/* Add further CMS-powered sections/components below */}
       </main>
-      {/* Use app/globals.css or CSS Modules for global styles if needed */}
+      <Footer />
     </>
   );
 }
