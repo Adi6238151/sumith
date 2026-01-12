@@ -1,56 +1,55 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
-import { parseBody } from 'next-sanity/webhook'
 
 export async function POST(request: NextRequest) {
   try {
-    const { isValidSignature, body } = await parseBody<{
-      _type: string
-      slug?: { current: string }
-    }>(request, process.env.SANITY_WEBHOOK_SECRET)
-
-    if (!isValidSignature) {
-      return NextResponse.json(
-        { message: 'Invalid signature' },
-        { status: 401 }
-      )
+    const secret = request.nextUrl.searchParams.get('secret')
+    
+    console.log('🔔 Webhook received!')
+    console.log('Secret provided:', secret ? 'Yes' : 'No')
+    
+    if (secret !== process.env.REVALIDATE_SECRET) {
+      console.log('❌ Invalid secret')
+      return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
     }
 
-    if (!body?._type) {
-      return NextResponse.json(
-        { message: 'Bad Request' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json()
+    console.log('📦 Webhook body:', body)
 
-    // Revalidate based on content type
-    console.log('🔄 Revalidating:', body._type)
+    const { _type } = body
 
-    switch (body._type) {
+    console.log('🔄 Revalidating for type:', _type)
+
+    // Use revalidatePath instead of revalidateTag for Next.js 16
+    switch (_type) {
       case 'product':
         revalidatePath('/solutions/products')
         revalidatePath('/')
+        console.log('✅ Revalidated products page')
         break
       case 'emailSettings':
-        revalidateTag('email-settings')
+        revalidatePath('/contact-us')
+        console.log('✅ Revalidated contact page')
         break
       case 'contactTopic':
-        revalidateTag('contact-topics')
+        revalidatePath('/contact-us')
+        console.log('✅ Revalidated contact page')
         break
       default:
         revalidatePath('/')
+        console.log('✅ Revalidated homepage')
     }
 
-    return NextResponse.json({
-      revalidated: true,
-      type: body._type,
-      now: Date.now(),
+    return NextResponse.json({ 
+      revalidated: true, 
+      type: _type,
+      timestamp: Date.now() 
     })
   } catch (error: unknown) {
     const err = error as Error
-    console.error('Webhook error:', err)
+    console.error('❌ Webhook error:', err.message)
     return NextResponse.json(
-      { message: 'Internal Server Error', error: err.message },
+      { message: 'Error', error: err.message },
       { status: 500 }
     )
   }
