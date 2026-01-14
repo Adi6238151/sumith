@@ -6,7 +6,6 @@ import BusSolutionImageRow from "@/components/transit-bus/BusSolutionTilesRow";
 import QualityOfLifeTechnology from "@/components/transit-bus/QualityOfLifeTechnology";
 import { sanity } from "@/lib/sanity.client";
 
-
 const customSectionHeaderQuery = `
   *[_type=="customSectionHeader"][0]{
     heading,
@@ -16,7 +15,6 @@ const customSectionHeaderQuery = `
   }
 `;
 
-
 const itsBusHeroQuery = `
   *[_type=="itsBusHero"][0]{
     tilesTitle,
@@ -25,7 +23,6 @@ const itsBusHeroQuery = `
     seo
   }
 `;
-
 
 const busSolutionImageRowQuery = `
   *[_type=="busSolutionImageRow"][0]{
@@ -39,18 +36,20 @@ const busSolutionImageRowQuery = `
   }
 `;
 
-
 const qualityOfLifeTechnologyQuery = `
   *[_type == "qualityOfLifeTechnology"][0]{
     title,
     tabs[]{
       tabTitle,
-      image,
+      "image": image.asset->url,   // <-- resolve to URL
       listItems
+    },
+    seo{
+      metaTitle,
+      metaDescription
     }
   }
 `;
-
 
 export default async function TransitBusITSPage() {
   const sectionHeaderData = await sanity.fetch(customSectionHeaderQuery);
@@ -58,46 +57,39 @@ export default async function TransitBusITSPage() {
   const busSolutionImageRowData = await sanity.fetch(busSolutionImageRowQuery);
   const qualityOfLifeTechnologyData = await sanity.fetch(qualityOfLifeTechnologyQuery);
 
-
   return (
     <>
       <Navigation />
+
       <CustomSectionHeader
         seo={sectionHeaderData?.seo}
         heading={sectionHeaderData?.heading}
         paragraph={sectionHeaderData?.paragraph}
         icon={sectionHeaderData?.icon}
       />
-      <main style={{ background: "#171f2e", minHeight: "100vh", width: "100vw" }}>
+
+      {/* Shared ITS background via global .its-page-shell class */}
+      <main className="its-page-shell">
         <ITSBusHero
           tilesTitle={itsBusHeroData?.tilesTitle}
           features={itsBusHeroData?.features || []}
           image={itsBusHeroData?.image || "/images/bus its.png"}
           seo={itsBusHeroData?.seo}
         />
+
         <BusSolutionImageRow
           images={busSolutionImageRowData?.images || []}
           seo={busSolutionImageRowData?.seo}
         />
+            {qualityOfLifeTechnologyData && (
+              <QualityOfLifeTechnology
+                title={qualityOfLifeTechnologyData.title}
+                tabs={qualityOfLifeTechnologyData.tabs}
+              />
+            )}
 
-
-        {/* Add the new QualityOfLifeTechnology section */}
-        {qualityOfLifeTechnologyData && (
-          <div style={{
-            background: "#fff",
-            margin: "0 auto",
-            marginTop: "36px",
-            borderRadius: "18px",
-            maxWidth: "1300px",
-            padding: "2.5rem 2rem"
-          }}>
-            <QualityOfLifeTechnology
-              title={qualityOfLifeTechnologyData.title}
-              tabs={qualityOfLifeTechnologyData.tabs}
-            />
-          </div>
-        )}
       </main>
+
       <Footer />
     </>
   );

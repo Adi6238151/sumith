@@ -1,4 +1,5 @@
 "use client";
+
 import { useRef, useState } from "react";
 import Image from "next/image";
 import Head from "next/head";
@@ -20,7 +21,7 @@ interface ITSBusHeroProps {
   seo?: SEOFields;
 }
 
-export default function ITSBusHero({ features, image, seo }: ITSBusHeroProps) {
+export default function ITSBusHero({ tilesTitle, features, image, seo }: ITSBusHeroProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [fallback, setFallback] = useState<{ [key: string]: boolean }>({});
 
@@ -30,7 +31,7 @@ export default function ITSBusHero({ features, image, seo }: ITSBusHeroProps) {
 
   const handleIconError = (idx: number) => {
     setFallback(f => ({ ...f, [idx]: true }));
-  }
+  };
 
   return (
     <>
@@ -38,166 +39,434 @@ export default function ITSBusHero({ features, image, seo }: ITSBusHeroProps) {
         {seo?.title && <title>{seo.title}</title>}
         {seo?.description && <meta name="description" content={seo.description} />}
       </Head>
-      <section className="bus-scroll-main">
-        <div className="bus-row">
-          <div className="tiles-side-scroll">
-            <div className="tiles-title">ONE BOX, ONE SOLUTION</div>
-            <button className="arrow-btn" onClick={() => scrollByBtn(-120)} aria-label="Scroll up">&#8593;</button>
-            <div className="tiles-scroll" ref={scrollRef}>
-              {features.map((f, idx) => (
-                <div className="tile" key={f.label}>
-                  <Image
-                    src={fallback[idx] ? "/icons/placeholder.png" : f.icon}
-                    alt={f.label}
-                    width={34}
-                    height={34}
-                    className="tile-icon"
-                    onError={() => handleIconError(idx)}
-                  />
-                  <span>{f.label}</span>
-                </div>
-              ))}
+
+      <section className="its-hero">
+        <div className="its-hero-inner">
+          {/* LEFT: title + tiles */}
+          <div className="its-tiles-panel">
+            <div className="its-title-block">
+              <p className="its-eyebrow">ONE BOX, ONE SOLUTION</p>
+              <h2 className="its-main-heading">
+                {tilesTitle ?? "Command Control Centre"}
+              </h2>
+              <p className="its-sub-copy">
+                Centralized <strong>control</strong> centre to monitor, manage, and
+                optimize bus operations in real time with rich analytics, alerts,
+                and digital dashboards.
+              </p>
             </div>
-            <button className="arrow-btn" onClick={() => scrollByBtn(120)} aria-label="Scroll down">&#8595;</button>
+
+            <div className="its-tiles-shell">
+              <button
+                className="its-arrow-btn"
+                onClick={() => scrollByBtn(-130)}
+                aria-label="Scroll up"
+              >
+                ↑
+              </button>
+
+              <div className="its-tiles-scroll" ref={scrollRef}>
+                {features.map((f, idx) => (
+                  <article className="its-tile" key={f.label}>
+                    <div className="its-tile-icon-wrap">
+                      <Image
+                        src={fallback[idx] ? "/icons/placeholder.png" : f.icon}
+                        alt={f.label}
+                        width={34}
+                        height={34}
+                        className="its-tile-icon"
+                        onError={() => handleIconError(idx)}
+                      />
+                    </div>
+                    <span className="its-tile-label">{f.label}</span>
+                  </article>
+                ))}
+              </div>
+
+              <button
+                className="its-arrow-btn"
+                onClick={() => scrollByBtn(130)}
+                aria-label="Scroll down"
+              >
+                ↓
+              </button>
+            </div>
           </div>
-          <div className="bus-img-col" style={{ background: "#fff" }}>
-            <Image
-              src={image}
-              width={990}
-              height={660}
-              alt="ITS bus"
-              priority
-              style={{
-                width: "100%",
-                maxWidth: "990px",
-                minWidth: "400px",
-                minHeight: "480px",
-                maxHeight: "760px",
-                height: "auto",
-                borderRadius: "20px",
-                background: "#fff"
-              }}
-            />
+
+          {/* RIGHT: dashboard image */}
+          <div className="its-image-panel">
+            <div className="its-image-frame">
+              <div className="its-image-header">
+                <span className="its-image-tag">Public Transport Bus Service</span>
+                <span className="its-image-status-dot" />
+              </div>
+              <div className="its-image-inner">
+                <Image
+                  src={image}
+                  width={990}
+                  height={660}
+                  alt="ITS bus"
+                  priority
+                  className="its-main-image"
+                />
+              </div>
+            </div>
           </div>
         </div>
+
         <style jsx>{`
-          /* All your original styles remain unchanged! */
-          .bus-scroll-main {
-            background: #fff;
-            width: 100vw;
-            padding: 0;
-            min-height: 760px;
+          :root {
+            --its-card-bg: #0b1020;
+            --its-border-subtle: #1b2642;
+            --its-accent: #4d5bff;
+            --its-cyan: #20e0d0;
+            --its-text-main: #f5f7ff;
+            --its-text-soft: #aab4d8;
+            --its-scroll-track: #10162d;
+            --its-scroll-thumb: #3ce2c4;
           }
-          .bus-row {
-            max-width: 1900px;
-            margin: 0 auto;
-            padding: 0;
+
+          /* Transparent so it sits on .its-page-shell background */
+          .its-hero {
+            background: transparent;
+            color: var(--its-text-main);
+            width: 100%;
+            height: 100vh;
+            max-height: 100vh;
+            padding: 32px 24px;
+            box-sizing: border-box;
             display: flex;
-            flex-direction: row;
+            justify-content: center;
             align-items: center;
-            justify-content: flex-start;
-            gap: 6vw;
+            overflow: hidden;
           }
-          .tiles-side-scroll {
-            margin-left: 2cm;
-            margin-right: 0.6vw;
+
+          .its-hero-inner {
+            max-width: 1920px;
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4vw;
+            overflow: hidden;
+          }
+
+          .its-tiles-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            max-width: 540px;
+            height: 100%;
+            max-height: 100%;
+          }
+
+          .its-title-block {
+            background:
+              radial-gradient(
+                circle at 0 0,
+                rgba(120, 185, 255, 0.32),
+                transparent 60%
+              ),
+              linear-gradient(135deg, #0c1534, #0a1d3c);
+            border-radius: 24px;
+            padding: 20px 22px 18px;
+            box-shadow:
+              0 20px 70px rgba(2, 8, 40, 0.98),
+              0 0 0 1px rgba(120, 170, 255, 0.55);
+            border: none;
+          }
+
+          .its-eyebrow {
+            font-size: 0.82rem;
+            letter-spacing: 0.26em;
+            text-transform: uppercase;
+            color: #c9e2ff;
+            margin: 0 0 6px 0;
+            opacity: 0.96;
+          }
+
+          .its-main-heading {
+            margin: 0 0 8px 0;
+            font-size: 1.9rem;
+            letter-spacing: 0.03em;
+            color: #ffffff;
+            text-shadow:
+              0 0 18px rgba(0, 0, 0, 0.85),
+              0 0 2px rgba(0, 0, 0, 0.9);
+          }
+
+          .its-sub-copy {
+            margin: 0;
+            font-size: 0.96rem;
+            line-height: 1.6;
+            color: #e3eeff;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
+          }
+
+          .its-tiles-shell {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: transparent;
+            gap: 6px;
+            flex: 1 1 auto;
+            min-height: 0;
           }
-          .tiles-title {
-            color: #0b2a2f;
-            background: rgba(230,241,247,0.64);
-            font-size: 1.3em;
-            font-weight: 700;
-            padding: 18px 18px;
-            margin-bottom: 8px;
-            letter-spacing: 0.01em;
-            border-radius: 13px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 3px 17px #0ec0ee07;
-          }
-          .tiles-scroll {
-            background: rgba(30,46,70,0.78);
-            border-radius: 22px;
-            box-shadow: 0 8px 48px #3040600b;
-            width: 470px;
-            min-width: 320px;
+
+          .its-tiles-scroll {
+            background:
+              radial-gradient(
+                circle at 0 0,
+                rgba(76, 225, 200, 0.07),
+                transparent 60%
+              ),
+              linear-gradient(160deg, rgba(17, 29, 63, 0.96), rgba(7, 13, 32, 0.98));
+            border-radius: 26px;
+            border: 1px solid var(--its-border-subtle);
+            box-shadow:
+              0 24px 70px rgba(4, 10, 33, 0.95),
+              0 0 0 1px rgba(115, 157, 255, 0.06);
+            width: 440px;
             max-width: 520px;
-            height: 570px;
+            flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            padding: 18px 12px;
             scrollbar-width: thin;
-            scrollbar-color: #36e0c2 #1e285c1a;
-            padding: 21px 0 21px 0;
-            margin-bottom: 5px;
+            scrollbar-color: var(--its-scroll-thumb) var(--its-scroll-track);
           }
-          .tile {
+
+          .its-tiles-scroll::-webkit-scrollbar {
+            width: 6px;
+          }
+          .its-tiles-scroll::-webkit-scrollbar-track {
+            background: var(--its-scroll-track);
+            border-radius: 999px;
+          }
+          .its-tiles-scroll::-webkit-scrollbar-thumb {
+            background: var(--its-scroll-thumb);
+            border-radius: 999px;
+          }
+
+          .its-tile {
             display: flex;
             align-items: center;
-            padding: 21px 54px 21px 21px;
-            min-width: 360px;
-            font-size: 1.20em;
+            padding: 15px 22px;
+            font-size: 0.98rem;
             font-weight: 500;
-            border-radius: 16px;
-            margin: 0 0 23px 0;
-            background: rgba(40,59,100,0.18);
-            color: #e6faff;
-            gap: 23px;
-            box-shadow: 0 2px 14px #21eaff09;
-            transition: background 0.18s, color 0.15s;
+            border-radius: 18px;
+            margin: 0 4px 14px 4px;
+            background:
+              radial-gradient(
+                circle at 0 0,
+                rgba(63, 239, 200, 0.16),
+                transparent 55%
+              ),
+              linear-gradient(
+                135deg,
+                rgba(36, 50, 99, 0.92),
+                rgba(17, 24, 56, 0.96)
+              );
+            color: #f3fbff;
+            gap: 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(107, 185, 255, 0.16);
+            transition:
+              background 0.2s ease-out,
+              transform 0.16s ease-out,
+              box-shadow 0.16s ease-out;
           }
-          .tile:last-child {
-            margin-bottom: 0;
+
+          .its-tile:last-child {
+            margin-bottom: 2px;
           }
-          .tile-icon {
-            min-width: 34px;
-            min-height: 34px;
-          }
-          .tile:hover {
-            background: #13d4be;
-            color: #fff;
-          }
-          .arrow-btn {
-            border: none;
-            background: rgba(25,36,56,0.78);
-            color: #28dbb2;
-            font-size: 2rem;
-            width: 2.3rem;
-            height: 2.3rem;
-            border-radius: 50%;
-            margin: 6px 0 6px 0;
-            cursor: pointer;
-            transition: background 0.16s;
-            box-shadow: 0 1.3px 6px #0729;
-          }
-          .arrow-btn:hover {
-            background: #11c7cf; color: #fff;
-          }
-          .bus-img-col {
-            flex: 1 1 0;
+
+          .its-tile-icon-wrap {
+            width: 38px;
+            height: 38px;
+            border-radius: 14px;
+            background:
+              radial-gradient(
+                circle at 0 0,
+                rgba(66, 243, 204, 0.3),
+                transparent 65%
+              ),
+              linear-gradient(145deg, rgba(23, 36, 91, 0.9), rgba(15, 30, 86, 0.98));
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            border-radius: 21px;
-            box-shadow: none;
-            padding: 42px 0;
+            flex-shrink: 0;
           }
+
+          .its-tile-icon {
+            min-width: 30px;
+            min-height: 30px;
+          }
+
+          .its-tile-label {
+            color: #e8f3ff;
+            letter-spacing: 0.01em;
+            word-break: break-word;
+          }
+
+          .its-tile:hover {
+            background: linear-gradient(135deg, #1fd7c8, #3f80ff);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(17, 230, 202, 0.35);
+          }
+
+          .its-arrow-btn {
+            border: none;
+            background:
+              radial-gradient(
+                circle at 30% 0,
+                rgba(255, 255, 255, 0.22),
+                transparent 55%
+              ),
+              linear-gradient(145deg, #111a40, #080f25);
+            color: var(--its-cyan);
+            font-size: 1.4rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin: 2px 0;
+            cursor: pointer;
+            box-shadow:
+              0 8px 24px rgba(2, 4, 18, 0.9),
+              0 0 0 1px rgba(111, 190, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition:
+              background 0.16s ease-out,
+              color 0.16s ease-out,
+              transform 0.12s ease-out;
+          }
+
+          .its-arrow-btn:hover {
+            background: linear-gradient(145deg, #33e5d0, #4f7bff);
+            color: #050815;
+            transform: translateY(-1px);
+          }
+
+          .its-image-panel {
+            flex: 1 1 0;
+            height: 100%;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 6px;
+            min-width: 0;
+          }
+
+          .its-image-frame {
+            background:
+              radial-gradient(
+                circle at 10% 0,
+                rgba(85, 234, 219, 0.18),
+                transparent 55%
+              ),
+              linear-gradient(135deg, #121b38, #070b1a);
+            border-radius: 24px;
+            padding: 16px 16px 18px;
+            box-shadow:
+              0 28px 90px rgba(0, 0, 0, 0.95),
+              0 0 0 1px rgba(82, 128, 255, 0.48);
+            width: 100%;
+            max-width: 980px;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .its-image-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+          }
+
+          .its-image-tag {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #a8c0ff;
+          }
+
+          .its-image-status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #25f2c6;
+            box-shadow: 0 0 12px rgba(37, 242, 198, 0.9);
+          }
+
+          .its-image-inner {
+            border-radius: 18px;
+            overflow: hidden;
+            background: #020412;
+            flex: 1 1 auto;
+            min-height: 0;
+          }
+
+          .its-main-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+
           @media (max-width: 1300px) {
-            .bus-row { flex-direction: column; align-items: stretch; gap: 25px; }
-            .tiles-side-scroll { margin: 0 auto; }
-            .bus-img-col { width: 100%; padding: 22px 0;}
+            .its-hero-inner {
+              flex-direction: column;
+              align-items: stretch;
+              gap: 18px;
+            }
+            .its-tiles-panel {
+              max-width: 100%;
+              height: 55%;
+            }
+            .its-image-panel {
+              height: 45%;
+            }
+            .its-tiles-scroll {
+              width: 100%;
+              max-width: 100%;
+            }
           }
+
           @media (max-width: 800px) {
-            .bus-scroll-main { min-height: 520px; }
-            .bus-row { gap: 10px; }
-            .tiles-scroll { min-width: 90vw; max-width:97vw; }
-            .tile { min-width: auto; width: 100%; }
-            .bus-img-col > :global(img) { min-width: 160px!important; max-width:95vw; }
+            .its-hero {
+              padding: 20px 14px;
+            }
+            .its-tiles-panel {
+              height: 52%;
+            }
+            .its-image-panel {
+              height: 48%;
+            }
+            .its-main-heading {
+              font-size: 1.6rem;
+            }
+            .its-sub-copy {
+              font-size: 0.94rem;
+            }
+          }
+
+          @media (max-width: 520px) {
+            .its-tiles-panel {
+              height: 55%;
+            }
+            .its-tiles-scroll {
+              padding-inline: 10px;
+            }
+            .its-tile {
+              padding: 13px 16px;
+            }
           }
         `}</style>
       </section>

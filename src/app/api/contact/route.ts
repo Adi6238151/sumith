@@ -21,8 +21,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ Resend API key found')
-
     if (!formData.email || !formData.personName || !formData.message) {
       console.error('❌ Validation failed: Missing required fields')
       return NextResponse.json(
@@ -42,11 +40,6 @@ export async function POST(request: NextRequest) {
         autoReplyMessage
       }`
     )
-
-    console.log('📋 Email settings fetched:', {
-      recipient: emailSettings?.recipientEmail,
-      cc: emailSettings?.ccEmails,
-    })
 
     if (!emailSettings?.recipientEmail) {
       console.error('❌ Email settings not found in Sanity')
@@ -86,7 +79,7 @@ export async function POST(request: NextRequest) {
     console.log('📧 Attempting to send email via Resend...')
     
     const emailResult = await resend.emails.send({
-      from: 'Contact Form <onboarding@resend.dev>',
+      from: 'Contact Form <noreply@sumith.in>',
       to: emailSettings.recipientEmail,
       cc: emailSettings.ccEmails || [],
       subject: emailSettings.emailSubject || 'New Contact Form Submission',
@@ -110,7 +103,7 @@ export async function POST(request: NextRequest) {
       console.log('📧 Sending auto-reply...')
       
       await resend.emails.send({
-        from: 'Sumith Electronics <onboarding@resend.dev>',
+        from: 'Sumith Electronics <noreply@sumith.in>',
         to: formData.email,
         subject: emailSettings.autoReplySubject || 'Thank you for contacting us',
         html: `
@@ -138,11 +131,6 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const err = error as Error
     console.error('❌ Contact form error:', err)
-    console.error('❌ Error details:', {
-      message: err.message,
-      stack: err.stack,
-      name: err.name,
-    })
     
     return NextResponse.json(
       { error: 'Failed to send email. Please try again.' },

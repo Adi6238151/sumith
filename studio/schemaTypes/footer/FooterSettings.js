@@ -48,6 +48,17 @@ export default {
               name: 'addressLine4',
               title: 'Address Line 4',
               type: 'string'
+            },
+            {
+              name: 'email',
+              title: 'Email',
+              type: 'string',
+              validation: (Rule) => Rule.email()
+            },
+            {
+              name: 'phone',
+              title: 'Phone',
+              type: 'string'
             }
           ],
           preview: {
@@ -197,7 +208,7 @@ export default {
       name: 'copyright',
       title: 'Copyright Text',
       type: 'string',
-      initialValue: '© 2027 Sumith Electronics.',
+      initialValue: 'Copyright ©2026 Sumith Electronics Pvt Ltd. All Rights Reserved.',
       validation: (Rule) => Rule.required()
     },
     {
