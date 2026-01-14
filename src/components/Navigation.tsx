@@ -1,5 +1,7 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -10,7 +12,6 @@ const dropdownSections = [
     items: [
       { label: "Bus", icon: "/icons/bullet-bus.png" },
       { label: "Metro/Rail", icon: "/icons/bullet-metro.png" },
-      // Changed here: set Airport link to /solutions/AirportSolutions
       { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
     ],
   },
@@ -22,7 +23,6 @@ const dropdownSections = [
       { label: "ETA", icon: "/icons/bullet-eta.png" },
     ],
   },
-
   {
     title: "R&D",
     icon: "/icons/rd-icon.png",
@@ -49,6 +49,34 @@ export default function Navigation() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const navRef = useRef<HTMLDivElement | null>(null);
 
+  const pathname = usePathname();
+
+  // activeIndex: which pill is "current page"
+  // 0 -> Solutions, 1..n -> navLinks in order
+  const getActiveIndexFromPath = () => {
+  // Home page (or root) -> Solutions pill
+  if (pathname === "/") return 0;
+
+  // Solutions sub pages that are not the Products overview
+  if (pathname.startsWith("/solutions") && !pathname.startsWith("/solutions/products")) {
+    return 0; // Solutions
+  }
+
+  // Exact match for Products (and its children)
+  const idx = navLinks.findIndex((l) => pathname === l.href || pathname.startsWith(l.href + "/"));
+
+  // If nothing matches, keep last pill (Contact us) as fallback
+  return idx === -1 ? navLinks.length : idx + 1;
+};
+
+
+  const [activeIndex, setActiveIndex] = useState<number>(() => getActiveIndexFromPath());
+  const [hoverIndex, setHoverIndex] = useState<number | null>(activeIndex);
+
+  const pillRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([]);
+  const pillNavRef = useRef<HTMLDivElement | null>(null);
+
+  // scroll hide/show
   useEffect(() => {
     if (sidebar) return;
     const handleScroll = () => {
@@ -64,11 +92,13 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, sidebar]);
 
+  // lock body on sidebar
   useEffect(() => {
     if (sidebar) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
   }, [sidebar]);
 
+  // click outside to close mega dropdown
   useEffect(() => {
     if (!open) return;
     const handleClick = (e: MouseEvent) => {
@@ -81,6 +111,7 @@ export default function Navigation() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  // reset mega dropdown / accordion when sidebar closes
   useEffect(() => {
     if (!sidebar) {
       setAccordion(false);
@@ -88,15 +119,50 @@ export default function Navigation() {
     }
   }, [sidebar]);
 
+  // update active tab when route changes
+  useEffect(() => {
+    const next = getActiveIndexFromPath();
+    setActiveIndex(next);
+    setHoverIndex(next);
+  }, [pathname]);
+
+  // move black highlight under hovered or active pill
+  useEffect(() => {
+    const indexToShow = hoverIndex ?? activeIndex;
+    if (indexToShow == null || !pillNavRef.current) return;
+
+    const pill = pillRefs.current[indexToShow];
+    const container = pillNavRef.current;
+    if (!pill || !container) return;
+
+    const pillRect = pill.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const width = pillRect.width;
+    const left = pillRect.left - containerRect.left;
+
+    container.style.setProperty("--pill-highlight-width", `${width}px`);
+    container.style.setProperty("--pill-highlight-left", `${left}px`);
+    container.style.setProperty("--pill-highlight-opacity", "1");
+  }, [hoverIndex, activeIndex]);
+
   return (
     <>
       <nav className={`mega-navbar${isVisible ? " visible" : " hidden"}`} ref={navRef}>
         {/* Mobile Sidebar overlay */}
-        <div className={`sidebar-overlay${sidebar ? " active" : ""}`} onClick={() => setSidebar(false)} />
+        <div
+          className={`sidebar-overlay${sidebar ? " active" : ""}`}
+          onClick={() => setSidebar(false)}
+        />
         {/* Mobile Sidebar */}
         <aside className={`sidebar${sidebar ? " open" : ""}`}>
           <div className="sidebar-header">
-            <Link href="/" tabIndex={sidebar ? 0 : -1} onClick={() => setSidebar(false)} style={{display: "inline-block"}}>
+            <Link
+              href="/"
+              tabIndex={sidebar ? 0 : -1}
+              onClick={() => setSidebar(false)}
+              style={{ display: "inline-block" }}
+            >
               <Image
                 src="/logos/sumith-logo.png"
                 width={120}
@@ -106,12 +172,19 @@ export default function Navigation() {
                 priority
               />
             </Link>
-            <button className="close-btn" aria-label="Close sidebar" onClick={() => setSidebar(false)}>
+            <button
+              className="close-btn"
+              aria-label="Close sidebar"
+              onClick={() => setSidebar(false)}
+            >
               <span>&#10005;</span>
             </button>
           </div>
           <div className="sidebar-links">
-            <button className="sidebar-link sidebar-dropdown" onClick={() => setAccordion((v) => !v)}>
+            <button
+              className="sidebar-link sidebar-dropdown"
+              onClick={() => setAccordion((v) => !v)}
+            >
               <span>SOLUTIONS</span>
               <span className={`arrow${accordion ? " open" : ""}`}>▼</span>
             </button>
@@ -129,7 +202,12 @@ export default function Navigation() {
                             href="/solutions/transit-bus"
                             tabIndex={accordion ? 0 : -1}
                             onClick={() => setSidebar(false)}
-                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              color: "inherit",
+                              textDecoration: "none",
+                            }}
                           >
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
@@ -139,18 +217,27 @@ export default function Navigation() {
                             href="/solutions/metro-rail"
                             tabIndex={accordion ? 0 : -1}
                             onClick={() => setSidebar(false)}
-                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              color: "inherit",
+                              textDecoration: "none",
+                            }}
                           >
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
                           </Link>
                         ) : item.label === "Airport" && item.href ? (
-                          // Airport links to /solutions/AirportSolutions
                           <Link
                             href={item.href}
                             tabIndex={accordion ? 0 : -1}
                             onClick={() => setSidebar(false)}
-                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              color: "inherit",
+                              textDecoration: "none",
+                            }}
                           >
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
@@ -168,7 +255,13 @@ export default function Navigation() {
               ))}
             </div>
             {navLinks.map((item) => (
-              <Link className="sidebar-link" key={item.label} href={item.href} tabIndex={sidebar ? 0 : -1} onClick={() => setSidebar(false)}>
+              <Link
+                className="sidebar-link"
+                key={item.label}
+                href={item.href}
+                tabIndex={sidebar ? 0 : -1}
+                onClick={() => setSidebar(false)}
+              >
                 {item.label}
               </Link>
             ))}
@@ -177,14 +270,19 @@ export default function Navigation() {
 
         <div className="navbar-inner">
           {/* Hamburger */}
-          <button className="hamburger" aria-label="Open menu" onClick={() => setSidebar(true)}>
+          <button
+            className="hamburger"
+            aria-label="Open menu"
+            onClick={() => setSidebar(true)}
+          >
             <span />
             <span />
             <span />
           </button>
-          {/* Logo (mobile: center, desktop: left) */}
+
+          {/* Logo */}
           <div className="logo">
-            <Link href="/" style={{display: "inline-block"}}>
+            <Link href="/" style={{ display: "inline-block" }}>
               <Image
                 src="/logos/sumith-logo.png"
                 width={150}
@@ -195,29 +293,62 @@ export default function Navigation() {
               />
             </Link>
           </div>
-          {/* Desktop menu */}
-          <div className="navbar-links">
-            <span
-              className="navbar-link main-dropdown"
-              tabIndex={0}
-              onMouseEnter={() => setOpen(true)}
-              onClick={() => setOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={open}
-              aria-label="Solutions"
-            >
-              Solutions
-              <span className="down-arrow" />
-            </span>
-            {navLinks.map((item) => (
-              <Link className="navbar-link" href={item.href} key={item.label}>
-                {item.label}
-              </Link>
-            ))}
+
+          {/* Desktop pill menu: Solutions + navLinks */}
+          <div className="pill-nav-wrapper">
+            <div className="pill-nav" ref={pillNavRef}>
+              {/* Solutions pill = index 0 */}
+              <button
+                ref={(el: HTMLButtonElement | null) => { pillRefs.current[0] = el; }}
+                className={`pill-nav-item solutions-pill${
+                  (hoverIndex ?? activeIndex) === 0 ? " is-hovered" : ""
+                }`}
+                onMouseEnter={() => {
+                  setOpen(true);
+                  setHoverIndex(0);
+                }}
+                onFocus={() => {
+                  setOpen(true);
+                  setHoverIndex(0);
+                }}
+                onMouseLeave={() => setHoverIndex(null)}
+                onBlur={() => setHoverIndex(null)}
+                onClick={() => setOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={open}
+                aria-label="Solutions"
+              >
+                Solutions
+                <span className="down-arrow-pill" />
+              </button>
+
+              {/* About us, Products, Insights, Careers, Contact us */}
+              {navLinks.map((item, idx) => {
+                const pillIndex = idx + 1;
+                const isCurrent = (hoverIndex ?? activeIndex) === pillIndex;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`pill-nav-item${isCurrent ? " is-hovered" : ""}`}
+                    ref={(el: HTMLAnchorElement | null) => { pillRefs.current[pillIndex] = el; }}
+                    onMouseEnter={() => setHoverIndex(pillIndex)}
+                    onFocus={() => setHoverIndex(pillIndex)}
+                    onMouseLeave={() => setHoverIndex(null)}
+                    onBlur={() => setHoverIndex(null)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+
+              {/* Moving black highlight */}
+              <span className="pill-nav-highlight" aria-hidden="true" />
+            </div>
           </div>
         </div>
 
-        {/* Desktop mega-dropdown */}
+        {/* Desktop mega-dropdown (Solutions) */}
         <div
           className="mega-dropdown"
           style={{ display: open ? "flex" : "none" }}
@@ -243,33 +374,71 @@ export default function Navigation() {
                       <Link
                         href="/solutions/transit-bus"
                         onClick={() => setOpen(false)}
-                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "inherit",
+                          textDecoration: "none",
+                        }}
                       >
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className="bullet-icon"
+                        />
                         <span>{item.label}</span>
                       </Link>
                     ) : item.label === "Metro/Rail" ? (
                       <Link
                         href="/solutions/metro-rail"
                         onClick={() => setOpen(false)}
-                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "inherit",
+                          textDecoration: "none",
+                        }}
                       >
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className="bullet-icon"
+                        />
                         <span>{item.label}</span>
                       </Link>
                     ) : item.label === "Airport" && item.href ? (
-                      // Airport links to /solutions/AirportSolutions
                       <Link
                         href="/solutions/Airport"
                         onClick={() => setOpen(false)}
-                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "inherit",
+                          textDecoration: "none",
+                        }}
                       >
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className="bullet-icon"
+                        />
                         <span>{item.label}</span>
                       </Link>
                     ) : (
                       <>
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className="bullet-icon"
+                        />
                         <span>{item.label}</span>
                       </>
                     )}
@@ -280,9 +449,9 @@ export default function Navigation() {
           ))}
         </div>
       </nav>
+
       <style jsx global>{`
-        /* (PASTE ALL YOUR ORIGINAL CSS FROM PREVIOUS CODE HERE) */
-        /* Hamburger styles */
+        /* Hamburger */
         .hamburger {
           display: none;
           flex-direction: column;
@@ -302,13 +471,17 @@ export default function Navigation() {
           border-radius: 2px;
           background: #112445;
         }
+
         /* Sidebar Overlay */
         .sidebar-overlay {
           visibility: hidden;
           opacity: 0;
           position: fixed;
-          left: 0; top: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.18);
+          left: 0;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.18);
           transition: visibility 0.22s, opacity 0.22s;
           z-index: 2001;
         }
@@ -316,6 +489,7 @@ export default function Navigation() {
           visibility: visible;
           opacity: 1;
         }
+
         /* Sidebar */
         .sidebar {
           position: fixed;
@@ -325,9 +499,9 @@ export default function Navigation() {
           width: 298px;
           max-width: 92vw;
           background: #fff;
-          box-shadow: 3px 0 15px rgba(30,40,68,0.13);
+          box-shadow: 3px 0 15px rgba(30, 40, 68, 0.13);
           z-index: 2002;
-          transition: left 0.28s cubic-bezier(.2,.6,.3,1);
+          transition: left 0.28s cubic-bezier(0.2, 0.6, 0.3, 1);
           display: flex;
           flex-direction: column;
         }
@@ -374,7 +548,8 @@ export default function Navigation() {
           display: flex;
           align-items: center;
         }
-        .sidebar-link:hover, .sidebar-link:focus {
+        .sidebar-link:hover,
+        .sidebar-link:focus {
           color: #43b724;
         }
         .sidebar-dropdown {
@@ -392,7 +567,7 @@ export default function Navigation() {
           transform: rotate(180deg);
         }
         .sidebar-dropdown-content {
-          max-height: 0; 
+          max-height: 0;
           overflow: hidden;
           transition: max-height 0.32s;
           background: #f7f8fb;
@@ -402,7 +577,7 @@ export default function Navigation() {
         .sidebar-dropdown-content.show {
           max-height: 800px;
           padding: 13px 0 2px 9px;
-          box-shadow: 0 1.5px 8px rgba(50,68,98,0.08);
+          box-shadow: 0 1.5px 8px rgba(50, 68, 98, 0.08);
           border: 1px solid #eff0f2;
         }
         .sidebar-dropdown-section {
@@ -431,17 +606,18 @@ export default function Navigation() {
           color: #4b5f79;
           padding: 4px 0 2px 2px;
         }
-        /* Normal navbar styles */
+
+        /* Top bar */
         .mega-navbar {
           width: 100%;
-          background: #fff;
+          background: #111111;
           position: fixed;
           top: 0;
           left: 0;
-          box-shadow: 0 1px 0 0 #eaeaea;
+          box-shadow: 0 1px 0 0 #1f2933;
           z-index: 1010;
           font-family: "Montserrat", Arial, sans-serif;
-          transition: top 0.4s cubic-bezier(0.2,0.82,0.42,1), box-shadow 0.22s;
+          transition: top 0.4s cubic-bezier(0.2, 0.82, 0.42, 1), box-shadow 0.22s;
         }
         .mega-navbar.hidden {
           top: -110px;
@@ -467,63 +643,92 @@ export default function Navigation() {
           width: 150px !important;
           height: auto;
         }
-        .navbar-links {
-          display: flex;
-          gap: 38px;
-          align-items: center;
+
+        /* PILL NAV */
+        .pill-nav-wrapper {
           flex: 2 1 750px;
+          display: flex;
           justify-content: center;
         }
-        .navbar-link {
-          font-size: 1.18rem;
-          font-weight: 700;
-          color: #142241;
-          letter-spacing: 0.02em;
-          text-transform: upperlowercase;
-          background: none;
-          border: none;
-          cursor: pointer;
+        .pill-nav {
           position: relative;
-          text-decoration: none;
-          transition: color 0.18s;
-          padding: 0 3px;
-        }
-        .navbar-link:hover,
-        .navbar-link:focus {
-          color: #43b724;
-        }
-        .main-dropdown {
-          display: flex;
+          display: inline-flex;
           align-items: center;
+          gap: 8px;
+          padding: 6px;
+          border-radius: 999px;
+          background: radial-gradient(circle at top, #f5f5f5, #d2d2d2);
+          box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.7);
+          --pill-highlight-left: 0px;
+          --pill-highlight-width: 0px;
+          --pill-highlight-opacity: 1;
         }
-        .down-arrow {
-          display: inline-block;
-          margin-left: 8px;
-          width: 18px;
-          height: 18px;
-          color: #43b724;
-          font-weight: bold;
-          font-size: 1rem;
+        .pill-nav-item {
           position: relative;
+          border: none;
+          outline: none;
+          border-radius: 999px;
+          padding: 9px 28px;
+          font-size: 1.02rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          background: transparent;
+          color: #111827;
+          cursor: pointer;
+          transition: color 0.16s ease, transform 0.16s ease,
+            text-shadow 0.16s ease;
+          white-space: nowrap;
+          z-index: 1;
+          text-decoration: none;
         }
-        .down-arrow:after {
-          content: '';
-          display: block;
-          border: solid #43b724;
-          border-width: 0 0 4px 4px;
-          width: 13px;
-          height: 13px;
-          margin-top: 0;
-          transform: rotate(-45deg) translateY(2px);
+        .solutions-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
         }
+        .down-arrow-pill {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 999px;
+          border: 2px solid #374151;
+          border-top: 0;
+          border-right: 0;
+          transform: rotate(-45deg) translateY(1px);
+        }
+        .pill-nav-item.is-hovered {
+          color: #f9fafb;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+        }
+        .pill-nav-item:hover {
+          transform: translateY(-1px);
+        }
+
+        .pill-nav-highlight {
+          position: absolute;
+          top: 4px;
+          height: calc(100% - 8px);
+          border-radius: 999px;
+          background: #000000;
+          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65);
+          transform: translateX(var(--pill-highlight-left));
+          width: var(--pill-highlight-width);
+          opacity: var(--pill-highlight-opacity);
+          transition: transform 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12),
+            width 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12);
+          pointer-events: none;
+        }
+
+        /* Mega dropdown */
         .mega-dropdown {
           width: 100%;
           left: 0;
           position: absolute;
-          background: #f8fbf9;
-          box-shadow: 0 11px 35px rgba(46, 49, 91, 0.07);
+          background: #0f172a;
+          box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
           top: 100%;
-          padding: 34px 38px 34px 38px;
+          padding: 30px 38px;
           display: flex;
           flex-direction: row;
           gap: 22px;
@@ -534,9 +739,10 @@ export default function Navigation() {
           padding: 0 16px 0 0;
           display: flex;
           flex-direction: column;
+          border-right: 1.5px solid #1f2937;
         }
-        .dropdown-section:not(:last-child) {
-          border-right: 1.5px solid #e9ecee;
+        .dropdown-section:last-child {
+          border-right: none;
         }
         .section-header {
           display: flex;
@@ -546,10 +752,10 @@ export default function Navigation() {
         }
         .section-title {
           text-transform: uppercase;
-          color: #1e2c44;
-          font-size: 1.09rem;
+          color: #e5e7eb;
+          font-size: 1.02rem;
           font-weight: 700;
-          letter-spacing: 0.035em;
+          letter-spacing: 0.06em;
         }
         .section-icon {
           width: 33px;
@@ -566,26 +772,40 @@ export default function Navigation() {
           align-items: center;
           font-size: 1.01rem;
           font-weight: 500;
-          color: #637391;
+          color: #cbd5f5;
           padding: 0 0 13px 0;
           gap: 8px;
         }
         .section-item:last-child {
           padding-bottom: 0;
         }
+        .section-item:hover {
+          color: #fbbf24;
+          transform: translateX(3px);
+          transition: transform 0.16s ease, color 0.16s ease;
+        }
         .bullet-icon {
           width: 16px;
           height: 16px;
           object-fit: contain;
         }
+
         @media (max-width: 1050px) {
           .navbar-inner,
           .mega-dropdown {
             padding-left: 5vw;
             padding-right: 5vw;
           }
-          .logo-img { width: 120px !important;}
-          .navbar-link {font-size: 1rem;}
+          .logo-img {
+            width: 120px !important;
+          }
+          .pill-nav {
+            gap: 4px;
+          }
+          .pill-nav-item {
+            padding: 8px 20px;
+            font-size: 0.96rem;
+          }
         }
         @media (max-width: 900px) {
           .navbar-inner {
@@ -596,8 +816,8 @@ export default function Navigation() {
           .logo-img {
             width: 80px !important;
           }
-          .navbar-links {
-            gap: 13px;
+          .pill-nav-wrapper {
+            display: none;
           }
           .mega-dropdown {
             flex-direction: column;
@@ -607,7 +827,7 @@ export default function Navigation() {
           }
           .dropdown-section {
             border-right: 0;
-            border-bottom: 1.5px solid #e9ecee;
+            border-bottom: 1.5px solid #1f2937;
             min-width: 0;
             margin-bottom: 20px;
           }
@@ -619,9 +839,6 @@ export default function Navigation() {
           }
         }
         @media (max-width: 680px) {
-          .navbar-links {
-            display: none !important;
-          }
           .hamburger {
             display: flex;
           }

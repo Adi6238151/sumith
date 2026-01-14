@@ -1,18 +1,12 @@
-'use client'
+"use client"
 
-import { useState, useEffect, type CSSProperties } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import Image from 'next/image'
+import { useState, useEffect, useRef, type CSSProperties } from "react"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
+import Image from "next/image"
 
-type HeroStat = {
-  number: string | number
-  label: string
-}
-
-type HeroBackground = {
-  asset?: { url?: string }
-}
+type HeroStat = { number: string | number; label: string }
+type HeroBackground = { asset?: { url?: string } }
 
 type HeroData = {
   solutions?: string[]
@@ -30,162 +24,223 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
   const solutions = heroData?.solutions || []
   const [currentSolution, setCurrentSolution] = useState(0)
 
+  const [typedHeadline, setTypedHeadline] = useState("")
+  const headingRef = useRef<HTMLHeadingElement | null>(null)
+
+  // rotate solutions
   useEffect(() => {
-    if (!solutions.length) return;
+    if (!solutions.length) return
     const interval = setInterval(() => {
       setCurrentSolution(prev => (prev + 1) % solutions.length)
     }, 3000)
     return () => clearInterval(interval)
   }, [solutions.length])
 
+  // scroll‑based typewriter
+  useEffect(() => {
+    if (!heroData?.headline || !headingRef.current) return
+
+    const fullText = heroData.headline
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0]
+        const el = entry.target as HTMLElement & { _typingInterval?: number | null }
+
+        if (entry.isIntersecting) {
+          let index = 0
+          setTypedHeadline("")
+          if (el._typingInterval) clearInterval(el._typingInterval)
+
+          const intervalId = window.setInterval(() => {
+            index += 1
+            setTypedHeadline(fullText.slice(0, index))
+            if (index === fullText.length) {
+              clearInterval(intervalId)
+              el._typingInterval = null
+            }
+          }, 60) // smooth typing
+
+          el._typingInterval = intervalId
+        } else {
+          if (el._typingInterval) {
+            clearInterval(el._typingInterval)
+            el._typingInterval = null
+          }
+          setTypedHeadline("")
+        }
+      },
+      { root: null, threshold: 0.4 }
+    )
+
+    observer.observe(headingRef.current)
+
+    return () => {
+      const el = headingRef.current as (HTMLElement & { _typingInterval?: number | null }) | null
+      if (el && el._typingInterval) clearInterval(el._typingInterval)
+      observer.disconnect()
+    }
+  }, [heroData?.headline])
+
   const styles: Record<string, CSSProperties> = {
     container: {
-      position: 'relative',
-      minHeight: '100vh',
-      width: '100%',
-      overflow: 'hidden',
-      fontFamily: 'Inter, -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif'
+      position: "relative",
+      minHeight: "100vh",
+      width: "100%",
+      overflow: "hidden",
+      fontFamily:
+        'Inter, -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
     },
     overlay: {
-      position: 'absolute',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(30,57,138,0.7)',
-      zIndex: 10
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(30,57,138,0.7)",
+      zIndex: 10,
     },
     mainContent: {
-      position: 'relative',
+      position: "relative",
       zIndex: 20,
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '14vh 0 0 0',
-      width: '100vw',
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "12vh 0 0 0",
+      width: "100vw",
     },
     contentWrapper: {
-      width: '100%',
+      width: "100%",
       maxWidth: "calc(100vw - 8cm)",
       margin: "0 auto",
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
     },
     badge: {
-      display: 'inline-block',
-      backgroundColor: '#f97316',
-      color: '#fff',
-      padding: '0.7em 1.7em',
-      borderRadius: '999px',
-      fontSize: '1.08rem',
-      fontWeight: '700',
-      marginBottom: '1.9rem',
-      boxShadow: '0px 2px 10px 0 rgba(0,0,0,.08)'
-    },
-    orangeText: {
-      color: '#fb923c',
-      fontWeight: 800,
+      display: "inline-block",
+      backgroundColor: "#f97316",
+      color: "#fff",
+      padding: "0.7em 1.7em",
+      borderRadius: "999px",
+      fontSize: "1.08rem",
+      fontWeight: "700",
+      marginBottom: "1.9rem",
+      boxShadow: "0px 2px 10px 0 rgba(0,0,0,.08)",
     },
     solutionText: {
-      fontSize: '1.5rem',
-      color: '#fff',
-      marginBottom: '1.7rem',
-      minHeight: '2.12rem',
+      fontSize: "1.5rem",
+      color: "#fff",
+      marginBottom: "1.7rem",
+      minHeight: "2.12rem",
       fontWeight: 600,
-      background: 'rgba(0,0,0,0.13)',
-      borderRadius: '0.28em',
-      padding: '0 0.7em',
-      textAlign: 'center',
-      fontFamily: 'inherit'
+      background: "rgba(0,0,0,0.13)",
+      borderRadius: "0.28em",
+      padding: "0 0.7em",
+      textAlign: "center",
+      fontFamily: "inherit",
     },
     description: {
-      fontSize: '1.18rem',
-      color: '#dbeafe',
-      marginBottom: '2.2rem',
+      fontSize: "1.18rem",
+      color: "#dbeafe",
+      marginBottom: "2.2rem",
       lineHeight: 1.7,
-      maxWidth: '900px',
-      textAlign: 'center',
-      fontWeight: 400
+      maxWidth: "900px",
+      textAlign: "center",
+      fontWeight: 400,
     },
     buttonContainer: {
-      display: 'flex',
-      gap: '2.3rem',
-      marginBottom: '3.4rem',
-      width: '100%',
-      justifyContent: 'center',
-      flexWrap: 'wrap'
+      display: "flex",
+      gap: "4.3rem",
+      marginBottom: "3.4rem",
+      width: "100%",
+      justifyContent: "center",
+      flexWrap: "wrap",
     },
     statsGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '2.7rem',
-      width: '100%',
+      display: "grid",
+      gridTemplateColumns: "repeat(4, 1fr)",
+      gap: "2.7rem",
+      width: "100%",
       maxWidth: "calc(100vw - 8cm)",
       margin: "0 auto",
-      justifyItems: "center"
+      justifyItems: "center",
     },
     statItem: {
-      textAlign: 'center'
+      textAlign: "center",
     },
     statNumber: {
-      fontSize: '2.45rem',
-      fontWeight: '700',
-      color: '#fb923c',
-      marginBottom: '0.17rem',
-      fontFamily: 'inherit',
-      textAlign: "center"
+      fontSize: "2.45rem",
+      fontWeight: "700",
+      color: "#fb923c",
+      marginBottom: "0.17rem",
+      fontFamily: "inherit",
+      textAlign: "center",
     },
     statLabel: {
-      fontSize: '1.05rem',
-      color: '#bfdbfe',
+      fontSize: "1.05rem",
+      color: "#bfdbfe",
       fontWeight: 500,
-      textAlign: "center"
+      textAlign: "center",
     },
     scrollIndicator: {
-      position: 'absolute',
-      bottom: '2.2rem',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      color: 'white',
+      position: "absolute",
+      bottom: "2.2rem",
+      left: "50%",
+      transform: "translateX(-50%)",
+      color: "white",
       zIndex: 23,
-      textAlign: 'center',
+      textAlign: "center",
       fontWeight: 500,
-      fontSize: '1.08rem'
+      fontSize: "1.08rem",
     },
     scrollIcon: {
-      width: '1.7rem',
-      height: '2.5rem',
-      border: '2px solid white',
-      borderRadius: '9999px',
-      display: 'flex',
-      justifyContent: 'center',
-      margin: '0 auto'
+      width: "1.7rem",
+      height: "2.5rem",
+      border: "2px solid white",
+      borderRadius: "9999px",
+      display: "flex",
+      justifyContent: "center",
+      margin: "0 auto",
     },
     scrollDot: {
-      width: '0.29rem',
-      height: '0.84rem',
-      backgroundColor: 'white',
-      borderRadius: '9999px',
-      marginTop: '0.57rem'
-    }
+      width: "0.29rem",
+      height: "0.84rem",
+      backgroundColor: "white",
+      borderRadius: "9999px",
+      marginTop: "0.57rem",
+    },
   }
 
   const backgroundImgUrl =
-    heroData?.backgroundImage?.asset?.url ||
-    "/backgrounds/hero-bg.jpg"
+    heroData?.backgroundImage?.asset?.url || "/backgrounds/hero-bg.jpg"
 
   return (
     <div style={styles.container}>
       <style jsx>{`
         @media (max-width: 1100px) {
-          .main-heading { font-size: 2.2rem; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr);}
+          .main-heading {
+            font-size: 2.2rem;
+          }
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
         }
         @media (max-width: 700px) {
-          .main-heading { font-size: 1.42rem;}
-          .solution-text { font-size: 0.97rem;}
-          .stat-number { font-size: 1.09rem;}
-          .stats-grid { gap: 0.5rem; }
+          .main-heading {
+            font-size: 1.42rem;
+          }
+          .solution-text {
+            font-size: 0.97rem;
+          }
+          .stat-number {
+            font-size: 1.09rem;
+          }
+          .stats-grid {
+            gap: 0.5rem;
+          }
         }
         .modern-btn-primary:hover {
           background: #ea580c;
@@ -207,6 +262,8 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           transform: scale(0.97);
           box-shadow: 0 2px 6px #ea580c22;
         }
+
+        /* headline: try to keep to 2 centered lines */
         .gradient-animate {
           background: linear-gradient(
             110deg,
@@ -223,16 +280,62 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           color: transparent;
           animation: run-hero-gradient 3.4s linear infinite alternate;
           font-weight: 800;
-          text-shadow: 0 2px 8px rgba(32,160,176,.12);
+          text-shadow: 0 2px 8px rgba(32, 160, 176, 0.12);
           text-align: center;
           font-size: 4.3rem;
-          line-height: 1.08;
+          line-height: 1.15;
           margin-bottom: 1rem;
           letter-spacing: -0.01em;
+          max-width: 1000px; /* adjust for exactly 2 lines on desktop */
+          margin-left: auto;
+          margin-right: auto;
+          white-space: normal;
         }
         @keyframes run-hero-gradient {
-          0% { background-position: 0% 60%; }
-          100% { background-position: 100% 40%; }
+          0% {
+            background-position: 0% 60%;
+          }
+          100% {
+            background-position: 100% 40%;
+          }
+        }
+
+        .hero-title-text {
+          display: inline;
+        }
+                  .hero-caret {
+            display: inline-block;
+            width: 2.8px;   /* <-- increase this value for a thicker cursor */
+            height: 1.1em;
+            margin-left: 4px;
+            background-color: black;
+            vertical-align: baseline;
+            animation: hero-blink 0.8s steps(1) infinite;
+          }
+
+        @keyframes hero-blink {
+          0%,
+          50% {
+            opacity: 1;
+          }
+          50.01%,
+          100% {
+            opacity: 0;
+          }
+        }
+
+        /* keep about 2 lines on smaller screens as well */
+        @media (max-width: 1100px) {
+          .gradient-animate {
+            font-size: 3.2rem;
+            max-width: 620px;
+          }
+        }
+        @media (max-width: 700px) {
+          .gradient-animate {
+            font-size: 2.1rem;
+            max-width: 380px;
+          }
         }
       `}</style>
 
@@ -242,19 +345,21 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
         fill
         priority
         className="object-cover"
-        style={{ objectPosition: 'center', zIndex: 1 }}
+        style={{ objectPosition: "center", zIndex: 1 }}
       />
 
       <div style={styles.overlay}></div>
 
       <div style={styles.mainContent}>
         <div style={styles.contentWrapper}>
-          <span style={styles.badge}>
-            {heroData?.badge}
-          </span>
-          <h1 className="main-heading gradient-animate">
-            {heroData?.headline}
+          <span style={styles.badge}>{heroData?.badge}</span>
+
+          {/* HERO heading with scroll-triggered typewriter + cursor */}
+          <h1 className="main-heading gradient-animate" ref={headingRef}>
+            <span className="hero-title-text">{typedHeadline}</span>
+            <span className="hero-caret" aria-hidden="true" />
           </h1>
+
           <motion.div
             className="solution-text"
             initial={{ opacity: 0, y: 18 }}
@@ -265,67 +370,75 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           >
             {solutions[currentSolution] || ""}
           </motion.div>
-          <div style={styles.description}>
-            {heroData?.description}
-          </div>
+
+          <div style={styles.description}>{heroData?.description}</div>
+
           <div className="button-container" style={styles.buttonContainer}>
             <button
-              onClick={() => router.push('/solutions/products')}
+              onClick={() => router.push("/solutions/products")}
               className="modern-btn modern-btn-primary"
               style={{
-                background: '#fb7e19',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '24px',
+                background: "#fb7e19",
+                color: "#fff",
+                border: "none",
+                borderRadius: "24px",
                 fontWeight: 700,
-                fontSize: '1.48rem',
-                fontStyle: 'italic',
-                padding: '1.1em 2.9em',
-                boxShadow: '0 8px 28px rgba(251,126,25,0.10)',
-                outline: 'none',
-                transition: 'all 0.18s cubic-bezier(.46,1.5,.58,1)',
-                cursor: 'pointer',
-                minWidth: '285px'
-              }}>
+                fontSize: "1.2rem",
+                fontStyle: "italic",
+                padding: "1.1em 2.9em",
+                boxShadow: "0 8px 28px rgba(251,126,25,0.1)",
+                outline: "none",
+                transition: "all 0.18s cubic-bezier(.46,1.5,.58,1)",
+                cursor: "pointer",
+                minWidth: "285px",
+              }}
+            >
               {heroData?.button1Text}
             </button>
             <button
               className="modern-btn modern-btn-outline"
               style={{
-                background: 'transparent',
-                color: '#fff',
-                border: '3px solid #fff',
-                borderRadius: '24px',
+                background: "transparent",
+                color: "#fff",
+                border: "3px solid #fff",
+                borderRadius: "24px",
                 fontWeight: 700,
-                fontSize: '1.48rem',
-                fontStyle: 'italic',
-                padding: '1.1em 2.9em',
-                boxShadow: 'none',
-                outline: 'none',
-                cursor: 'pointer',
-                minWidth: '285px',
-                transition: 'all 0.17s cubic-bezier(.46,1.5,.58,1)'
-              }}>
+                fontSize: "1rem",
+                fontStyle: "italic",
+                padding: "1.1em 2.9em",
+                boxShadow: "none",
+                outline: "none",
+                cursor: "pointer",
+                minWidth: "285px",
+                transition: "all 0.17s cubic-bezier(.46,1.5,.58,1)",
+              }}
+            >
               {heroData?.button2Text}
             </button>
           </div>
+
           <div className="stats-grid" style={styles.statsGrid}>
             {(heroData?.stats || []).map((stat, idx) => (
               <div style={styles.statItem} key={idx}>
-                <div className="stat-number" style={styles.statNumber}>{stat.number}</div>
+                <div className="stat-number" style={styles.statNumber}>
+                  {stat.number}
+                </div>
                 <div style={styles.statLabel}>{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
       <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
         style={styles.scrollIndicator}
       >
         <div>
-          <div style={{ marginBottom: '0.38rem', fontSize: '0.96rem' }}>Scroll to explore</div>
+          <div style={{ marginBottom: "0.38rem", fontSize: "0.96rem" }}>
+            Scroll to explore
+          </div>
           <div style={styles.scrollIcon}>
             <motion.div
               animate={{ y: [0, 16, 0] }}
