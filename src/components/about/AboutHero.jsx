@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function AboutHero({ hero }) {
@@ -12,12 +13,60 @@ export default function AboutHero({ hero }) {
     ctaLabel,
     ctaHref,
   } = hero;
+ const sectionRef = useRef(null);          // ✅ no generic in .jsx
+  const [isVisible, setIsVisible] = useState(false);
+  const [parallax, setParallax] = useState(0);
+
+  // Scroll‑reveal for glass card
+  useEffect(() => {
+    const sectionEl = sectionRef.current;
+    if (!sectionEl) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          setIsVisible(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(sectionEl);
+    return () => observer.disconnect();
+  }, []);
+
+  // Very soft parallax on background image while hero is on screen
+  useEffect(() => {
+    const handleScroll = () => {
+      const sectionEl = sectionRef.current;
+      if (!sectionEl) return;
+
+      const rect = sectionEl.getBoundingClientRect();
+      const windowHeight = window.innerHeight || 1;
+
+      // progress from 0 (bottom just enters) to 1 (top leaves)
+      const progress = 1 - Math.min(Math.max((rect.top + rect.height) / (rect.height + windowHeight), 0), 1);
+      // map to small translateY range
+      setParallax(progress * 24); // max 24px
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, []);
 
   return (
     <>
-      <section className="about-hero">
+      <section className="about-hero" ref={sectionRef}>
         {/* Background Image with Overlay */}
-        <div className="about-hero-bg">
+        <div
+          className="about-hero-bg"
+          style={{ transform: `translateY(${parallax * 0.6}px)` }}
+        >
           {backgroundImageUrl && (
             <img
               src={backgroundImageUrl}
@@ -25,24 +74,22 @@ export default function AboutHero({ hero }) {
               className="about-hero-bg-img"
             />
           )}
-          <div className="about-hero-overlay"></div>
+          <div className="about-hero-overlay" />
         </div>
 
         {/* Content */}
         <div className="about-hero-content">
-          <div className="about-hero-box">
+          <div className={`about-hero-box ${isVisible ? "about-hero-box--visible" : ""}`}>
             {kicker && <div className="about-hero-kicker">{kicker}</div>}
             {title && <h1 className="about-hero-title">{title}</h1>}
             {subtitle && <p className="about-hero-subtitle">{subtitle}</p>}
-            
-            {/* Always show button if ctaLabel exists */}
+
             {ctaLabel && ctaHref && (
               <Link href={ctaHref} className="about-hero-cta">
                 {ctaLabel}
               </Link>
             )}
-            
-            {/* Fallback button if no ctaLabel in Sanity */}
+
             {!ctaLabel && (
               <Link href="/contact" className="about-hero-cta">
                 Book a Discovery Call
@@ -70,6 +117,8 @@ export default function AboutHero({ hero }) {
           width: 100%;
           height: 100%;
           z-index: 1;
+          will-change: transform;
+          transition: transform 0.12s linear;
         }
 
         .about-hero-bg-img {
@@ -112,6 +161,21 @@ export default function AboutHero({ hero }) {
           margin: 0 auto;
           border: 1px solid rgba(255, 255, 255, 0.1);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+          /* scroll-reveal initial state */
+          opacity: 0;
+          transform: translateY(40px) scale(0.97);
+          filter: blur(6px);
+          transition:
+            opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+            filter 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .about-hero-box--visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
         }
 
         .about-hero-kicker {

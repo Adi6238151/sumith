@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Head from "next/head";
 
@@ -20,6 +21,31 @@ interface BusSolutionImageRowProps {
 }
 
 export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRowProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const rows = containerRef.current?.querySelectorAll<HTMLElement>(".solution-row");
+    if (!rows || rows.length === 0) return;
+
+    const observer = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("solution-row--visible");
+      } else {
+        entry.target.classList.remove("solution-row--visible");
+      }
+    });
+  },
+  { threshold: 0.9 }
+);
+
+
+    rows.forEach(row => observer.observe(row));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <Head>
@@ -28,14 +54,13 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
       </Head>
 
       <section className="bus-solution-section">
-        <div className="solution-container">
+        <div className="solution-container" ref={containerRef}>
           {images.map((item, idx) => {
             const isEven = idx % 2 === 0;
             return (
               <div
                 key={idx}
                 className={`solution-row ${isEven ? "image-right" : "image-left"}`}
-                style={{ animationDelay: `${idx * 0.15}s` }}
               >
                 {/* Content (Text) */}
                 <div className="content-block">
@@ -43,7 +68,6 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
                     <h3 className="solution-title">{item.title}</h3>
                     <div className="title-underline" />
                     <p className="solution-description">{item.caption}</p>
-                    
                   </div>
                 </div>
 
@@ -90,7 +114,6 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             color: var(--its-text-main);
           }
 
-          /* very soft global glow; optional */
           .bus-solution-section::before {
             content: "";
             position: absolute;
@@ -125,28 +148,31 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             grid-template-columns: 1.05fr 1fr;
             gap: 80px;
             align-items: center;
-            opacity: 0;
-            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             position: relative;
+
+            /* scroll‑reveal initial state */
+            opacity: 0;
+            transform: translateY(48px) scale(0.98);
+            transition:
+              opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(40px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
+          /* direction‑aware offset */
           .solution-row.image-right {
             grid-template-areas: "content image";
+            transform: translate3d(-32px, 48px, 0) scale(0.98);
           }
 
           .solution-row.image-left {
             grid-template-areas: "image content";
+            transform: translate3d(32px, 48px, 0) scale(0.98);
+          }
+
+          /* when IntersectionObserver adds this class */
+          .solution-row.solution-row--visible {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
           }
 
           .content-block {
@@ -220,28 +246,6 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             color: var(--its-text-soft);
             line-height: 1.7;
             margin: 0;
-          }
-
-          .number-badge {
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 58px;
-            height: 58px;
-            background: radial-gradient(
-              circle at 20% 0,
-              #ffffff,
-              #cfe6ff 55%,
-              #6e86ff 100%
-            );
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #121736;
-            box-shadow: 0 16px 36px rgba(9, 16, 54, 0.9);
           }
 
           .image-wrapper {
@@ -370,13 +374,6 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             .solution-title {
               font-size: 1.5rem;
             }
-            .number-badge {
-              width: 52px;
-              height: 52px;
-              font-size: 1.25rem;
-              top: -16px;
-              right: -16px;
-            }
           }
 
           @media (max-width: 768px) {
@@ -408,17 +405,6 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             }
             .solution-description {
               font-size: 0.96rem;
-            }
-            .number-badge {
-              width: 46px;
-              height: 46px;
-              font-size: 1.1rem;
-              top: -12px;
-              right: -12px;
-            }
-            .floating-accent {
-              width: 170px;
-              height: 170px;
             }
           }
 

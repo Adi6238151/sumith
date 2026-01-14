@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Head from "next/head";
 
 type Tab = {
@@ -31,6 +32,30 @@ export default function QualityOfLifeTechnology({
   tabs,
   seo,
 }: QualityOfLifeTechnologyProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const rows = containerRef.current?.querySelectorAll<HTMLElement>(".solution-row");
+    if (!rows || rows.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("solution-row--visible");
+          } else {
+            entry.target.classList.remove("solution-row--visible");
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    rows.forEach(row => observer.observe(row));
+
+    return () => observer.disconnect();
+  }, []);
+
   if (!tabs || tabs.length === 0) return null;
 
   return (
@@ -43,7 +68,7 @@ export default function QualityOfLifeTechnology({
       </Head>
 
       <section className="bus-solution-section">
-        <div className="solution-container">
+        <div className="solution-container" ref={containerRef}>
           <h2 className="solution-main-heading">{title}</h2>
 
           {tabs.map((tab, idx) => {
@@ -54,7 +79,6 @@ export default function QualityOfLifeTechnology({
               <div
                 key={idx}
                 className={`solution-row ${isEven ? "image-right" : "image-left"}`}
-                style={{ animationDelay: `${idx * 0.15}s` }}
               >
                 {/* Content (Text) */}
                 <div className="content-block">
@@ -74,7 +98,6 @@ export default function QualityOfLifeTechnology({
                         </li>
                       )}
                     </ul>
-        
                   </div>
                 </div>
 
@@ -170,28 +193,31 @@ export default function QualityOfLifeTechnology({
             grid-template-columns: 1.05fr 1fr;
             gap: 80px;
             align-items: center;
-            opacity: 0;
-            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             position: relative;
+
+            /* scroll‑reveal initial state */
+            opacity: 0;
+            transform: translateY(48px) scale(0.98);
+            transition:
+              opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(40px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
+          /* direction‑aware offset */
           .solution-row.image-right {
             grid-template-areas: "content image";
+            transform: translate3d(-32px, 48px, 0) scale(0.98);
           }
 
           .solution-row.image-left {
             grid-template-areas: "image content";
+            transform: translate3d(32px, 48px, 0) scale(0.98);
+          }
+
+          /* when IntersectionObserver adds this class */
+          .solution-row.solution-row--visible {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
           }
 
           .content-block {
@@ -219,7 +245,6 @@ export default function QualityOfLifeTechnology({
                 rgba(10, 28, 65, 0.98)
               );
             border-radius: 22px;
-            /* border removed as requested */
             border: none;
             box-shadow:
               0 20px 70px rgba(0, 0, 0, 0.85),
@@ -259,7 +284,6 @@ export default function QualityOfLifeTechnology({
             margin-bottom: 20px;
           }
 
-          /* Bullet list styles: one per line, well aligned */
           .bullet-list {
             list-style: disc;
             padding-left: 24px;
@@ -310,20 +334,24 @@ export default function QualityOfLifeTechnology({
           }
 
           .image-frame {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  border-radius: 24px;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 0 0, rgba(88, 235, 207, 0.22), transparent 60%),
-    linear-gradient(135deg, #111a3b, #050817);
-  box-shadow:
-    0 28px 80px rgba(0, 0, 0, 0.95),
-    0 0 0 1px rgba(80, 124, 255, 0.7);
-  /* remove fixed height: */
-  /* height: 380px; */
-}
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            background:
+              radial-gradient(
+                circle at 0 0,
+                rgba(88, 235, 207, 0.22),
+                transparent 60%
+              ),
+              linear-gradient(135deg, #111a3b, #050817);
+            box-shadow:
+              0 28px 80px rgba(0, 0, 0, 0.95),
+              0 0 0 1px rgba(80, 124, 255, 0.7);
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+          }
 
           .image-frame:hover {
             transform: translateY(-4px);
@@ -332,19 +360,20 @@ export default function QualityOfLifeTechnology({
               0 0 0 1px rgba(122, 175, 255, 0.95);
           }
 
-         .solution-image {
-  display: block;
-  width: 100%;
-  height: auto;          /* keep aspect ratio */
-  object-fit: cover;     /* or 'contain' if you prefer */
-}
+          .solution-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          }
 
           .solution-image-placeholder {
             width: 100%;
             border-radius: 24px;
             background-color: rgba(8, 15, 38, 0.94);
             border: 1px dashed rgba(148, 163, 184, 0.7);
-            padding-top: 56.25%;   /* 16:9 aspect ratio box; adjust if needed */
+            padding-top: 56.25%;
             position: relative;
           }
 
@@ -460,13 +489,6 @@ export default function QualityOfLifeTechnology({
               height: 280px;
               border-radius: 18px;
             }
-            .solution-image-placeholder span {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
             .content-inner {
               padding: 24px;
               border-radius: 18px;
@@ -505,13 +527,6 @@ export default function QualityOfLifeTechnology({
             }
             .image-frame {
               height: 240px;
-            }
-            .solution-image-placeholder span {
-              position: absolute;
-              inset: 0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
             }
             .solution-title {
               font-size: 1.25rem;
