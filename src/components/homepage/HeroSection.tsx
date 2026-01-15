@@ -31,56 +31,61 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
   useEffect(() => {
     if (!solutions.length) return
     const interval = setInterval(() => {
-      setCurrentSolution(prev => (prev + 1) % solutions.length)
+      setCurrentSolution((prev) => (prev + 1) % solutions.length)
     }, 3000)
     return () => clearInterval(interval)
   }, [solutions.length])
 
   // scroll‑based typewriter
-  useEffect(() => {
-    if (!heroData?.headline || !headingRef.current) return
-
-    const fullText = heroData.headline
-
-    const observer = new IntersectionObserver(
-      entries => {
-        const entry = entries[0]
-        const el = entry.target as HTMLElement & { _typingInterval?: number | null }
-
-        if (entry.isIntersecting) {
-          let index = 0
-          setTypedHeadline("")
-          if (el._typingInterval) clearInterval(el._typingInterval)
-
-          const intervalId = window.setInterval(() => {
-            index += 1
-            setTypedHeadline(fullText.slice(0, index))
-            if (index === fullText.length) {
-              clearInterval(intervalId)
+    useEffect(() => {
+      const node = headingRef.current
+      if (!heroData?.headline || !node) return
+  
+      const fullText = heroData.headline
+  
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0]
+          const el = entry.target as HTMLElement & {
+            _typingInterval?: number | null
+          }
+  
+          if (entry.isIntersecting) {
+            let index = 0
+            setTypedHeadline("")
+            if (el._typingInterval) clearInterval(el._typingInterval)
+  
+            const intervalId = window.setInterval(() => {
+              index += 1
+              setTypedHeadline(fullText.slice(0, index))
+              if (index === fullText.length) {
+                clearInterval(intervalId)
+                el._typingInterval = null
+              }
+            }, 60)
+  
+            el._typingInterval = intervalId
+          } else {
+            if (el._typingInterval) {
+              clearInterval(el._typingInterval)
               el._typingInterval = null
             }
-          }, 60) // smooth typing
-
-          el._typingInterval = intervalId
-        } else {
-          if (el._typingInterval) {
-            clearInterval(el._typingInterval)
-            el._typingInterval = null
+            setTypedHeadline("")
           }
-          setTypedHeadline("")
-        }
-      },
-      { root: null, threshold: 0.4 }
-    )
-
-    observer.observe(headingRef.current)
-
-    return () => {
-      const el = headingRef.current as (HTMLElement & { _typingInterval?: number | null }) | null
-      if (el && el._typingInterval) clearInterval(el._typingInterval)
-      observer.disconnect()
-    }
-  }, [heroData?.headline])
+        },
+        { root: null, threshold: 0.4 }
+      )
+  
+      observer.observe(node)
+  
+      return () => {
+        const el = node as
+          | (HTMLElement & { _typingInterval?: number | null })
+          | null
+        if (el && el._typingInterval) clearInterval(el._typingInterval)
+        observer.disconnect()
+      }
+    }, [heroData?.headline])
 
   const styles: Record<string, CSSProperties> = {
     container: {
@@ -148,7 +153,6 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
       marginBottom: "2.2rem",
       lineHeight: 1.7,
       maxWidth: "900px",
-      textAlign: "center",
       fontWeight: 400,
     },
     buttonContainer: {
@@ -242,6 +246,7 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
             gap: 0.5rem;
           }
         }
+
         .modern-btn-primary:hover {
           background: #ea580c;
           box-shadow: 0 12px 46px 0 #ea580c33, 0 1px 8px #ea580c12;
@@ -263,7 +268,6 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           box-shadow: 0 2px 6px #ea580c22;
         }
 
-        /* headline: try to keep to 2 centered lines */
         .gradient-animate {
           background: linear-gradient(
             110deg,
@@ -286,7 +290,7 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           line-height: 1.15;
           margin-bottom: 1rem;
           letter-spacing: -0.01em;
-          max-width: 1000px; /* adjust for exactly 2 lines on desktop */
+          max-width: 1000px;
           margin-left: auto;
           margin-right: auto;
           white-space: normal;
@@ -303,15 +307,15 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
         .hero-title-text {
           display: inline;
         }
-                  .hero-caret {
-            display: inline-block;
-            width: 2.8px;   /* <-- increase this value for a thicker cursor */
-            height: 1.1em;
-            margin-left: 4px;
-            background-color: black;
-            vertical-align: baseline;
-            animation: hero-blink 0.8s steps(1) infinite;
-          }
+        .hero-caret {
+          display: inline-block;
+          width: 2.8px;
+          height: 1.1em;
+          margin-left: 4px;
+          background-color: black;
+          vertical-align: baseline;
+          animation: hero-blink 0.8s steps(1) infinite;
+        }
 
         @keyframes hero-blink {
           0%,
@@ -324,17 +328,101 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           }
         }
 
-        /* keep about 2 lines on smaller screens as well */
         @media (max-width: 1100px) {
           .gradient-animate {
             font-size: 3.2rem;
             max-width: 620px;
           }
         }
+
+        /* heading behaviour on very small screens */
         @media (max-width: 700px) {
           .gradient-animate {
-            font-size: 2.1rem;
-            max-width: 380px;
+            font-size: 1.4rem;
+            max-width: 18rem;
+            line-height: 1.25;
+            margin-bottom: 0.6rem;
+            word-break: normal;
+            overflow-wrap: normal;
+            white-space: normal;
+            text-align: left;
+          }
+
+          .main-heading {
+            margin-left: 0;
+            margin-right: 0;
+          }
+
+          .hero-main-content {
+            align-items: flex-start;
+          }
+        }
+
+        /* description + buttons + stats mobile layout */
+        @media (max-width: 700px) {
+          .hero-inner {
+            max-width: 94vw;
+          }
+
+          .hero-badge {
+            font-size: 0.85rem;
+            padding: 0.45em 1.3em;
+            margin-bottom: 1.1rem;
+          }
+
+          .solution-text {
+            font-size: 0.95rem;
+            padding: 0.3em 0.7em;
+            margin-bottom: 1.1rem;
+          }
+
+          .hero-description {
+            display: block;
+            width: 100%;
+            max-width: 94vw;
+            margin-inline: auto;
+            margin-bottom: 1.4rem;
+            text-align: left;
+            font-size: 0.98rem;
+            line-height: 1.55;
+            word-break: normal;
+            overflow-wrap: normal;
+            white-space: normal;
+          }
+
+          .button-container {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+          }
+
+          .button-container .modern-btn {
+            width: 100%;
+            min-width: 0;
+            font-size: 0.96rem;
+            padding: 0.95em 1.6em;
+          }
+
+          .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-width: 94vw;
+            gap: 0.7rem 0.9rem;
+            justify-items: flex-start;
+          }
+
+          .stat-number {
+            font-size: 1.15rem;
+            margin-bottom: 0.08rem;
+          }
+
+          .stat-label {
+            font-size: 0.82rem;
+            text-align: left;
+          }
+
+          .hero-scroll-indicator {
+            bottom: 1.3rem;
+            font-size: 0.9rem;
           }
         }
       `}</style>
@@ -350,12 +438,25 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
 
       <div style={styles.overlay}></div>
 
-      <div style={styles.mainContent}>
-        <div style={styles.contentWrapper}>
-          <span style={styles.badge}>{heroData?.badge}</span>
+      <div
+        style={styles.mainContent}
+        className="hero-main-content"
+      >
+        <div
+          style={styles.contentWrapper}
+          className="hero-inner"
+        >
+          <span
+            style={styles.badge}
+            className="hero-badge"
+          >
+            {heroData?.badge}
+          </span>
 
-          {/* HERO heading with scroll-triggered typewriter + cursor */}
-          <h1 className="main-heading gradient-animate" ref={headingRef}>
+          <h1
+            className="main-heading gradient-animate"
+            ref={headingRef}
+          >
             <span className="hero-title-text">{typedHeadline}</span>
             <span className="hero-caret" aria-hidden="true" />
           </h1>
@@ -371,9 +472,17 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
             {solutions[currentSolution] || ""}
           </motion.div>
 
-          <div style={styles.description}>{heroData?.description}</div>
+          <div
+            className="hero-description"
+            style={styles.description}
+          >
+            {heroData?.description}
+          </div>
 
-          <div className="button-container" style={styles.buttonContainer}>
+          <div
+            className="button-container"
+            style={styles.buttonContainer}
+          >
             <button
               onClick={() => router.push("/solutions/products")}
               className="modern-btn modern-btn-primary"
@@ -417,13 +526,24 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
             </button>
           </div>
 
-          <div className="stats-grid" style={styles.statsGrid}>
+          <div
+            className="stats-grid"
+            style={styles.statsGrid}
+          >
             {(heroData?.stats || []).map((stat, idx) => (
               <div style={styles.statItem} key={idx}>
-                <div className="stat-number" style={styles.statNumber}>
+                <div
+                  className="stat-number"
+                  style={styles.statNumber}
+                >
                   {stat.number}
                 </div>
-                <div style={styles.statLabel}>{stat.label}</div>
+                <div
+                  className="stat-label"
+                  style={styles.statLabel}
+                >
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
@@ -434,6 +554,7 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
         style={styles.scrollIndicator}
+        className="hero-scroll-indicator"
       >
         <div>
           <div style={{ marginBottom: "0.38rem", fontSize: "0.96rem" }}>
@@ -444,7 +565,7 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
               animate={{ y: [0, 16, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
               style={styles.scrollDot}
-            ></motion.div>
+            />
           </div>
         </div>
       </motion.div>

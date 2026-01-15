@@ -1,7 +1,8 @@
 "use client"
+
 import Image from "next/image"
 import Head from "next/head"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface LogoItem {
   name: string
@@ -22,197 +23,247 @@ interface CustomerLogoGridProps {
   } | null
 }
 
-export default function CustomerLogoGrid({ customerLogoGridData }: CustomerLogoGridProps) {
+export default function CustomerLogoGrid({
+  customerLogoGridData,
+}: CustomerLogoGridProps) {
   const [fallback, setFallback] = useState<{ [key: string]: boolean }>({})
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
 
-  if (!customerLogoGridData) {
-    return (
-      <div style={{padding:"4em", textAlign:"center", color:"#d9534f"}}>
-        No Customer Logo Grid data found.<br />
-        Please create and publish a <strong>customerLogoGrid</strong> document in Sanity Studio.
-      </div>
+  // Scroll‑reveal: toggles visibility on both enter and exit
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // entry.isIntersecting true when section enters,
+        // false when it leaves → triggers fade-out and lets it re-animate next time
+        setIsVisible(entry.isIntersecting)
+      },
+      {
+        threshold: 0.25,
+        rootMargin: "0px 0px -10% 0px",
+      }
     )
-  }
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  if (!customerLogoGridData) return null
 
   const { heading, oems, otherSegments, seo } = customerLogoGridData
 
-  const handleError = (idx: number, isOem: boolean) => {
-    setFallback(f => ({ ...f, [isOem ? `oem${idx}` : `other${idx}`]: true }))
+  const handleError = (key: string) => {
+    setFallback((f) => ({ ...f, [key]: true }))
   }
 
   return (
     <>
       <Head>
         {seo?.title && <title>{seo.title}</title>}
-        {seo?.description && <meta name="description" content={seo.description} />}
+        {seo?.description && (
+          <meta name="description" content={seo.description} />
+        )}
       </Head>
-      <section className="customer-grid-section">
+
+      <section
+        ref={sectionRef}
+        className={`clients-section ${isVisible ? "is-visible" : "is-hidden"}`}
+      >
         <style jsx>{`
-          .customer-grid-section {
-            background: linear-gradient(to bottom, #fff 0%, #e9f6ff 100%);
-            padding-top: 90px;
-            padding-bottom: 90px;
+          .clients-section {
+            background: #ffffff;
+            padding: 120px 16px;
+            display: flex;
+            justify-content: center;
           }
-          .customer-heading {
-            background: linear-gradient(110deg,#23fc60 8%,#20bbfd 33%,#22fdab 55%,#2893f5 93%,#23fc60 100%);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            animation: hgrid-run-gradient 2.6s linear infinite alternate;
-            font-weight: 800;
-            font-size: 2.13rem;
-            letter-spacing: 0.01em;
-            text-align: center;
-            line-height: 1.19;
-            margin-bottom: 0.45em;
-          }
-          @media (min-width:700px) { .customer-heading { font-size:2.7rem; } }
-          .customer-heading span {
-            background: linear-gradient(110deg,#17c924 20%,#0ec14a 90%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-          }
-          @keyframes hgrid-run-gradient {
-            0% { background-position: 0% 60%; }
-            100% { background-position: 100% 40%; }
-          }
-          .customer-grid-wrap {
+
+          .clients-inner {
+            max-width: 1120px;
             width: 100%;
-            max-width: calc(100vw - 10cm);
-            margin: 0 auto;
+            text-align: center;
+          }
+
+          .eyebrow {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(124, 58, 237, 0.75);
+            margin-bottom: 6px;
+          }
+
+          .headline {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 56px;
+          }
+
+          .logos-wrapper {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 40px;
+            margin-bottom: 48px;
           }
+
           .logos-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2.5em 2.8em;
-            margin-bottom: 2.3em;
-          }
-          .logo-tile-oem {
-            height: 108px;
-            width: 186px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-            border-radius: 1.17em;
-            box-shadow: 0 2px 18px #1777dd15;
-            border: 2.1px solid #f7fafc;
-            transition: box-shadow 0.18s, border 0.18s, transform 0.17s;
-          }
-          .logo-tile-oem:hover {
-            border-color: #24b3fb;
-            box-shadow: 0 7px 34px #009df950, 0 2px 8px #22c9cf22;
-            transform: scale(1.045);
-          }
-          .logo-img-oem {
-            object-fit: contain;
-            max-height: 70px;
-            max-width: 150px;
-            width: auto;
-            height: auto;
-            margin: auto;
-          }
-          .other-label {
-            text-align: center;
-            font-size: 1.46rem;
-            font-weight: 700;
-            color: #1971d3;
-            margin-bottom: 1.2em;
-            letter-spacing: .045em;
-          }
-          .logos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-            gap: 1.75em 2.09em;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 32px;
             justify-items: center;
-            align-items: center;
-            width: 100%;
           }
-          .logo-tile-other {
-            height: 84px;
-            width: 138px;
+
+          .logo-card {
+            width: 120px;
+            height: 82px;
+            border-radius: 18px;
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            border-radius: 0.93em;
-            box-shadow: 0 2px 18px #1977dd0e;
-            border: 1.6px solid #f6faf9;
-            transition: box-shadow 0.18s, border 0.18s, transform 0.17s;
+            border: 1px solid rgba(226, 232, 240, 1);
+            box-shadow:
+              0 4px 10px rgba(15, 23, 42, 0.05),
+              0 1px 2px rgba(15, 23, 42, 0.04);
+            transition:
+              transform 260ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 260ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 260ms cubic-bezier(0.4, 0, 0.2, 1);
           }
-          .logo-tile-other:hover {
-            border-color: #18b4fa;
-            box-shadow: 0 7px 24px #009df944, 0 2px 6px #22c9cf22;
-            transform: scale(1.04);
+
+          .logo-card:hover {
+            transform: translateY(-5px) scale(1.055);
+            box-shadow:
+              0 24px 48px rgba(15, 23, 42, 0.2),
+              0 10px 20px rgba(15, 23, 42, 0.14);
+            border-color: rgba(148, 163, 184, 0.4);
           }
-          .logo-img-other {
+
+          .logo-img {
+            max-width: 72px;
+            max-height: 40px;
             object-fit: contain;
-            max-height: 52px;
-            max-width: 110px;
-            width: auto;
-            height: auto;
-            margin: auto;
+            filter: saturate(0.95);
+            transition: filter 180ms ease;
           }
-          @media (max-width: 1300px) {
-            .customer-grid-wrap { max-width: 960px; }
+
+          .logo-card:hover .logo-img {
+            filter: saturate(1);
           }
-          @media (max-width: 900px) {
-            .customer-grid-wrap { max-width: 98vw; }
-            .logos-row, .logos-grid {gap: 1.2em 1.4em;}
+
+          .description {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 0.96rem;
+            line-height: 1.75;
+            color: #475569;
           }
-          @media (max-width: 600px) {
-            .customer-heading {font-size: 1.18rem;}
-            .logos-row { gap: 1em .6em; }
-            .logos-grid { grid-template-columns: repeat(2, minmax(110px, 1fr));}
+
+          /* Scroll‑reveal animation */
+          .fade-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition:
+              opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .clients-section.is-visible .fade-up {
+            opacity: 1;
+            transform: translateY(0);
+          }
+
+          .clients-section.is-hidden .fade-up {
+            opacity: 0;
+            transform: translateY(24px);
+          }
+
+          .delay-1 {
+            transition-delay: 0.12s;
+          }
+          .delay-2 {
+            transition-delay: 0.24s;
+          }
+          .delay-3 {
+            transition-delay: 0.36s;
+          }
+          .delay-4 {
+            transition-delay: 0.48s;
+          }
+
+          @media (max-width: 1024px) {
+            .logos-row {
+              grid-template-columns: repeat(4, 1fr);
+            }
+          }
+
+          @media (max-width: 640px) {
+            .headline {
+              font-size: 2rem;
+            }
+            .logos-row {
+              grid-template-columns: repeat(2, 1fr);
+              gap: 24px;
+            }
           }
         `}</style>
-        <h2 className="customer-heading">
-          {heading}
-        </h2>
-        <div className="customer-grid-wrap">
 
-          {/* OEMs Row */}
-          <div className="other-label">OEMs</div>
-          <div className="logos-row">
-            {oems.map((c, idx) => (
-              <div key={c.name} className="logo-tile-oem">
-                <Image
-                  src={fallback[`oem${idx}`] ? "/logos/placeholder.png" : c.logo}
-                  alt={c.name}
-                  width={150}
-                  height={70}
-                  className="logo-img-oem"
-                  onError={() => handleError(idx, true)}
-                  priority
-                />
-              </div>
-            ))}
+        <div className="clients-inner">
+          <div className="eyebrow fade-up">Trusted by Leaders</div>
+
+          <h2 className="headline fade-up delay-1">
+            {heading || "Our Customers & Partners"}
+          </h2>
+
+          <div className="logos-wrapper">
+            <div className="logos-row fade-up delay-2">
+              {oems.map((c, idx) => (
+                <div key={`oem-${idx}`} className="logo-card">
+                  <Image
+                    src={
+                      fallback[`oem${idx}`]
+                        ? "/logos/placeholder.png"
+                        : c.logo
+                    }
+                    alt={c.name}
+                    width={72}
+                    height={40}
+                    className="logo-img"
+                    onError={() => handleError(`oem${idx}`)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="logos-row fade-up delay-3">
+              {otherSegments.map((c, idx) => (
+                <div key={`other-${idx}`} className="logo-card">
+                  <Image
+                    src={
+                      fallback[`other${idx}`]
+                        ? "/logos/placeholder.png"
+                        : c.logo
+                    }
+                    alt={c.name}
+                    width={72}
+                    height={40}
+                    className="logo-img"
+                    onError={() => handleError(`other${idx}`)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Other Segments */}
-          <div className="other-label">Other Segments</div>
-          <div className="logos-grid">
-            {otherSegments.map((c, idx) => (
-              <div key={c.name} className="logo-tile-other">
-                <Image
-                  src={fallback[`other${idx}`] ? "/logos/placeholder.png" : c.logo}
-                  alt={c.name}
-                  width={100}
-                  height={52}
-                  className="logo-img-other"
-                  onError={() => handleError(idx, false)}
-                />
-              </div>
-            ))}
-          </div>
+          <p className="description fade-up delay-4">
+            We&apos;re proud to partner with a diverse range of clients, from
+            industry giants to innovative startups. Their logos represent the
+            trust they&apos;ve placed in us and the successful collaborations
+            we&apos;ve built together.
+          </p>
         </div>
       </section>
     </>
