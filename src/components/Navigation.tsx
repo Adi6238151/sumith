@@ -51,24 +51,16 @@ export default function Navigation() {
 
   const pathname = usePathname();
 
-  // activeIndex: which pill is "current page"
-  // 0 -> Solutions, 1..n -> navLinks in order
   const getActiveIndexFromPath = () => {
-  // Home page (or root) -> Solutions pill
-  if (pathname === "/") return 0;
-
-  // Solutions sub pages that are not the Products overview
-  if (pathname.startsWith("/solutions") && !pathname.startsWith("/solutions/products")) {
-    return 0; // Solutions
-  }
-
-  // Exact match for Products (and its children)
-  const idx = navLinks.findIndex((l) => pathname === l.href || pathname.startsWith(l.href + "/"));
-
-  // If nothing matches, keep last pill (Contact us) as fallback
-  return idx === -1 ? navLinks.length : idx + 1;
-};
-
+    if (pathname === "/") return 0;
+    if (pathname.startsWith("/solutions") && !pathname.startsWith("/solutions/products")) {
+      return 0;
+    }
+    const idx = navLinks.findIndex(
+      (l) => pathname === l.href || pathname.startsWith(l.href + "/"),
+    );
+    return idx === -1 ? navLinks.length : idx + 1;
+  };
 
   const [activeIndex, setActiveIndex] = useState<number>(() => getActiveIndexFromPath());
   const [hoverIndex, setHoverIndex] = useState<number | null>(activeIndex);
@@ -76,7 +68,6 @@ export default function Navigation() {
   const pillRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([]);
   const pillNavRef = useRef<HTMLDivElement | null>(null);
 
-  // scroll hide/show
   useEffect(() => {
     if (sidebar) return;
     const handleScroll = () => {
@@ -92,13 +83,10 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY, sidebar]);
 
-  // lock body on sidebar
   useEffect(() => {
-    if (sidebar) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    document.body.style.overflow = sidebar ? "hidden" : "";
   }, [sidebar]);
 
-  // click outside to close mega dropdown
   useEffect(() => {
     if (!open) return;
     const handleClick = (e: MouseEvent) => {
@@ -111,7 +99,6 @@ export default function Navigation() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  // reset mega dropdown / accordion when sidebar closes
   useEffect(() => {
     if (!sidebar) {
       setAccordion(false);
@@ -119,14 +106,12 @@ export default function Navigation() {
     }
   }, [sidebar]);
 
-  // update active tab when route changes
   useEffect(() => {
     const next = getActiveIndexFromPath();
     setActiveIndex(next);
     setHoverIndex(next);
   }, [pathname]);
 
-  // move black highlight under hovered or active pill
   useEffect(() => {
     const indexToShow = hoverIndex ?? activeIndex;
     if (indexToShow == null || !pillNavRef.current) return;
@@ -149,12 +134,10 @@ export default function Navigation() {
   return (
     <>
       <nav className={`mega-navbar${isVisible ? " visible" : " hidden"}`} ref={navRef}>
-        {/* Mobile Sidebar overlay */}
         <div
           className={`sidebar-overlay${sidebar ? " active" : ""}`}
           onClick={() => setSidebar(false)}
         />
-        {/* Mobile Sidebar */}
         <aside className={`sidebar${sidebar ? " open" : ""}`}>
           <div className="sidebar-header">
             <Link
@@ -180,13 +163,14 @@ export default function Navigation() {
               <span>&#10005;</span>
             </button>
           </div>
+
           <div className="sidebar-links">
             <button
               className="sidebar-link sidebar-dropdown"
               onClick={() => setAccordion((v) => !v)}
             >
               <span>SOLUTIONS</span>
-              <span className={`arrow${accordion ? " open" : ""}`}>▼</span>
+              <span className={`arrow${accordion ? " open" : ""}`}>▲</span>
             </button>
             <div className={`sidebar-dropdown-content${accordion ? " show" : ""}`}>
               {dropdownSections.map((section) => (
@@ -254,6 +238,7 @@ export default function Navigation() {
                 </div>
               ))}
             </div>
+
             {navLinks.map((item) => (
               <Link
                 className="sidebar-link"
@@ -269,7 +254,6 @@ export default function Navigation() {
         </aside>
 
         <div className="navbar-inner">
-          {/* Hamburger */}
           <button
             className="hamburger"
             aria-label="Open menu"
@@ -280,7 +264,6 @@ export default function Navigation() {
             <span />
           </button>
 
-          {/* Logo */}
           <div className="logo">
             <Link href="/" style={{ display: "inline-block" }}>
               <Image
@@ -294,12 +277,12 @@ export default function Navigation() {
             </Link>
           </div>
 
-          {/* Desktop pill menu: Solutions + navLinks */}
           <div className="pill-nav-wrapper">
             <div className="pill-nav" ref={pillNavRef}>
-              {/* Solutions pill = index 0 */}
               <button
-                ref={(el: HTMLButtonElement | null) => { pillRefs.current[0] = el; }}
+                ref={(el: HTMLButtonElement | null) => {
+                  pillRefs.current[0] = el;
+                }}
                 className={`pill-nav-item solutions-pill${
                   (hoverIndex ?? activeIndex) === 0 ? " is-hovered" : ""
                 }`}
@@ -322,7 +305,6 @@ export default function Navigation() {
                 <span className="down-arrow-pill" />
               </button>
 
-              {/* About us, Products, Insights, Careers, Contact us */}
               {navLinks.map((item, idx) => {
                 const pillIndex = idx + 1;
                 const isCurrent = (hoverIndex ?? activeIndex) === pillIndex;
@@ -331,7 +313,9 @@ export default function Navigation() {
                     key={item.label}
                     href={item.href}
                     className={`pill-nav-item${isCurrent ? " is-hovered" : ""}`}
-                    ref={(el: HTMLAnchorElement | null) => { pillRefs.current[pillIndex] = el; }}
+                    ref={(el: HTMLAnchorElement | null) => {
+                      pillRefs.current[pillIndex] = el;
+                    }}
                     onMouseEnter={() => setHoverIndex(pillIndex)}
                     onFocus={() => setHoverIndex(pillIndex)}
                     onMouseLeave={() => setHoverIndex(null)}
@@ -342,13 +326,11 @@ export default function Navigation() {
                 );
               })}
 
-              {/* Moving black highlight */}
               <span className="pill-nav-highlight" aria-hidden="true" />
             </div>
           </div>
         </div>
 
-        {/* Desktop mega-dropdown (Solutions) */}
         <div
           className="mega-dropdown"
           style={{ display: open ? "flex" : "none" }}
@@ -451,7 +433,6 @@ export default function Navigation() {
       </nav>
 
       <style jsx global>{`
-        /* Hamburger */
         .hamburger {
           display: none;
           flex-direction: column;
@@ -472,15 +453,11 @@ export default function Navigation() {
           background: #112445;
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
           visibility: hidden;
           opacity: 0;
           position: fixed;
-          left: 0;
-          top: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           background: rgba(0, 0, 0, 0.18);
           transition: visibility 0.22s, opacity 0.22s;
           z-index: 2001;
@@ -490,16 +467,15 @@ export default function Navigation() {
           opacity: 1;
         }
 
-        /* Sidebar */
         .sidebar {
           position: fixed;
           top: 0;
-          left: -320px;
-          height: 100vh;
-          width: 298px;
-          max-width: 92vw;
-          background: #fff;
-          box-shadow: 3px 0 15px rgba(30, 40, 68, 0.13);
+          left: -100%;
+          height: 100dvh;
+          width: 100%;
+          max-width: 420px;
+          background: #ffffff;
+          box-shadow: 3px 0 15px rgba(30, 40, 68, 0.18);
           z-index: 2002;
           transition: left 0.28s cubic-bezier(0.2, 0.6, 0.3, 1);
           display: flex;
@@ -509,10 +485,11 @@ export default function Navigation() {
           left: 0;
         }
         .sidebar-header {
+          flex: 0 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 16px 17px 10px 18px;
+          padding: 16px 17px 12px 18px;
           border-bottom: 1px solid #eff0f1;
         }
         .sidebar-logo {
@@ -527,16 +504,19 @@ export default function Navigation() {
           cursor: pointer;
         }
         .sidebar-links {
+          flex: 1 1 auto;
           display: flex;
           flex-direction: column;
-          padding: 13px 6px 13px 18px;
+          padding: 13px 10px 18px 18px;
           gap: 7px;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
         .sidebar-link {
           background: none;
           border: none;
           outline: none;
-          font-size: 1.13rem;
+          font-size: clamp(1rem, 2.7vw, 1.13rem);
           font-weight: 600;
           color: #172c44;
           letter-spacing: 0.015em;
@@ -576,7 +556,7 @@ export default function Navigation() {
         }
         .sidebar-dropdown-content.show {
           max-height: 800px;
-          padding: 13px 0 2px 9px;
+          padding: 13px 0 6px 9px;
           box-shadow: 0 1.5px 8px rgba(50, 68, 98, 0.08);
           border: 1px solid #eff0f2;
         }
@@ -607,7 +587,6 @@ export default function Navigation() {
           padding: 4px 0 2px 2px;
         }
 
-        /* Top bar */
         .mega-navbar {
           width: 100%;
           background: #111111;
@@ -638,13 +617,14 @@ export default function Navigation() {
         .logo {
           flex: 1 1 auto;
           text-align: left;
+          display: flex;
+          align-items: center;
         }
         .logo-img {
           width: 150px !important;
           height: auto;
         }
 
-        /* PILL NAV */
         .pill-nav-wrapper {
           flex: 2 1 750px;
           display: flex;
@@ -704,7 +684,6 @@ export default function Navigation() {
         .pill-nav-item:hover {
           transform: translateY(-1px);
         }
-
         .pill-nav-highlight {
           position: absolute;
           top: 4px;
@@ -720,7 +699,6 @@ export default function Navigation() {
           pointer-events: none;
         }
 
-        /* Mega dropdown */
         .mega-dropdown {
           width: 100%;
           left: 0;
@@ -807,48 +785,33 @@ export default function Navigation() {
             font-size: 0.96rem;
           }
         }
+
         @media (max-width: 900px) {
           .navbar-inner {
-            padding: 0 6px;
+            padding: 0 10px;
             height: 56px;
-            gap: 9px;
+            gap: 10px;
           }
           .logo-img {
-            width: 80px !important;
+            width: 90px !important;
           }
           .pill-nav-wrapper {
             display: none;
           }
           .mega-dropdown {
-            flex-direction: column;
-            gap: 0;
-            top: 92px;
-            padding-bottom: 18px;
+            display: none !important;
           }
-          .dropdown-section {
-            border-right: 0;
-            border-bottom: 1.5px solid #1f2937;
-            min-width: 0;
-            margin-bottom: 20px;
-          }
-        }
-        @media (max-width: 800px) {
-          .navbar-inner {
-            padding: 0 2px;
-            gap: 3px;
-          }
-        }
-        @media (max-width: 680px) {
           .hamburger {
             display: flex;
           }
-          .logo {
-            justify-content: center;
-            flex: 1 1 auto;
-            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+          .navbar-inner {
+            padding: 0 8px;
           }
-          .mega-dropdown {
-            display: none !important;
+          .sidebar {
+            max-width: 100%;
           }
         }
       `}</style>
