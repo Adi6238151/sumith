@@ -156,6 +156,7 @@ export default function MissionVision({ mission, vision }) {
 
         .mv-text {
           font-size: 1rem;
+          text-align: justify;
           font-weight: 400;
           color: #e0e0e0;
           line-height: 1.8;

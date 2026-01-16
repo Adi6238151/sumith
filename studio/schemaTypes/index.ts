@@ -14,7 +14,7 @@ import safetyTabSection from './metro-rail/safetyTabSection'
 import passengerDisplaySection from './metro-rail/passengerDisplaySection'
 import AirportSectionHeader from './Airport/AirportSectionHeader'
 import footerSettings from './footer/FooterSettings'
-
+import indiaPresence from "./indiaPresence"
 
 
 
@@ -29,6 +29,9 @@ import aboutCoreValues from './about/AboutCoreValues'
 import aboutTechPartners from './about/AboutTechPartners'
 import aboutAwards from './about/AboutAwards'
 import aboutLeadership from './about/AboutLeadership'
+import aboutTimeline from "./about/aboutTimeline"
+
+
 
 //Products
 import { blockContent } from './products/blockContent'
@@ -56,6 +59,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     safetyTabSection,
     passengerDisplaySection,
     AirportSectionHeader,
+    indiaPresence,
+
     // About page schemas
     aboutPage,
     aboutStats,
@@ -68,6 +73,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     aboutAwards,
     aboutLeadership,
     footerSettings,
+    aboutTimeline,
+
     // Products
     product,
     blockContent,
