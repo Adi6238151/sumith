@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import Head from "next/head"
-import { motion, Variants } from "framer-motion"
+import Head from "next/head";
+import { motion, Variants } from "framer-motion";
 import {
   PiCircuitry,
   PiMonitor,
   PiMoney,
   PiSecurityCamera,
   PiSealCheck,
-} from "react-icons/pi"
+} from "react-icons/pi";
 
 const iconMap = {
   PiCircuitry,
@@ -16,27 +16,27 @@ const iconMap = {
   PiMoney,
   PiSecurityCamera,
   PiSealCheck,
-}
+};
 
 interface Benefit {
-  icon: keyof typeof iconMap
-  title: string
-  desc: string
+  icon: keyof typeof iconMap;
+  title: string;
+  desc: string;
 }
 interface BenefitsData {
-  heading: string
-  subtitle: string
-  benefits: Benefit[]
+  heading: string;
+  subtitle: string;
+  benefits: Benefit[];
   seo?: {
-    title?: string
-    description?: string
-  }
+    title?: string;
+    description?: string;
+  };
 }
 interface Props {
-  benefitsData: BenefitsData
+  benefitsData: BenefitsData;
 }
 
-// section: fade + translate only, so re-runs are smooth
+// section: fade + translate only
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 32 },
   visible: {
@@ -49,7 +49,7 @@ const sectionVariants: Variants = {
       staggerChildren: 0.08,
     },
   },
-}
+};
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 22, scale: 0.98 },
@@ -62,7 +62,7 @@ const cardVariants: Variants = {
       ease: [0.22, 0.61, 0.36, 1],
     },
   },
-}
+};
 
 export default function SumithTMSBenefits({ benefitsData }: Props) {
   if (!benefitsData || !benefitsData.benefits) {
@@ -73,10 +73,10 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
       >
         <h2>No Benefits Data Found. Add and publish some in Sanity Studio!</h2>
       </section>
-    )
+    );
   }
 
-  const data = benefitsData
+  const data = benefitsData;
 
   return (
     <>
@@ -281,7 +281,7 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
           initial="hidden"
           whileInView="visible"
           viewport={{
-            once: false, // run every time section enters the viewport
+            once: true, // only first time after reload
             amount: 0.35,
           }}
         >
@@ -293,7 +293,7 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
           <div className="benefits-grid-wrap">
             <div className="benefits-grid">
               {data.benefits.map((f, i) => {
-                const IconComponent = iconMap[f.icon as keyof typeof iconMap]
+                const IconComponent = iconMap[f.icon as keyof typeof iconMap];
                 return (
                   <motion.article
                     key={i}
@@ -314,12 +314,12 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
                     <div className="benefit-title">{f.title}</div>
                     <div className="benefit-desc">{f.desc}</div>
                   </motion.article>
-                )
+                );
               })}
             </div>
           </div>
         </motion.div>
       </section>
     </>
-  )
+  );
 }

@@ -55,9 +55,9 @@ export default function IndiaMapSvg({
           const isAvailable = availableStates.includes(stateId)
 
           if (isAvailable) {
-            // Available states: lighter grey, interactive
-            path.setAttribute("fill", "#6b7280")
-            path.setAttribute("stroke", "#374151")
+            // Available states: light grey with blue highlights
+            path.setAttribute("fill", "#333232")
+            path.setAttribute("stroke", "#9ca3af")
             path.setAttribute("stroke-width", "0.8")
             path.setAttribute("style", "cursor: pointer; transition: all 0.3s ease;")
             
@@ -65,9 +65,9 @@ export default function IndiaMapSvg({
             path.addEventListener("mouseleave", () => onStateLeave())
             path.addEventListener("click", () => onStateClick(stateId))
           } else {
-            // Non-available states: dark grey, non-interactive
-            path.setAttribute("fill", "#374151")
-            path.setAttribute("stroke", "#1f2937")
+            // Non-available states: lighter grey, non-interactive
+            path.setAttribute("fill", "#f3f4f6")
+            path.setAttribute("stroke", "#d1d5db")
             path.setAttribute("stroke-width", "0.5")
             path.setAttribute("opacity", "0.6")
           }
@@ -86,20 +86,20 @@ export default function IndiaMapSvg({
       const stateId = path.getAttribute("id")
       if (!stateId || !availableStates.includes(stateId)) return
 
-      let fill = "#6b7280" // default grey
-      let stroke = "#374151"
+      let fill = "#333232" // default light grey
+      let stroke = "#9ca3af"
       let filter = "none"
       
       if (selectedStateId === stateId) {
-        // Selected: BRIGHT ORANGE (very visible)
+        // Selected: vibrant blue
+        fill = "#3b82f6"
+        stroke = "#2563eb"
+        filter = "drop-shadow(0 0 12px rgba(59, 130, 246, 0.5))"
+      } else if (hoveredStateId === stateId) {
+        // Hovered: orange
         fill = "#f97316"
         stroke = "#ea580c"
-        filter = "drop-shadow(0 0 12px rgba(249, 115, 22, 0.9))"
-      } else if (hoveredStateId === stateId) {
-        // Hovered: CYAN BLUE (clearly different from selected)
-        fill = "#06b6d4"
-        stroke = "#0891b2"
-        filter = "drop-shadow(0 0 8px rgba(6, 182, 212, 0.7))"
+        filter = "drop-shadow(0 0 8px rgba(249, 115, 22, 0.4))"
       }
 
       path.setAttribute("fill", fill)

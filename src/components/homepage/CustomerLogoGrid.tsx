@@ -1,63 +1,65 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Head from "next/head"
-import { useEffect, useRef, useState } from "react"
+import Image from "next/image";
+import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
 
 interface LogoItem {
-  name: string
-  logo: string
+  name: string;
+  logo: string;
 }
 
 interface SEOFields {
-  title?: string
-  description?: string
+  title?: string;
+  description?: string;
 }
 
 interface CustomerLogoGridProps {
   customerLogoGridData: {
-    heading: string
-    oems: LogoItem[]
-    otherSegments: LogoItem[]
-    seo?: SEOFields
-  } | null
+    heading: string;
+    oems: LogoItem[];
+    otherSegments: LogoItem[];
+    seo?: SEOFields;
+  } | null;
 }
 
 export default function CustomerLogoGrid({
   customerLogoGridData,
 }: CustomerLogoGridProps) {
-  const [fallback, setFallback] = useState<{ [key: string]: boolean }>({})
-  const sectionRef = useRef<HTMLElement | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
+  const [fallback, setFallback] = useState<{ [key: string]: boolean }>({});
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // Scroll‑reveal: toggles visibility on both enter and exit
+  // Scroll‑reveal: run only once per reload
   useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
+    const el = sectionRef.current;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // entry.isIntersecting true when section enters,
-        // false when it leaves → triggers fade-out and lets it re-animate next time
-        setIsVisible(entry.isIntersecting)
+        if (entry.isIntersecting) {
+          // First time section enters viewport after reload → show and stop observing
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
       },
       {
         threshold: 0.25,
         rootMargin: "0px 0px -10% 0px",
       }
-    )
+    );
 
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-  if (!customerLogoGridData) return null
+  if (!customerLogoGridData) return null;
 
-  const { heading, oems, otherSegments, seo } = customerLogoGridData
+  const { heading, oems, otherSegments, seo } = customerLogoGridData;
 
   const handleError = (key: string) => {
-    setFallback((f) => ({ ...f, [key]: true }))
-  }
+    setFallback(f => ({ ...f, [key]: true }));
+  };
 
   return (
     <>
@@ -267,5 +269,5 @@ export default function CustomerLogoGrid({
         </div>
       </section>
     </>
-  )
+  );
 }

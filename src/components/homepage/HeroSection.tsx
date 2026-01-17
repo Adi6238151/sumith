@@ -1,99 +1,98 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, type CSSProperties } from "react"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import Image from "next/image"
+import Image from "next/image";
+import Head from "next/head";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
-type HeroStat = { number: string | number; label: string }
-type HeroBackground = { asset?: { url?: string } }
+type HeroStat = { number: string | number; label: string };
+type HeroBackground = { asset?: { url?: string } };
 
 type HeroData = {
-  solutions?: string[] // used for subline like "Passenger Information Systems (PIS)"
-  backgroundImage?: HeroBackground
-  badge?: string
-  headline?: string // main typing headline from Sanity
-  description?: string
-  button1Text?: string
-  button2Text?: string
-  stats?: HeroStat[]
-}
+  solutions?: string[];
+  backgroundImage?: HeroBackground;
+  badge?: string;
+  headline?: string;
+  description?: string;
+  button1Text?: string;
+  button2Text?: string;
+  stats?: HeroStat[];
+};
 
 export default function HeroSection({ heroData }: { heroData?: HeroData }) {
-  const router = useRouter()
+  const router = useRouter();
 
-  // subline rotation (PIS, AFC, etc.)
-  const solutions = heroData?.solutions || []
-  const [currentSolution, setCurrentSolution] = useState(0)
+  const solutions = heroData?.solutions ?? [];
+  const [currentSolution, setCurrentSolution] = useState(0);
 
-  // typing headline state
-  const [typedHeadline, setTypedHeadline] = useState("")
-  const headingRef = useRef<HTMLHeadingElement | null>(null)
+  const [typedHeadline, setTypedHeadline] = useState("");
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
 
-  // rotate solutions
+  // rotate subline – depend only on length so dependency array size is stable
   useEffect(() => {
-    if (!solutions.length) return
-    const interval = setInterval(
-      () => setCurrentSolution((prev) => (prev + 1) % solutions.length),
-      3000
-    )
-    return () => clearInterval(interval)
-  }, [solutions.length])
+    if (!solutions.length) return;
+    setCurrentSolution(0);
+    const interval = window.setInterval(() => {
+      setCurrentSolution(prev => (prev + 1) % solutions.length);
+    }, 3000);
+    return () => window.clearInterval(interval);
+  }, [solutions.length]);
 
-  // scroll‑based typewriter for headline from Sanity
+  // scroll‑based typewriter for headline
   useEffect(() => {
-    const node = headingRef.current
-    const fullText = heroData?.headline?.trim() || ""
+    const node = headingRef.current;
+    const fullText = heroData?.headline?.trim() || "";
 
     if (!fullText || !node) {
-      setTypedHeadline(fullText)
-      return
+      setTypedHeadline(fullText);
+      return;
     }
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0]
+      entries => {
+        const entry = entries[0];
         const el = entry.target as HTMLElement & {
-          _typingInterval?: number | null
-        }
+          _typingInterval?: number | null;
+        };
 
         if (entry.isIntersecting) {
-          let index = 0
-          setTypedHeadline("")
-          if (el._typingInterval) window.clearInterval(el._typingInterval)
+          let index = 0;
+          setTypedHeadline("");
+          if (el._typingInterval) window.clearInterval(el._typingInterval);
 
           const intervalId = window.setInterval(() => {
-            index += 1
-            setTypedHeadline(fullText.slice(0, index))
+            index += 1;
+            setTypedHeadline(fullText.slice(0, index));
             if (index >= fullText.length) {
-              window.clearInterval(intervalId)
-              el._typingInterval = null
+              window.clearInterval(intervalId);
+              el._typingInterval = null;
             }
-          }, 60)
+          }, 60);
 
-          el._typingInterval = intervalId
+          el._typingInterval = intervalId;
         } else {
           if (el._typingInterval) {
-            window.clearInterval(el._typingInterval)
-            el._typingInterval = null
+            window.clearInterval(el._typingInterval);
+            el._typingInterval = null;
           }
-          setTypedHeadline("")
+          setTypedHeadline("");
         }
       },
       { root: null, threshold: 0.4 }
-    )
+    );
 
-    observer.observe(node)
+    observer.observe(node);
 
     return () => {
-      const el = node as HTMLElement & { _typingInterval?: number | null }
-      if (el && el._typingInterval) window.clearInterval(el._typingInterval)
-      observer.disconnect()
-    }
-  }, [heroData?.headline])
+      const el = node as HTMLElement & { _typingInterval?: number | null };
+      if (el && el._typingInterval) window.clearInterval(el._typingInterval);
+      observer.disconnect();
+    };
+  }, [heroData?.headline]);
 
   const backgroundImgUrl =
-    heroData?.backgroundImage?.asset?.url || "/backgrounds/hero-bg.jpg"
+    heroData?.backgroundImage?.asset?.url || "/backgrounds/hero-bg.jpg";
 
   const containerStyles: CSSProperties = {
     position: "relative",
@@ -101,7 +100,7 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
     overflow: "hidden",
     fontFamily:
       'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  }
+  };
 
   return (
     <section style={containerStyles}>
@@ -140,8 +139,9 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           margin-inline: auto;
           display: flex;
           flex-direction: column;
-          gap: 1.6rem;
+          gap: 1.4rem;
           text-align: center;
+          align-items: center;
         }
 
         .hero-badge {
@@ -155,13 +155,22 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
         }
 
+        /* Fixed width + stable height for heading */
         .hero-heading {
           font-weight: 800;
           letter-spacing: -0.02em;
-          font-size: clamp(2rem, 5vw, 3.6rem);
+          font-size: clamp(2rem, 5vw, 3.2rem);
           line-height: 1.18;
           max-width: 18ch;
+          min-height: 3.6em;
           margin-inline: auto;
+        }
+
+        @media (max-width: 480px) {
+          .hero-heading {
+            max-width: 16ch;
+            font-size: 2.1rem;
+          }
         }
 
         .hero-heading span {
@@ -190,10 +199,57 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           animation: hero-blink 0.8s steps(1) infinite;
         }
 
-        .hero-subline {
-          margin-top: 0.7rem;
-          font-size: clamp(1rem, 2.4vw, 1.4rem);
+        /* Vertical word-roll subline (long text friendly) */
+        .hero-subline-wrapper {
+          margin-top: 0.4rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          font-size: clamp(0.95rem, 2.4vw, 1.3rem);
           font-weight: 600;
+          color: #e5edff;
+          gap: 0.25rem;
+          max-width: 26rem;
+        }
+
+        .hero-subline-label {
+          opacity: 0.9;
+          white-space: nowrap;
+        }
+
+        .hero-subline-viewport {
+          position: relative;
+          height: 1.6em; /* tall enough so ADAS text is not clipped */
+          overflow: hidden;
+          display: inline-block;
+          min-width: 10rem;
+        }
+
+        .hero-subline-track {
+          display: flex;
+          flex-direction: column;
+          transform: translateY(0);
+          transition: transform 600ms cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .hero-subline-item {
+          height: 1.6em; /* match viewport height */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 0.25rem;
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        @media (max-width: 480px) {
+          .hero-subline-viewport {
+            min-width: 100%;
+          }
+          .hero-subline-wrapper {
+            max-width: 20rem;
+          }
         }
 
         .hero-description {
@@ -201,7 +257,8 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
           line-height: 1.7;
           max-width: 48rem;
           margin-inline: auto;
-          color: #e5edff;
+          color: #f5f7f5;
+          font-weight: 500;
         }
 
         .hero-actions {
@@ -272,12 +329,14 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
         }
 
         .hero-scroll {
-          margin-top: 2.4rem;
+          margin-top: 2.2rem;
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           gap: 0.5rem;
           font-size: clamp(0.85rem, 2vw, 0.95rem);
+          text-align: center;
         }
 
         .scroll-shell {
@@ -307,10 +366,6 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
             grid-template-columns: repeat(4, minmax(0, 1fr));
             max-width: 42rem;
             margin-inline: auto;
-          }
-
-          .hero-content {
-            text-align: center;
           }
         }
 
@@ -342,7 +397,6 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
       `}</style>
 
       <div className="hero-root">
-        {/* background image + overlay */}
         <div className="hero-bg-wrapper">
           <Image
             src={backgroundImgUrl}
@@ -366,10 +420,26 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
               <span className="hero-caret" aria-hidden="true" />
             </h1>
 
-            {solutions[currentSolution] && (
-              <p className="hero-subline">
-                {solutions[currentSolution]}
-              </p>
+            {solutions.length > 0 && (
+              <div className="hero-subline-wrapper">
+                <span className="hero-subline-label">
+                  Intelligent transit for
+                </span>
+                <span className="hero-subline-viewport">
+                  <span
+                    className="hero-subline-track"
+                    style={{
+                      transform: `translateY(-${currentSolution * 1.6}em)`,
+                    }}
+                  >
+                    {solutions.map((text, idx) => (
+                      <span key={idx} className="hero-subline-item">
+                        {text}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              </div>
             )}
 
             {heroData?.description && (
@@ -421,5 +491,5 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
         </div>
       </div>
     </section>
-  )
+  );
 }

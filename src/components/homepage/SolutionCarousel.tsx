@@ -7,11 +7,13 @@ interface Slide {
   label?: string;
   title: string;
   description: string;
-  image?: {
-    asset?: {
-      url: string;
-    };
-  } | string;
+  image?:
+    | {
+        asset?: {
+          url: string;
+        };
+      }
+    | string;
 }
 
 interface SolutionStackProps {
@@ -30,9 +32,11 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
       entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("solution-row--visible");
-          } else {
-            entry.target.classList.remove("solution-row--visible");
+            const target = entry.target as HTMLElement;
+            // Add visible class once when it first comes into view
+            target.classList.add("solution-row--visible");
+            // Stop observing this row so it doesn't toggle on scroll up/down
+            observer.unobserve(target);
           }
         });
       },
@@ -105,7 +109,6 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
             --its-text-soft: #aab4d8;
           }
 
-          /* ONLY CHANGE from reference: light background to match SolutionCarousel */
           .solution-section-light {
             width: 100%;
             padding: 90px 24px 110px;
@@ -156,7 +159,6 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
             align-items: center;
             position: relative;
 
-            /* scroll‑reveal initial state */
             opacity: 0;
             transform: translateY(48px) scale(0.98);
             transition:
@@ -164,7 +166,6 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
               transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
-          /* direction‑aware offset */
           .solution-row.image-right {
             grid-template-areas: "content image";
             transform: translate3d(-32px, 48px, 0) scale(0.98);
@@ -175,7 +176,6 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
             transform: translate3d(32px, 48px, 0) scale(0.98);
           }
 
-          /* when IntersectionObserver adds this class */
           .solution-row.solution-row--visible {
             opacity: 1;
             transform: translate3d(0, 0, 0) scale(1);
