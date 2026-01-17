@@ -36,7 +36,6 @@ interface Props {
   benefitsData: BenefitsData;
 }
 
-// section: fade + translate only
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 32 },
   visible: {
@@ -92,23 +91,30 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
           .benefits-section {
             width: 100%;
             padding: 4.5rem 1.25rem 4.8rem;
-            background: radial-gradient(circle at top, #f1fbff 0, transparent 55%),
-              linear-gradient(to bottom, #ffffff 0%, #f1f7fd 100%);
+            background: #FFFFFF;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
           }
 
-          .heading-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2.8rem;
-            text-align: center;
-            max-width: 38rem;
-          }
+           .benefits-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* stretch to full width */
+  }
+
+           .heading-wrap {
+    width: 100%;
+    max-width: 64rem;          /* same width as grid-wrap below */
+    margin: 0 auto 2.8rem;     /* center within that width */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
 
           .benefit-headline {
             background: linear-gradient(
@@ -124,27 +130,28 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
             color: transparent;
             animation: benefit-gradient-run 2.7s linear infinite alternate;
             font-weight: 800;
-            font-size: clamp(1.6rem, 3.7vw, 2.2rem);
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
             line-height: 1.25;
           }
 
           .benefit-fixed-subtitle {
-            font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+            font-size: clamp(0.96rem, 1.9vw, 1.1rem);
             font-weight: 500;
             color: #25486a;
             line-height: 1.6;
+            max-width: 40rem;
           }
 
-          .benefits-grid-wrap {
-            width: 100%;
-            max-width: 64rem;
-            margin: 0 auto;
-          }
+           .benefits-grid-wrap {
+    width: 100%;
+    max-width: 64rem;          /* match heading */
+    margin: 0 auto;
+  }
 
           .benefits-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr);
-            gap: 1.6rem;
+            gap: 1.8rem;
             width: 100%;
           }
 
@@ -159,7 +166,7 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
             border-radius: 1.6rem;
             border: 1px solid rgba(173, 205, 243, 0.95);
             box-shadow: 0 14px 32px rgba(26, 108, 190, 0.12);
-            padding: 1.7rem 1.4rem 1.9rem;
+            padding: 1.7rem 1.6rem 1.9rem;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -192,7 +199,7 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
 
           .benefit-title {
             font-weight: 600;
-            font-size: clamp(1.05rem, 2.4vw, 1.22rem);
+            font-size: clamp(1.05rem, 2.2vw, 1.2rem);
             line-height: 1.35;
             letter-spacing: 0.012em;
             margin-bottom: 0.4rem;
@@ -214,10 +221,10 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
 
           .benefit-desc {
             color: #225185;
-            font-size: clamp(0.9rem, 2.2vw, 1.02rem);
+            font-size: clamp(0.9rem, 2vw, 1.02rem);
             font-weight: 500;
             letter-spacing: 0.015em;
-            line-height: 1.6;
+            line-height: 1.65;
           }
 
           .benefit-card:hover,
@@ -241,18 +248,18 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
 
           @media (min-width: 768px) {
             .benefits-section {
-              padding: 5.5rem 2.5rem 5.5rem;
+              padding: 5.2rem 2.5rem 5.4rem;
             }
 
             .benefits-grid {
               grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 1.9rem 2.4rem;
+              gap: 2rem 2.4rem;
             }
 
             .benefit-card {
-              padding: 2rem 1.6rem 2.2rem;
+              padding: 2rem 1.8rem 2.2rem;
               border-radius: 1.8rem;
-              min-height: 240px;
+              min-height: 230px;
             }
           }
 
@@ -274,51 +281,67 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
               padding-right: 5rem;
             }
           }
+
+          @media (max-width: 640px) {
+            .benefits-section {
+              padding: 3.6rem 1.2rem 4rem;
+            }
+
+            .heading-wrap {
+              margin-bottom: 2.2rem;
+            }
+
+            .benefit-card {
+              padding: 1.5rem 1.25rem 1.7rem;
+            }
+          }
         `}</style>
 
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{
-            once: true, // only first time after reload
-            amount: 0.35,
-          }}
-        >
-          <div className="heading-wrap">
-            <h2 className="benefit-headline">{data.heading}</h2>
-            <div className="benefit-fixed-subtitle">{data.subtitle}</div>
-          </div>
-
-          <div className="benefits-grid-wrap">
-            <div className="benefits-grid">
-              {data.benefits.map((f, i) => {
-                const IconComponent = iconMap[f.icon as keyof typeof iconMap];
-                return (
-                  <motion.article
-                    key={i}
-                    className="benefit-card"
-                    variants={cardVariants}
-                    whileHover={{
-                      y: -4,
-                      scale: 1.02,
-                      transition: {
-                        type: "spring",
-                        stiffness: 220,
-                        damping: 20,
-                      },
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {IconComponent && <IconComponent className="icon" />}
-                    <div className="benefit-title">{f.title}</div>
-                    <div className="benefit-desc">{f.desc}</div>
-                  </motion.article>
-                );
-              })}
+        <div className="benefits-inner">
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{
+              once: true,
+              amount: 0.35,
+            }}
+          >
+            <div className="heading-wrap">
+              <h2 className="benefit-headline">{data.heading}</h2>
+              <div className="benefit-fixed-subtitle">{data.subtitle}</div>
             </div>
-          </div>
-        </motion.div>
+
+            <div className="benefits-grid-wrap">
+              <div className="benefits-grid">
+                {data.benefits.map((f, i) => {
+                  const IconComponent = iconMap[f.icon as keyof typeof iconMap];
+                  return (
+                    <motion.article
+                      key={i}
+                      className="benefit-card"
+                      variants={cardVariants}
+                      whileHover={{
+                        y: -4,
+                        scale: 1.02,
+                        transition: {
+                          type: "spring",
+                          stiffness: 220,
+                          damping: 20,
+                        },
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {IconComponent && <IconComponent className="icon" />}
+                      <div className="benefit-title">{f.title}</div>
+                      <div className="benefit-desc">{f.desc}</div>
+                    </motion.article>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
     </>
   );

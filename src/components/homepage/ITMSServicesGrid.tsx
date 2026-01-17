@@ -80,7 +80,7 @@ export default function ITMSServicesGrid({
         <style jsx>{`
           .product-grid-section {
             width: 100%;
-            background: linear-gradient(to bottom, #f8fbff 0%, #ffffff 100%);
+            background: linear-gradient(to bottom, #ffffff 0%, #ffffff 100%);
             display: flex;
             flex-direction: column;
             align-items: center;

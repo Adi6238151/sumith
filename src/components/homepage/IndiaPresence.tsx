@@ -145,8 +145,8 @@ export default function IndiaPresence({ data }: { data: IndiaPresenceData }) {
           background: linear-gradient(135deg, #f3f4f6, #333232);
           border: 1px solid #d1d5db;
           border-radius: 0.6rem;
-          width: 36px;
-          height: 36px;
+          width: 20px;
+          height: 20px;
           display: flex;
           align-items: center;
           justify-content: center;

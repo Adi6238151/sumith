@@ -33,9 +33,7 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const target = entry.target as HTMLElement;
-            // Add visible class once when it first comes into view
             target.classList.add("solution-row--visible");
-            // Stop observing this row so it doesn't toggle on scroll up/down
             observer.unobserve(target);
           }
         });
@@ -67,7 +65,7 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
                 key={idx}
                 className={`solution-row ${isEven ? "image-right" : "image-left"}`}
               >
-                {/* Content */}
+                {/* Text content */}
                 <div className="content-block">
                   <div className="content-inner">
                     <h3 className="solution-title">{item.title}</h3>
@@ -76,16 +74,16 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
                   </div>
                 </div>
 
-                {/* Image */}
+                {/* Image as background-like card */}
                 <div className="image-block">
                   <div className="image-wrapper">
                     <div className="image-frame">
                       <Image
                         src={imageSrc}
                         alt={item.title}
-                        width={600}
-                        height={400}
+                        fill
                         priority={idx === 0}
+                        sizes="(min-width: 1024px) 560px, 100vw"
                         className="solution-image"
                       />
                       <div className="image-overlay" />
@@ -99,47 +97,18 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
         </div>
 
         <style jsx>{`
-          :root {
-            --its-card-bg: #0b1020;
-            --its-card-soft: #101833;
-            --its-border-subtle: #1b2642;
-            --its-accent: #4d5bff;
-            --its-accent2: #20e0d0;
-            --its-text-main: #f5f7ff;
-            --its-text-soft: #aab4d8;
-          }
-
           .solution-section-light {
             width: 100%;
             padding: 90px 24px 110px;
             position: relative;
             overflow: hidden;
             color: #13333c;
-            background: radial-gradient(
-                circle at top left,
-                rgba(255, 255, 255, 0.9),
-                #fafdff 55%
-              ),
-              linear-gradient(180deg, #fafdff 0%, #f3f7ff 60%, #fafdff 100%);
+            background: #ffffff; /* plain white */
           }
 
+          /* remove background effects */
           .solution-section-light::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-              radial-gradient(
-                circle at 10% 0,
-                rgba(93, 127, 255, 0.08),
-                transparent 60%
-              ),
-              radial-gradient(
-                circle at 90% 100%,
-                rgba(36, 230, 195, 0.08),
-                transparent 55%
-              );
-            opacity: 0.08;
-            pointer-events: none;
+            content: none;
           }
 
           .solution-container {
@@ -194,17 +163,11 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
           .content-inner {
             position: relative;
             padding: 32px 30px 30px;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(83, 225, 203, 0.22),
-                transparent 60%
-              ),
-              linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.98),
-                rgba(240, 246, 255, 0.98)
-              );
+            background: linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.98),
+              rgba(240, 246, 255, 0.98)
+            );
             border-radius: 22px;
             border: 1px solid rgba(184, 208, 255, 0.8);
             box-shadow:
@@ -266,31 +229,26 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
             height: 380px;
             border-radius: 24px;
             overflow: hidden;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(88, 235, 207, 0.22),
-                transparent 60%
-              ),
-              linear-gradient(135deg, #eef6ff, #cfe0ff);
             box-shadow:
               0 28px 80px rgba(6, 40, 100, 0.35),
-              0 0 0 1px rgba(80, 124, 255, 0.6);
+              0 0 0 1px rgba(80, 124, 255, 0.2);
             transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
               box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
           .image-frame:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
             box-shadow:
               0 34px 96px rgba(16, 147, 248, 0.32),
-              0 0 0 1px rgba(122, 175, 255, 0.95);
+              0 0 0 1px rgba(122, 175, 255, 0.8);
           }
 
           .solution-image {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover; /* fill frame */
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
@@ -301,25 +259,19 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
           .image-overlay {
             position: absolute;
             inset: 0;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(46, 219, 187, 0.28),
-                transparent 60%
-              ),
-              linear-gradient(
-                135deg,
-                rgba(207, 225, 255, 0.7),
-                rgba(191, 211, 255, 0.95)
-              );
-            mix-blend-mode: soft-light;
+            background: linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0),
+              rgba(15, 23, 42, 0.08)
+            );
+            mix-blend-mode: normal;
             pointer-events: none;
-            opacity: 0.4;
+            opacity: 1;
             transition: opacity 0.4s ease;
           }
 
           .image-frame:hover .image-overlay {
-            opacity: 0.7;
+            opacity: 0.9;
           }
 
           .floating-accent {
