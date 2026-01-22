@@ -26,6 +26,6 @@
       }
     ]
   },
-  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "sanity.config.ts"],
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "sanity.config.ts", "schemaTypes/products/product.js", "schemaTypes/products/solution.js"],
   "exclude": ["node_modules"]
 }

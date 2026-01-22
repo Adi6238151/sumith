@@ -1,0 +1,163 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import ProductFeatureSection from "@/components/products/sections/ProductFeatureSection";
+import ProductSpecsSection from "@/components/products/sections/ProductSpecsSection";
+import styles from "./ProductPageClient.module.css";
+
+export default function ProductPageClient({ product }) {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("features");
+
+  const featureSections = product.sections?.filter(s => s._type === "featureSection") || [];
+  const specSections = product.sections?.filter(s => s._type === "specSection") || [];
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const offsetHeight = 140;
+      const y = el.getBoundingClientRect().top + window.scrollY - offsetHeight;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  // Scroll Spy Logic
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "-20% 0px -60% 0px",
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveTab(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    const sections = ["features", "specifications", "ordering", "trackers"];
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      {/* HERO/INTRO SECTION */}
+      {product.intro && (
+        <div className={styles.heroSection}>
+          {/* Back Button */}
+          <button 
+            onClick={() => router.back()} 
+            className={styles.backButton}
+            aria-label="Go back to products"
+          >
+            <svg 
+              className={styles.backIcon}
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M19 12H5M5 12L12 19M5 12L12 5" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className={styles.backText}>Back to Products</span>
+          </button>
+
+          <div className={styles.heroTitleContainer}>
+            <h1 className={styles.heroTitle}>
+              {product.name}
+            </h1>
+          </div>
+
+          <p className={styles.heroDescription}>
+            {product.intro}
+          </p>
+        </div>
+      )}
+
+      {/* STICKY SUB-NAVIGATION */}
+      <div className={styles.stickyNav}>
+        <div className={styles.navContainer}>
+          {["features", "specifications", "ordering", "trackers"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => scrollToSection(tab)}
+              className={`${styles.navButton} ${activeTab === tab ? styles.navButtonActive : ''}`}
+              onMouseEnter={(e) => {
+                if (activeTab !== tab) {
+                  e.currentTarget.style.color = '#111827';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== tab) {
+                  e.currentTarget.style.color = '#6b7280';
+                }
+              }}
+            >
+              {tab}
+              {activeTab === tab && (
+                <span className={styles.navIndicator} />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* CONTENT SECTIONS */}
+      <div className={styles.contentWrapper}>
+        
+        {/* Features Group */}
+        <div id="features" className={styles.section}>
+          {featureSections.map((section, idx) => (
+            <ProductFeatureSection 
+              key={`feature-${section._key}-${product.slug?.current || product._id}`}
+              data={section} 
+              isReverse={idx % 2 !== 0}
+            />
+          ))}
+        </div>
+
+        {/* Specifications */}
+        {specSections.length > 0 && (
+          <div id="specifications" className={styles.section}>
+            {specSections.map((section) => (
+               <ProductSpecsSection key={section._key} data={section} />
+            ))}
+          </div>
+        )}
+
+        {/* Placeholders */}
+        <div 
+          id="ordering" 
+          className={`${styles.placeholderSection} ${styles.placeholderOrdering}`}
+        >
+          <p className={styles.placeholderText}>
+            Ordering Section Placeholder
+          </p>
+        </div>
+        
+        <div 
+          id="trackers" 
+          className={`${styles.placeholderSection} ${styles.placeholderTrackers}`}
+        >
+          <p className={styles.placeholderText}>
+            Trackers Section Placeholder
+          </p>
+        </div>
+
+      </div>
+    </>
+  );
+}

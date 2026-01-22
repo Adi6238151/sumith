@@ -16,8 +16,6 @@ import AirportSectionHeader from './Airport/AirportSectionHeader'
 import footerSettings from './footer/FooterSettings'
 import indiaPresence from "./indiaPresence"
 
-
-
 // About Page Schemas
 import aboutPage from './about/AboutHero'
 import aboutStats from './about/AboutStats'
@@ -32,16 +30,24 @@ import aboutLeadership from './about/AboutLeadership'
 import aboutTimeline from "./about/aboutTimeline"
 
 
+// Products
+//import { blockContent } from './products/blockContent'
+//import { product } from './products/product'
+//import { solutionCard } from './products/solutionCard'
+//import { solutionCardsContainer } from './products/solutionCardsContainer'
 
-//Products
-import { blockContent } from './products/blockContent'
-import { product } from './products/product'
-
-//contact
+// Contact
 import emailSettings from './contact/emailSettings'
 import contactTopic from './contact/contactTopic'
 
-
+//products
+import productHero from "./products/productHero"
+import { product } from "./products/product";
+import solution from './products/solution'
+import { featureSection } from "./products/featureSection";
+import { specSection } from "./products/specSection";
+// Services
+import servicesHero from './services/heroSection'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -76,11 +82,21 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     aboutTimeline,
 
     // Products
+    //product,
+    //blockContent,
+    //solutionCard,
+    //solutionCardsContainer,
+    productHero,
     product,
-    blockContent,
+    solution,
+    featureSection,
+    specSection,
+
     // Contact
     emailSettings,
     contactTopic,
 
+    // Services
+    servicesHero,
   ],
 }

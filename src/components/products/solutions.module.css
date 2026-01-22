@@ -1,0 +1,185 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 36px;
+  padding: 72px 0;
+}
+
+/* ============================= */
+/* CARD */
+/* ============================= */
+.card {
+  position: relative;
+  height: 540px;
+  border-radius: 40px;
+  padding: 56px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-decoration: none;
+  transition: box-shadow 0.4s ease;
+   cursor: pointer;
+}
+
+.card:hover {
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.18);
+}
+
+/* ============================= */
+/* THEMES */
+/* ============================= */
+
+/* BLUE THEME */
+.blue {
+  background-color: #5fafed;     /* default */
+  color: #1782d4;                /* default text */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.card:hover.blue {
+  background-color: #1782d4;     /* hover */
+  color: #ffffff;
+}
+
+/* GREEN THEME */
+.green {
+  background-color: #d9f1c9;     /* KEEP AS-IS (default) */
+  color: #1f7a1f;                /* default text */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.card:hover.green {
+  background-color: #36a300;     /* ✅ REQUIRED HOVER COLOR */
+  color: #ffffff;
+}
+
+/* ============================= */
+/* CONTENT */
+/* ============================= */
+.content {
+  z-index: 2;
+  max-width: 58%;
+}
+
+.title {
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: 28px;
+}
+
+.cta {
+  font-size: 18px;
+  font-weight: 500;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.card:hover .arrow {
+  transform: translateX(6px);
+}
+
+/* ============================= */
+/* IMAGE */
+/* ============================= */
+.imageWrap {
+  position: absolute;
+  width: 580px;
+  height: 480px;
+
+  bottom: -270px;
+  left: 20%;
+  transform: translateX(-10%);
+
+  overflow: visible;
+  pointer-events: none;
+}
+
+.image {
+  object-fit: contain;
+}
+
+/* ============================= */
+/* TABLET */
+/* ============================= */
+@media (max-width: 1024px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .card {
+    height: 500px;
+    padding: 48px;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+
+  .imageWrap {
+    width: 420px;
+    height: 320px;
+    bottom: -140px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================= */
+/* MOBILE */
+/* ============================= */
+@media (max-width: 640px) {
+  .wrapper {
+    padding: 48px 0;
+    gap: 24px;
+  }
+
+  .card {
+    height: auto;
+    min-height: 460px;
+    padding: 28px;
+    border-radius: 28px;
+  }
+
+  .content {
+    max-width: 100%;
+    padding-bottom: 300px;
+  }
+
+  .title {
+    font-size: 26px;
+    line-height: 1.25;
+  }
+
+  .cta {
+    font-size: 16px;
+  }
+
+  .imageWrap {
+    width: 88%;
+    max-width: 380px;
+    aspect-ratio: 16 / 10;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .card:hover {
+    box-shadow: none;
+  }
+
+  .card:hover .arrow {
+    transform: none;
+  }
+}

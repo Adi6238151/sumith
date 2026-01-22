@@ -1,0 +1,141 @@
+.section {
+  width: 100%;
+  padding: 4rem 0;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Reverse layout for alternating sections */
+.reverse {
+  direction: rtl;
+}
+
+.reverse .imageContainer,
+.reverse .textContainer {
+  direction: ltr;
+}
+
+/* Image Container */
+.imageContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 600px;
+}
+
+/* Text Container */
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.description {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #475569;
+  margin: 0;
+}
+
+/* Tablet Breakpoint */
+@media (max-width: 1024px) {
+  .container {
+    gap: 2rem;
+    padding: 0 1.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+}
+
+/* Mobile Breakpoint - Stack Vertically */
+@media (max-width: 768px) {
+  .section {
+    padding: 3rem 0;
+  }
+
+  .container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 0 1rem;
+    direction: ltr !important;
+  }
+
+  /* Remove reverse direction on mobile */
+  .reverse {
+    direction: ltr;
+  }
+
+  .imageContainer {
+    order: 1;
+  }
+
+  .textContainer {
+    order: 2;
+    padding: 0;
+    text-align: center;
+  }
+
+  .imageWrapper {
+    max-width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .section {
+    padding: 2rem 0;
+  }
+
+  .container {
+    gap: 1.5rem;
+    padding: 0 0.75rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .description {
+    font-size: 0.875rem;
+  }
+}

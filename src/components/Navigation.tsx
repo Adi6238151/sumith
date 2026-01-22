@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import styles from "./Navigation.module.css";
 
 const dropdownSections = [
   {
@@ -35,7 +36,7 @@ const dropdownSections = [
 
 const navLinks = [
   { label: "About us", href: "/about-us" },
-  { label: "Products", href: "/solutions/products" },
+  { label: "Products", href: "/products" },
   { label: "Insights", href: "/insights" },
   { label: "Careers", href: "/careers" },
   { label: "Contact us", href: "/contact-us" },
@@ -133,13 +134,13 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className={`mega-navbar${isVisible ? " visible" : " hidden"}`} ref={navRef}>
+      <nav className={`${styles.megaNavbar}${isVisible ? ` ${styles.visible}` : ` ${styles.hidden}`}`} ref={navRef}>
         <div
-          className={`sidebar-overlay${sidebar ? " active" : ""}`}
+          className={`${styles.sidebarOverlay}${sidebar ? ` ${styles.active}` : ""}`}
           onClick={() => setSidebar(false)}
         />
-        <aside className={`sidebar${sidebar ? " open" : ""}`}>
-          <div className="sidebar-header">
+        <aside className={`${styles.sidebar}${sidebar ? ` ${styles.open}` : ""}`}>
+          <div className={styles.sidebarHeader}>
             <Link
               href="/"
               tabIndex={sidebar ? 0 : -1}
@@ -151,12 +152,12 @@ export default function Navigation() {
                 width={120}
                 height={36}
                 alt="Sumith Electronics Logo"
-                className="sidebar-logo"
+                className={styles.sidebarLogo}
                 priority
               />
             </Link>
             <button
-              className="close-btn"
+              className={styles.closeBtn}
               aria-label="Close sidebar"
               onClick={() => setSidebar(false)}
             >
@@ -164,18 +165,18 @@ export default function Navigation() {
             </button>
           </div>
 
-          <div className="sidebar-links">
+          <div className={styles.sidebarLinks}>
             <button
-              className="sidebar-link sidebar-dropdown"
+              className={`${styles.sidebarLink} ${styles.sidebarDropdown}`}
               onClick={() => setAccordion((v) => !v)}
             >
               <span>SOLUTIONS</span>
-              <span className={`arrow${accordion ? " open" : ""}`}>▲</span>
+              <span className={`${styles.arrow}${accordion ? ` ${styles.arrowOpen}` : ""}`}>▲</span>
             </button>
-            <div className={`sidebar-dropdown-content${accordion ? " show" : ""}`}>
+            <div className={`${styles.sidebarDropdownContent}${accordion ? ` ${styles.show}` : ""}`}>
               {dropdownSections.map((section) => (
-                <div className="sidebar-dropdown-section" key={section.title}>
-                  <div className="sidebar-dropdown-title">
+                <div className={styles.sidebarDropdownSection} key={section.title}>
+                  <div className={styles.sidebarDropdownTitle}>
                     <Image src={section.icon} alt="" width={22} height={22} /> {section.title}
                   </div>
                   <ul>
@@ -241,7 +242,7 @@ export default function Navigation() {
 
             {navLinks.map((item) => (
               <Link
-                className="sidebar-link"
+                className={styles.sidebarLink}
                 key={item.label}
                 href={item.href}
                 tabIndex={sidebar ? 0 : -1}
@@ -253,9 +254,9 @@ export default function Navigation() {
           </div>
         </aside>
 
-        <div className="navbar-inner">
+        <div className={styles.navbarInner}>
           <button
-            className="hamburger"
+            className={styles.hamburger}
             aria-label="Open menu"
             onClick={() => setSidebar(true)}
           >
@@ -264,27 +265,27 @@ export default function Navigation() {
             <span />
           </button>
 
-          <div className="logo">
+          <div className={styles.logo}>
             <Link href="/" style={{ display: "inline-block" }}>
               <Image
                 src="/logos/sumith-logo.png"
                 width={150}
                 height={44}
                 alt="Sumith Electronics Logo"
-                className="logo-img"
+                className={styles.logoImg}
                 priority
               />
             </Link>
           </div>
 
-          <div className="pill-nav-wrapper">
-            <div className="pill-nav" ref={pillNavRef}>
+          <div className={styles.pillNavWrapper}>
+            <div className={styles.pillNav} ref={pillNavRef}>
               <button
                 ref={(el: HTMLButtonElement | null) => {
                   pillRefs.current[0] = el;
                 }}
-                className={`pill-nav-item solutions-pill${
-                  (hoverIndex ?? activeIndex) === 0 ? " is-hovered" : ""
+                className={`${styles.pillNavItem} ${styles.solutionsPill}${
+                  (hoverIndex ?? activeIndex) === 0 ? ` ${styles.isHovered}` : ""
                 }`}
                 onMouseEnter={() => {
                   setOpen(true);
@@ -302,7 +303,7 @@ export default function Navigation() {
                 aria-label="Solutions"
               >
                 Solutions
-                <span className="down-arrow-pill" />
+                <span className={styles.downArrowPill} />
               </button>
 
               {navLinks.map((item, idx) => {
@@ -312,7 +313,7 @@ export default function Navigation() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className={`pill-nav-item${isCurrent ? " is-hovered" : ""}`}
+                    className={`${styles.pillNavItem}${isCurrent ? ` ${styles.isHovered}` : ""}`}
                     ref={(el: HTMLAnchorElement | null) => {
                       pillRefs.current[pillIndex] = el;
                     }}
@@ -326,32 +327,32 @@ export default function Navigation() {
                 );
               })}
 
-              <span className="pill-nav-highlight" aria-hidden="true" />
+              <span className={styles.pillNavHighlight} aria-hidden="true" />
             </div>
           </div>
         </div>
 
         <div
-          className="mega-dropdown"
+          className={styles.megaDropdown}
           style={{ display: open ? "flex" : "none" }}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
           {dropdownSections.map((section) => (
-            <div className="dropdown-section" key={section.title}>
-              <div className="section-header">
+            <div className={styles.dropdownSection} key={section.title}>
+              <div className={styles.sectionHeader}>
                 <Image
                   src={section.icon}
                   alt=""
                   width={40}
                   height={40}
-                  className="section-icon"
+                  className={styles.sectionIcon}
                 />
-                <span className="section-title">{section.title}</span>
+                <span className={styles.sectionTitle}>{section.title}</span>
               </div>
-              <ul className="section-items">
+              <ul className={styles.sectionItems}>
                 {section.items.map((item) => (
-                  <li className="section-item" key={item.label}>
+                  <li className={styles.sectionItem} key={item.label}>
                     {item.label === "Bus" ? (
                       <Link
                         href="/solutions/transit-bus"
@@ -368,7 +369,7 @@ export default function Navigation() {
                           alt=""
                           width={16}
                           height={16}
-                          className="bullet-icon"
+                          className={styles.bulletIcon}
                         />
                         <span>{item.label}</span>
                       </Link>
@@ -388,7 +389,7 @@ export default function Navigation() {
                           alt=""
                           width={16}
                           height={16}
-                          className="bullet-icon"
+                          className={styles.bulletIcon}
                         />
                         <span>{item.label}</span>
                       </Link>
@@ -408,7 +409,7 @@ export default function Navigation() {
                           alt=""
                           width={16}
                           height={16}
-                          className="bullet-icon"
+                          className={styles.bulletIcon}
                         />
                         <span>{item.label}</span>
                       </Link>
@@ -419,7 +420,7 @@ export default function Navigation() {
                           alt=""
                           width={16}
                           height={16}
-                          className="bullet-icon"
+                          className={styles.bulletIcon}
                         />
                         <span>{item.label}</span>
                       </>
@@ -431,390 +432,6 @@ export default function Navigation() {
           ))}
         </div>
       </nav>
-
-      <style jsx global>{`
-        .hamburger {
-          display: none;
-          flex-direction: column;
-          gap: 3px;
-          background: transparent;
-          border: none;
-          outline: none;
-          cursor: pointer;
-          width: 36px;
-          height: 36px;
-          margin-right: 16px;
-        }
-        .hamburger span {
-          display: block;
-          width: 29px;
-          height: 3.5px;
-          border-radius: 2px;
-          background: #112445;
-        }
-
-        .sidebar-overlay {
-          visibility: hidden;
-          opacity: 0;
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.18);
-          transition: visibility 0.22s, opacity 0.22s;
-          z-index: 2001;
-        }
-        .sidebar-overlay.active {
-          visibility: visible;
-          opacity: 1;
-        }
-
-        .sidebar {
-          position: fixed;
-          top: 0;
-          left: -100%;
-          height: 100dvh;
-          width: 100%;
-          max-width: 420px;
-          background: #ffffff;
-          box-shadow: 3px 0 15px rgba(30, 40, 68, 0.18);
-          z-index: 2002;
-          transition: left 0.28s cubic-bezier(0.2, 0.6, 0.3, 1);
-          display: flex;
-          flex-direction: column;
-        }
-        .sidebar.open {
-          left: 0;
-        }
-        .sidebar-header {
-          flex: 0 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 17px 12px 18px;
-          border-bottom: 1px solid #eff0f1;
-        }
-        .sidebar-logo {
-          width: 110px !important;
-          height: auto;
-        }
-        .close-btn {
-          font-size: 1.6rem;
-          border: none;
-          background: transparent;
-          color: #1753a6;
-          cursor: pointer;
-        }
-        .sidebar-links {
-          flex: 1 1 auto;
-          display: flex;
-          flex-direction: column;
-          padding: 13px 10px 18px 18px;
-          gap: 7px;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-        .sidebar-link {
-          background: none;
-          border: none;
-          outline: none;
-          font-size: clamp(1rem, 2.7vw, 1.13rem);
-          font-weight: 600;
-          color: #172c44;
-          letter-spacing: 0.015em;
-          text-align: left;
-          text-decoration: none;
-          cursor: pointer;
-          padding: 11px 0;
-          transition: color 0.18s;
-          display: flex;
-          align-items: center;
-        }
-        .sidebar-link:hover,
-        .sidebar-link:focus {
-          color: #43b724;
-        }
-        .sidebar-dropdown {
-          justify-content: space-between;
-        }
-        .arrow {
-          transition: transform 0.17s;
-          font-size: 1.16em;
-          color: #43b724;
-          display: inline-block;
-          margin-left: 6px;
-          vertical-align: middle;
-        }
-        .arrow.open {
-          transform: rotate(180deg);
-        }
-        .sidebar-dropdown-content {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.32s;
-          background: #f7f8fb;
-          border-radius: 7px;
-          margin: 0 0 10px 0;
-        }
-        .sidebar-dropdown-content.show {
-          max-height: 800px;
-          padding: 13px 0 6px 9px;
-          box-shadow: 0 1.5px 8px rgba(50, 68, 98, 0.08);
-          border: 1px solid #eff0f2;
-        }
-        .sidebar-dropdown-section {
-          margin-bottom: 7px;
-        }
-        .sidebar-dropdown-title {
-          color: #27304d;
-          font-size: 0.97rem;
-          font-weight: 600;
-          display: flex;
-          gap: 8px;
-          margin-bottom: 5px;
-          align-items: center;
-        }
-        .sidebar-dropdown-section ul {
-          list-style: none;
-          margin: 0;
-          padding: 0 0 2px 0;
-        }
-        .sidebar-dropdown-section li {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.98rem;
-          font-weight: 500;
-          color: #4b5f79;
-          padding: 4px 0 2px 2px;
-        }
-
-        .mega-navbar {
-          width: 100%;
-          background: #111111;
-          position: fixed;
-          top: 0;
-          left: 0;
-          box-shadow: 0 1px 0 0 #1f2933;
-          z-index: 1010;
-          font-family: "Montserrat", Arial, sans-serif;
-          transition: top 0.4s cubic-bezier(0.2, 0.82, 0.42, 1), box-shadow 0.22s;
-        }
-        .mega-navbar.hidden {
-          top: -110px;
-        }
-        .mega-navbar.visible {
-          top: 0;
-        }
-        .navbar-inner {
-          max-width: 1550px;
-          margin: 0 auto;
-          height: 96px;
-          display: flex;
-          align-items: center;
-          gap: 48px;
-          padding: 0 48px;
-          position: relative;
-        }
-        .logo {
-          flex: 1 1 auto;
-          text-align: left;
-          display: flex;
-          align-items: center;
-        }
-        .logo-img {
-          width: 150px !important;
-          height: auto;
-        }
-
-        .pill-nav-wrapper {
-          flex: 2 1 750px;
-          display: flex;
-          justify-content: center;
-        }
-        .pill-nav {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 6px;
-          border-radius: 999px;
-          background: radial-gradient(circle at top, #f5f5f5, #d2d2d2);
-          box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25),
-            inset 0 1px 0 rgba(255, 255, 255, 0.7);
-          --pill-highlight-left: 0px;
-          --pill-highlight-width: 0px;
-          --pill-highlight-opacity: 1;
-        }
-        .pill-nav-item {
-          position: relative;
-          border: none;
-          outline: none;
-          border-radius: 999px;
-          padding: 9px 28px;
-          font-size: 1.02rem;
-          font-weight: 700;
-          letter-spacing: 0.02em;
-          background: transparent;
-          color: #111827;
-          cursor: pointer;
-          transition: color 0.16s ease, transform 0.16s ease,
-            text-shadow 0.16s ease;
-          white-space: nowrap;
-          z-index: 1;
-          text-decoration: none;
-        }
-        .solutions-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .down-arrow-pill {
-          display: inline-block;
-          width: 12px;
-          height: 12px;
-          border-radius: 999px;
-          border: 2px solid #374151;
-          border-top: 0;
-          border-right: 0;
-          transform: rotate(-45deg) translateY(1px);
-        }
-        .pill-nav-item.is-hovered {
-          color: #f9fafb;
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
-        }
-        .pill-nav-item:hover {
-          transform: translateY(-1px);
-        }
-        .pill-nav-highlight {
-          position: absolute;
-          top: 4px;
-          height: calc(100% - 8px);
-          border-radius: 999px;
-          background: #000000;
-          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65);
-          transform: translateX(var(--pill-highlight-left));
-          width: var(--pill-highlight-width);
-          opacity: var(--pill-highlight-opacity);
-          transition: transform 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12),
-            width 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12);
-          pointer-events: none;
-        }
-
-        .mega-dropdown {
-          width: 100%;
-          left: 0;
-          position: absolute;
-          background: #0f172a;
-          box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
-          top: 100%;
-          padding: 30px 38px;
-          display: flex;
-          flex-direction: row;
-          gap: 22px;
-          z-index: 1011;
-        }
-        .dropdown-section {
-          min-width: 215px;
-          padding: 0 16px 0 0;
-          display: flex;
-          flex-direction: column;
-          border-right: 1.5px solid #1f2937;
-        }
-        .dropdown-section:last-child {
-          border-right: none;
-        }
-        .section-header {
-          display: flex;
-          align-items: center;
-          gap: 13px;
-          margin-bottom: 18px;
-        }
-        .section-title {
-          text-transform: uppercase;
-          color: #e5e7eb;
-          font-size: 1.02rem;
-          font-weight: 700;
-          letter-spacing: 0.06em;
-        }
-        .section-icon {
-          width: 33px;
-          height: 33px;
-          object-fit: contain;
-        }
-        .section-items {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-        .section-item {
-          display: flex;
-          align-items: center;
-          font-size: 1.01rem;
-          font-weight: 500;
-          color: #cbd5f5;
-          padding: 0 0 13px 0;
-          gap: 8px;
-        }
-        .section-item:last-child {
-          padding-bottom: 0;
-        }
-        .section-item:hover {
-          color: #fbbf24;
-          transform: translateX(3px);
-          transition: transform 0.16s ease, color 0.16s ease;
-        }
-        .bullet-icon {
-          width: 16px;
-          height: 16px;
-          object-fit: contain;
-        }
-
-        @media (max-width: 1050px) {
-          .navbar-inner,
-          .mega-dropdown {
-            padding-left: 5vw;
-            padding-right: 5vw;
-          }
-          .logo-img {
-            width: 120px !important;
-          }
-          .pill-nav {
-            gap: 4px;
-          }
-          .pill-nav-item {
-            padding: 8px 20px;
-            font-size: 0.96rem;
-          }
-        }
-
-        @media (max-width: 900px) {
-          .navbar-inner {
-            padding: 0 10px;
-            height: 56px;
-            gap: 10px;
-          }
-          .logo-img {
-            width: 90px !important;
-          }
-          .pill-nav-wrapper {
-            display: none;
-          }
-          .mega-dropdown {
-            display: none !important;
-          }
-          .hamburger {
-            display: flex;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .navbar-inner {
-            padding: 0 8px;
-          }
-          .sidebar {
-            max-width: 100%;
-          }
-        }
-      `}</style>
     </>
   );
 }
