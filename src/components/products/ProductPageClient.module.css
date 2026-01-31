@@ -27,7 +27,7 @@
 
 .stickyNav {
   position: sticky !important;
-  top: 80px !important;
+  /* Remove: top: 80px !important; */
   z-index: 90 !important;
   background-color: white !important;
   border-top: 1px solid #e5e7eb !important;
@@ -36,6 +36,9 @@
   margin: 0 !important;
   padding: 0 !important;
 }
+
+/* Rest of the CSS remains the same */
+
 
 .navContainer {
   max-width: 1400px !important;

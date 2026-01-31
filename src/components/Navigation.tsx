@@ -13,25 +13,28 @@ const dropdownSections = [
     items: [
       { label: "Bus", icon: "/icons/bullet-bus.png" },
       { label: "Metro/Rail", icon: "/icons/bullet-metro.png" },
-      { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
+      // ❌ TEMPORARILY DISABLED
+      // { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
     ],
   },
-  {
-    title: "DIGITAL SIGNAGE",
-    icon: "/icons/digital-signage-icon.png",
-    items: [
-      { label: "Variable Message Display", icon: "/icons/bullet-vmd.png" },
-      { label: "ETA", icon: "/icons/bullet-eta.png" },
-    ],
-  },
-  {
-    title: "R&D",
-    icon: "/icons/rd-icon.png",
-    items: [
-      { label: "IOT Hardware & Communication system", icon: "/icons/bullet-iot.png" },
-      { label: "Custom IOT software & system integration", icon: "/icons/bullet-software.png" },
-    ],
-  },
+  // ❌ TEMPORARILY DISABLED - DIGITAL SIGNAGE
+  // {
+  //   title: "DIGITAL SIGNAGE",
+  //   icon: "/icons/digital-signage-icon.png",
+  //   items: [
+  //     { label: "Variable Message Display", icon: "/icons/bullet-vmd.png" },
+  //     { label: "ETA", icon: "/icons/bullet-eta.png" },
+  //   ],
+  // },
+  // ❌ TEMPORARILY DISABLED - R&D
+  // {
+  //   title: "R&D",
+  //   icon: "/icons/rd-icon.png",
+  //   items: [
+  //     { label: "IOT Hardware & Communication system", icon: "/icons/bullet-iot.png" },
+  //     { label: "Custom IOT software & system integration", icon: "/icons/bullet-software.png" },
+  //   ],
+  // },
 ];
 
 const navLinks = [
@@ -212,21 +215,6 @@ export default function Navigation() {
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
                           </Link>
-                        ) : item.label === "Airport" && item.href ? (
-                          <Link
-                            href={item.href}
-                            tabIndex={accordion ? 0 : -1}
-                            onClick={() => setSidebar(false)}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              color: "inherit",
-                              textDecoration: "none",
-                            }}
-                          >
-                            <Image src={item.icon} alt="" width={14} height={14} />
-                            <span>{item.label}</span>
-                          </Link>
                         ) : (
                           <>
                             <Image src={item.icon} alt="" width={14} height={14} />
@@ -376,26 +364,6 @@ export default function Navigation() {
                     ) : item.label === "Metro/Rail" ? (
                       <Link
                         href="/solutions/metro-rail"
-                        onClick={() => setOpen(false)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          color: "inherit",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <Image
-                          src={item.icon}
-                          alt=""
-                          width={16}
-                          height={16}
-                          className={styles.bulletIcon}
-                        />
-                        <span>{item.label}</span>
-                      </Link>
-                    ) : item.label === "Airport" && item.href ? (
-                      <Link
-                        href="/solutions/Airport"
                         onClick={() => setOpen(false)}
                         style={{
                           display: "flex",

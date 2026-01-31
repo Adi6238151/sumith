@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ProductFeatureSection from "@/components/products/sections/ProductFeatureSection";
 import ProductSpecsSection from "@/components/products/sections/ProductSpecsSection";
@@ -9,6 +9,8 @@ import styles from "./ProductPageClient.module.css";
 export default function ProductPageClient({ product }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("features");
+  const [isMainNavVisible, setIsMainNavVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   const featureSections = product.sections?.filter(s => s._type === "featureSection") || [];
   const specSections = product.sections?.filter(s => s._type === "specSection") || [];
@@ -21,6 +23,26 @@ export default function ProductPageClient({ product }) {
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
+
+  // Detect main nav visibility based on scroll direction
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+        // Scrolling down - hide main nav, sub-nav goes to top
+        setIsMainNavVisible(false);
+      } else {
+        // Scrolling up - show main nav, sub-nav goes below it
+        setIsMainNavVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Scroll Spy Logic
   useEffect(() => {
@@ -88,7 +110,13 @@ export default function ProductPageClient({ product }) {
       )}
 
       {/* STICKY SUB-NAVIGATION */}
-      <div className={styles.stickyNav}>
+      <div 
+        className={styles.stickyNav}
+        style={{ 
+          top: isMainNavVisible ? '80px' : '0px',
+          transition: 'top 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
+      >
         <div className={styles.navContainer}>
           {["features", "specifications", "ordering", "trackers"].map((tab) => (
             <button

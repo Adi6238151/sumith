@@ -6,11 +6,11 @@ export default defineType({
   title: 'ITS Bus Hero',
   fields: [
     defineField({
-   name: 'tilesTitle',
-   type: 'string',
-   title: 'Tiles Area Title',
-   initialValue: "ONE BOX, ONE SOLUTION"
-}),
+      name: 'tilesTitle',
+      type: 'string',
+      title: 'Tiles Area Title',
+      initialValue: "ONE BOX, ONE SOLUTION"
+    }),
     defineField({
       name: 'features',
       type: 'array',
@@ -21,11 +21,28 @@ export default defineType({
           name: 'feature',
           title: 'Feature',
           fields: [
-            defineField({ name: 'label', type: 'string', title: 'Label' }),
-            defineField({ name: 'icon', type: 'image', title: 'Icon Image' }),
+            defineField({ 
+              name: 'label', 
+              type: 'string', 
+              title: 'Label' 
+            }),
+            defineField({ 
+              name: 'icon', 
+              type: 'image', 
+              title: 'Icon Image' 
+            }),
+            defineField({ 
+              name: 'image', 
+              type: 'image', 
+              title: 'Feature Display Image',
+              description: 'Large image that displays when this feature is selected'
+            }),
           ],
           preview: {
-            select: { title: 'label', media: 'icon' },
+            select: { 
+              title: 'label', 
+              media: 'icon' 
+            },
           }
         }
       ],
@@ -33,7 +50,8 @@ export default defineType({
     defineField({
       name: 'image',
       type: 'image',
-      title: 'Bus Image'
+      title: 'Default Bus Image',
+      description: 'Fallback image shown initially'
     }),
     defineField({
       name: 'seo',
@@ -42,6 +60,6 @@ export default defineType({
     }),
   ],
   preview: {
-    select: { title: 'title' }
+    select: { title: 'tilesTitle' }
   }
 })

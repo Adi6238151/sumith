@@ -28,18 +28,16 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
     if (!rows || rows.length === 0) return;
 
     const observer = new IntersectionObserver(
-  entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("solution-row--visible");
-      } else {
-        entry.target.classList.remove("solution-row--visible");
-      }
-    });
-  },
-  { threshold: 0.9 }
-);
-
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("solution-row--visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
 
     rows.forEach(row => observer.observe(row));
 
@@ -62,30 +60,26 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
                 key={idx}
                 className={`solution-row ${isEven ? "image-right" : "image-left"}`}
               >
-                {/* Content (Text) */}
+                {/* Content (Text) - No Card Background */}
                 <div className="content-block">
                   <div className="content-inner">
+                    <div className="accent-line" />
                     <h3 className="solution-title">{item.title}</h3>
-                    <div className="title-underline" />
                     <p className="solution-description">{item.caption}</p>
                   </div>
                 </div>
 
-                {/* Image */}
+                {/* Image - Direct to White Background */}
                 <div className="image-block">
                   <div className="image-wrapper">
-                    <div className="image-frame">
-                      <Image
-                        src={item.image}
-                        alt={item.alt}
-                        width={600}
-                        height={400}
-                        priority={idx === 0}
-                        className="solution-image"
-                      />
-                      <div className="image-overlay" />
-                    </div>
-                    <div className="floating-accent" />
+                    <Image
+                      src={item.image}
+                      alt={item.alt}
+                      width={700}
+                      height={500}
+                      priority={idx === 0}
+                      className="solution-image"
+                    />
                   </div>
                 </div>
               </div>
@@ -94,85 +88,56 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
         </div>
 
         <style jsx>{`
-          :root {
-            --its-card-bg: #0b1020;
-            --its-card-soft: #101833;
-            --its-border-subtle: #1b2642;
-            --its-accent: #4d5bff;
-            --its-accent2: #20e0d0;
-            --its-text-main: #f5f7ff;
-            --its-text-soft: #aab4d8;
-          }
+          /* ═══════════════════════════════════════════════════════════════
+             🎨 ULTRA MODERN DESIGN - IMAGES DIRECTLY ON WHITE BACKGROUND
+             ═══════════════════════════════════════════════════════════════ */
 
-          /* Transparent so it uses .its-page-shell background */
           .bus-solution-section {
             background: transparent;
             width: 100%;
-            padding: 90px 24px 110px;
+            padding: 100px 24px 120px;
             position: relative;
             overflow: hidden;
-            color: var(--its-text-main);
-          }
-
-          .bus-solution-section::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-              radial-gradient(
-                circle at 10% 0,
-                rgba(93, 127, 255, 0.08),
-                transparent 60%
-              ),
-              radial-gradient(
-                circle at 90% 100%,
-                rgba(36, 230, 195, 0.08),
-                transparent 55%
-              );
-            opacity: 0.01;
-            pointer-events: none;
           }
 
           .solution-container {
-            max-width: 1300px;
+            max-width: 1320px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 80px;
+            gap: 120px;
             position: relative;
-            z-index: 1;
           }
+
+          /* ─────────────────────────────────────────────────────────────
+             📐 ROW LAYOUT & ONE-TIME SCROLL REVEAL
+             ───────────────────────────────────────────────────────────── */
 
           .solution-row {
             display: grid;
-            grid-template-columns: 1.05fr 1fr;
-            gap: 80px;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 100px;
             align-items: center;
             position: relative;
 
-            /* scroll‑reveal initial state */
             opacity: 0;
-            transform: translateY(48px) scale(0.98);
+            transform: translateY(60px);
             transition:
-              opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+              opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
           }
 
-          /* direction‑aware offset */
           .solution-row.image-right {
             grid-template-areas: "content image";
-            transform: translate3d(-32px, 48px, 0) scale(0.98);
           }
 
           .solution-row.image-left {
             grid-template-areas: "image content";
-            transform: translate3d(32px, 48px, 0) scale(0.98);
           }
 
-          /* when IntersectionObserver adds this class */
           .solution-row.solution-row--visible {
             opacity: 1;
-            transform: translate3d(0, 0, 0) scale(1);
+            transform: translateY(0);
           }
 
           .content-block {
@@ -185,226 +150,224 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             position: relative;
           }
 
+          /* ─────────────────────────────────────────────────────────────
+             ✍️ TEXT CONTENT (NO CARD BACKGROUND)
+             ───────────────────────────────────────────────────────────── */
+
           .content-inner {
             position: relative;
-            padding: 32px 30px 30px;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(83, 225, 203, 0.22),
-                transparent 60%
-              ),
-              linear-gradient(
-                135deg,
-                rgba(14, 24, 66, 0.98),
-                rgba(10, 28, 65, 0.98)
-              );
-            border-radius: 22px;
-            border: 1px solid rgba(115, 160, 255, 0.52);
-            box-shadow:
-              0 20px 70px rgba(0, 0, 0, 0.85),
-              0 0 0 1px rgba(22, 40, 94, 0.85);
-            transition: transform 0.35s ease, box-shadow 0.35s ease,
-              border-color 0.3s ease;
+            padding: 0;
+            max-width: 580px;
           }
 
-          .content-inner:hover {
-            transform: translateY(-6px);
-            box-shadow:
-              0 26px 80px rgba(10, 255, 210, 0.28),
-              0 0 0 1px rgba(117, 174, 255, 0.7);
-            border-color: rgba(166, 214, 255, 0.9);
+          .accent-line {
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(
+              90deg,
+              #2563eb 0%,
+              #3b82f6 50%,
+              #60a5fa 100%
+            );
+            border-radius: 2px;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+          }
+
+          .solution-row--visible .accent-line {
+            opacity: 1;
+            transform: scaleX(1);
           }
 
           .solution-title {
-            font-size: 1.7rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 0 0 10px 0;
-            line-height: 1.35;
-            letter-spacing: 0.03em;
-            text-shadow:
-              0 0 18px rgba(0, 0, 0, 0.85),
-              0 0 2px rgba(0, 0, 0, 0.9);
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 20px 0;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
           }
 
-          .title-underline {
-            width: 70px;
-            height: 3px;
-            background: linear-gradient(
-              90deg,
-              #36e2c1 0%,
-              #4e76ff 40%,
-              #7e6bff 100%
-            );
-            border-radius: 999px;
-            margin-bottom: 20px;
+          .solution-row--visible .solution-title {
+            opacity: 1;
+            transform: translateY(0);
           }
 
           .solution-description {
-            font-size: 0.98rem;
-            color: var(--its-text-soft);
-            line-height: 1.7;
+            font-size: 1.125rem;
+            color: #475569;
+            line-height: 1.8;
             margin: 0;
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
           }
+
+          .solution-row--visible .solution-description {
+            opacity: 1;
+            transform: translateY(0);
+          }
+
+          /* ─────────────────────────────────────────────────────────────
+             🖼️ IMAGE - DIRECTLY ON WHITE BACKGROUND
+             
+             ✅ IMPROVEMENTS:
+             - Removed gray gradient wrapper background
+             - Images sit directly on white background
+             - Automatic sizing with aspect ratio preserved
+             - Subtle shadow for depth without wrapper interference
+             - object-fit: contain to show full image without cropping
+             ───────────────────────────────────────────────────────────── */
 
           .image-wrapper {
             position: relative;
             width: 100%;
-            height: 100%;
+            /* ⚡ No fixed height - automatically adjusts to image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
           }
 
-          .image-frame {
-            position: relative;
-            width: 100%;
-            height: 380px;
-            border-radius: 24px;
-            overflow: hidden;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(88, 235, 207, 0.22),
-                transparent 60%
-              ),
-              linear-gradient(135deg, #111a3b, #050817);
-            box-shadow:
-              0 28px 80px rgba(0, 0, 0, 0.95),
-              0 0 0 1px rgba(80, 124, 255, 0.7);
-            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+          .solution-row--visible .image-wrapper {
+            opacity: 1;
+            transform: scale(1) translateY(0);
           }
 
-          .image-frame:hover {
-            transform: translateY(-4px);
-            box-shadow:
-              0 34px 96px rgba(18, 252, 204, 0.3),
-              0 0 0 1px rgba(122, 175, 255, 0.95);
-          }
-
+          /* ✨ Image sits DIRECTLY on white background - no wrapper overlays */
           .solution-image {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            height: auto; /* ⚡ Automatic height based on aspect ratio */
+            max-height: 500px;
+            object-fit: contain; /* ⚡ Shows full image, preserves aspect ratio [web:26] */
+            border-radius: 20px;
+            
+            /* 🎯 Shadow applied directly to image, not wrapper [web:31] */
+            box-shadow:
+              0 2px 8px rgba(0, 0, 0, 0.04),
+              0 12px 40px rgba(0, 0, 0, 0.08),
+              0 0 0 1px rgba(0, 0, 0, 0.02);
+            
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* 🔥 Performance optimization */
+            will-change: transform;
           }
 
-          .image-frame:hover .solution-image {
-            transform: scale(1.03);
+          /* Enhanced hover effect directly on image */
+          .image-wrapper:hover .solution-image {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow:
+              0 4px 12px rgba(0, 0, 0, 0.06),
+              0 24px 60px rgba(37, 99, 235, 0.12),
+              0 0 0 1px rgba(59, 130, 246, 0.08);
           }
 
-          .image-overlay {
+          /* Subtle accent glow on hover - positioned behind image */
+          .image-wrapper::before {
+            content: "";
             position: absolute;
-            inset: 0;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(46, 219, 187, 0.28),
-                transparent 60%
-              ),
-              linear-gradient(
-                135deg,
-                rgba(24, 40, 110, 0.6),
-                rgba(11, 21, 59, 0.9)
-              );
-            mix-blend-mode: soft-light;
-            pointer-events: none;
-            opacity: 0.4;
-            transition: opacity 0.4s ease;
-          }
-
-          .image-frame:hover .image-overlay {
-            opacity: 0.7;
-          }
-
-          .floating-accent {
-            position: absolute;
-            width: 220px;
-            height: 220px;
+            inset: -20px;
             background: radial-gradient(
-              circle at 30% 0,
-              rgba(66, 224, 198, 0.24),
-              transparent 65%
+              circle at center,
+              rgba(59, 130, 246, 0.08) 0%,
+              transparent 70%
             );
-            border-radius: 50%;
-            filter: blur(55px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
             z-index: -1;
-            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
           }
 
-          .image-right .floating-accent {
-            top: -80px;
-            right: -120px;
+          .image-wrapper:hover::before {
+            opacity: 1;
           }
 
-          .image-left .floating-accent {
-            top: -80px;
-            left: -120px;
-          }
-
-          @keyframes float {
-            0%,
-            100% {
-              transform: translate(0, 0);
-            }
-            50% {
-              transform: translate(18px, 16px);
-            }
-          }
+          /* ─────────────────────────────────────────────────────────────
+             📱 RESPONSIVE DESIGN
+             ───────────────────────────────────────────────────────────── */
 
           @media (max-width: 1024px) {
             .solution-container {
-              gap: 70px;
+              gap: 90px;
             }
+
             .solution-row {
               grid-template-columns: 1fr;
-              gap: 40px;
+              gap: 50px;
             }
+
             .solution-row.image-right,
             .solution-row.image-left {
               grid-template-areas:
                 "image"
                 "content";
             }
-            .image-frame {
-              height: 340px;
-            }
+
             .content-inner {
-              padding: 28px;
+              max-width: 100%;
+              text-align: center;
             }
+
+            .accent-line {
+              margin-left: auto;
+              margin-right: auto;
+            }
+
+            .solution-image {
+              max-height: 450px;
+            }
+
             .solution-title {
-              font-size: 1.5rem;
+              font-size: 2.25rem;
+            }
+
+            .solution-description {
+              font-size: 1.0625rem;
             }
           }
 
           @media (max-width: 768px) {
             .bus-solution-section {
-              padding: 70px 20px 90px;
+              padding: 80px 20px 100px;
             }
+
             .solution-container {
-              gap: 56px;
+              gap: 70px;
             }
+
             .solution-row {
-              gap: 30px;
+              gap: 40px;
             }
-            .image-frame {
-              height: 280px;
-              border-radius: 18px;
+
+            .solution-image {
+              max-height: 380px;
+              border-radius: 16px;
             }
-            .content-inner {
-              padding: 24px;
-              border-radius: 18px;
-            }
-            .solution-title {
-              font-size: 1.35rem;
-              margin-bottom: 10px;
-            }
-            .title-underline {
-              width: 56px;
+
+            .accent-line {
+              width: 50px;
               height: 3px;
-              margin-bottom: 18px;
+              margin-bottom: 20px;
             }
+
+            .solution-title {
+              font-size: 1.875rem;
+              margin-bottom: 16px;
+            }
+
             .solution-description {
-              font-size: 0.96rem;
+              font-size: 1rem;
+              line-height: 1.7;
             }
           }
 
@@ -412,17 +375,26 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             .bus-solution-section {
               padding: 60px 16px 80px;
             }
+
             .solution-container {
-              gap: 48px;
+              gap: 60px;
             }
-            .image-frame {
-              height: 240px;
+
+            .solution-row {
+              gap: 32px;
             }
+
+            .solution-image {
+              max-height: 300px;
+              border-radius: 14px;
+            }
+
             .solution-title {
-              font-size: 1.25rem;
+              font-size: 1.625rem;
             }
+
             .solution-description {
-              font-size: 0.93rem;
+              font-size: 0.9375rem;
               line-height: 1.65;
             }
           }

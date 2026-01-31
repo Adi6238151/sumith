@@ -7,6 +7,7 @@ import Head from "next/head";
 interface Feature {
   label: string;
   icon: string;
+  image: string;
 }
 
 interface SEOFields {
@@ -24,6 +25,8 @@ interface ITSBusHeroProps {
 export default function ITSBusHero({ tilesTitle, features, image, seo }: ITSBusHeroProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [fallback, setFallback] = useState<{ [key: string]: boolean }>({});
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   function scrollByBtn(delta: number) {
     scrollRef.current?.scrollBy({ top: delta, behavior: "smooth" });
@@ -32,6 +35,19 @@ export default function ITSBusHero({ tilesTitle, features, image, seo }: ITSBusH
   const handleIconError = (idx: number) => {
     setFallback(f => ({ ...f, [idx]: true }));
   };
+
+  const handleTileClick = (idx: number) => {
+    if (idx !== activeIndex && !isTransitioning) {
+      setIsTransitioning(true);
+      setActiveIndex(idx);
+      
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 600);
+    }
+  };
+
+  const currentImage = features[activeIndex]?.image || image;
 
   return (
     <>
@@ -42,430 +58,502 @@ export default function ITSBusHero({ tilesTitle, features, image, seo }: ITSBusH
 
       <section className="its-hero">
         <div className="its-hero-inner">
-          {/* LEFT: title + tiles */}
-          <div className="its-tiles-panel">
-            <div className="its-title-block">
-              <p className="its-eyebrow">ONE BOX, ONE SOLUTION</p>
-              <h2 className="its-main-heading">
-                {tilesTitle ?? "Command Control Centre"}
-              </h2>
-              <p className="its-sub-copy">
-                Centralized <strong>control</strong> centre to monitor, manage, and
-                optimize bus operations in real time with rich analytics, alerts,
-                and digital dashboards.
-              </p>
-            </div>
-
-            <div className="its-tiles-shell">
-              <button
-                className="its-arrow-btn"
-                onClick={() => scrollByBtn(-130)}
-                aria-label="Scroll up"
-              >
-                ↑
-              </button>
-
-              <div className="its-tiles-scroll" ref={scrollRef}>
-                {features.map((f, idx) => (
-                  <article className="its-tile" key={f.label}>
-                    <div className="its-tile-icon-wrap">
-                      <Image
-                        src={fallback[idx] ? "/icons/placeholder.png" : f.icon}
-                        alt={f.label}
-                        width={34}
-                        height={34}
-                        className="its-tile-icon"
-                        onError={() => handleIconError(idx)}
-                      />
-                    </div>
-                    <span className="its-tile-label">{f.label}</span>
-                  </article>
-                ))}
-              </div>
-
-              <button
-                className="its-arrow-btn"
-                onClick={() => scrollByBtn(130)}
-                aria-label="Scroll down"
-              >
-                ↓
-              </button>
-            </div>
+          {/* CENTERED HEADER */}
+          <div className="its-header-section">
+            <p className="its-eyebrow">ONE BOX, ONE SOLUTION</p>
+            <h1 className="its-main-heading">
+              {tilesTitle ?? "ONE BOX, ONE SOLUTION"}
+            </h1>
+            <p className="its-sub-copy">
+              Centralized <strong>control</strong> centre to monitor, manage, and
+              optimize bus operations in real time with rich analytics, alerts,
+              and digital dashboards.
+            </p>
           </div>
 
-          {/* RIGHT: dashboard image */}
-          <div className="its-image-panel">
-            <div className="its-image-frame">
-              <div className="its-image-header">
-                <span className="its-image-tag">Public Transport Bus Service</span>
-                <span className="its-image-status-dot" />
+          {/* CONTENT GRID: Tiles + Image */}
+          <div className="its-content-grid">
+            {/* LEFT: tiles */}
+            <div className="its-tiles-panel">
+              <div className="its-tiles-shell">
+                <button
+                  className="its-arrow-btn its-arrow-up"
+                  onClick={() => scrollByBtn(-130)}
+                  aria-label="Scroll up"
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 16V4M10 4L4 10M10 4L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                <div className="its-tiles-scroll" ref={scrollRef}>
+                  {features.map((f, idx) => (
+                    <article 
+                      className={`its-tile ${idx === activeIndex ? 'active' : ''}`}
+                      key={idx}
+                      onClick={() => handleTileClick(idx)}
+                    >
+                      <div className="its-tile-icon-wrap">
+                        <Image
+                          src={fallback[idx] ? "/icons/placeholder.png" : f.icon}
+                          alt={f.label}
+                          width={40}
+                          height={40}
+                          className="its-tile-icon"
+                          onError={() => handleIconError(idx)}
+                        />
+                      </div>
+                      <span className="its-tile-label">{f.label}</span>
+                    </article>
+                  ))}
+                </div>
+
+                <button
+                  className="its-arrow-btn its-arrow-down"
+                  onClick={() => scrollByBtn(130)}
+                  aria-label="Scroll down"
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 4V16M10 16L16 10M10 16L4 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
               </div>
-              <div className="its-image-inner">
-                <Image
-                  src={image}
-                  width={990}
-                  height={660}
-                  alt="ITS bus"
-                  priority
-                  className="its-main-image"
-                />
+            </div>
+
+            {/* RIGHT: dashboard image */}
+            <div className="its-image-panel">
+              <div className="its-image-frame">
+                <div className="its-image-header">
+                  <span className="its-image-tag">PUBLIC TRANSPORT BUS SERVICE</span>
+                  <span className="its-image-status-dot" />
+                </div>
+                <div className={`its-image-inner ${isTransitioning ? 'transitioning' : ''}`}>
+                  <div className="its-image-wrapper">
+                    <Image
+                      src={currentImage}
+                      fill
+                      alt="ITS bus"
+                      priority
+                      className="its-main-image"
+                      key={activeIndex}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 50vw"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <style jsx>{`
-          :root {
-            --its-card-bg: #0b1020;
-            --its-border-subtle: #1b2642;
-            --its-accent: #4d5bff;
-            --its-cyan: #20e0d0;
-            --its-text-main: #f5f7ff;
-            --its-text-soft: #aab4d8;
-            --its-scroll-track: #10162d;
-            --its-scroll-thumb: #3ce2c4;
-          }
-
-          /* Transparent so it sits on .its-page-shell background */
           .its-hero {
-            background: transparent;
-            color: var(--its-text-main);
+            background: #ffffff;
             width: 100%;
-            height: 100vh;
-            max-height: 100vh;
-            padding: 32px 24px;
+            min-height: 100vh;
+            padding: 80px 40px 60px;
             box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
           }
 
           .its-hero-inner {
-            max-width: 1920px;
+            max-width: 1600px;
             width: 100%;
-            height: 100%;
-            max-height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 4vw;
-            overflow: hidden;
-          }
-
-          .its-tiles-panel {
             display: flex;
             flex-direction: column;
-            gap: 18px;
-            max-width: 540px;
-            height: 100%;
-            max-height: 100%;
+            gap: 60px;
           }
 
-          .its-title-block {
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(120, 185, 255, 0.32),
-                transparent 60%
-              ),
-              linear-gradient(135deg, #0c1534, #0a1d3c);
-            border-radius: 24px;
-            padding: 20px 22px 18px;
-            box-shadow:
-              0 20px 70px rgba(2, 8, 40, 0.98),
-              0 0 0 1px rgba(120, 170, 255, 0.55);
-            border: none;
+          /* CENTERED HEADER */
+          .its-header-section {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
           }
 
           .its-eyebrow {
-            font-size: 0.82rem;
-            letter-spacing: 0.26em;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: #c9e2ff;
-            margin: 0 0 6px 0;
-            opacity: 0.96;
+            color: #6b7280;
+            margin: 0 0 16px 0;
+            font-weight: 600;
           }
 
           .its-main-heading {
-            margin: 0 0 8px 0;
-            font-size: 1.9rem;
-            letter-spacing: 0.03em;
-            color: #ffffff;
-            text-shadow:
-              0 0 18px rgba(0, 0, 0, 0.85),
-              0 0 2px rgba(0, 0, 0, 0.9);
+            margin: 0 0 20px 0;
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #111827;
+            line-height: 1.1;
           }
 
           .its-sub-copy {
             margin: 0;
-            font-size: 0.96rem;
-            line-height: 1.6;
-            color: #e3eeff;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: #4b5563;
+            font-weight: 400;
+          }
+
+          .its-sub-copy strong {
+            color: #111827;
+            font-weight: 600;
+          }
+
+          /* CONTENT GRID */
+          .its-content-grid {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 60px;
+          }
+
+          .its-tiles-panel {
+            flex: 0 0 420px;
+            max-width: 420px;
           }
 
           .its-tiles-shell {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            flex: 1 1 auto;
-            min-height: 0;
+            gap: 12px;
           }
 
           .its-tiles-scroll {
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(76, 225, 200, 0.07),
-                transparent 60%
-              ),
-              linear-gradient(160deg, rgba(17, 29, 63, 0.96), rgba(7, 13, 32, 0.98));
-            border-radius: 26px;
-            border: 1px solid var(--its-border-subtle);
-            box-shadow:
-              0 24px 70px rgba(4, 10, 33, 0.95),
-              0 0 0 1px rgba(115, 157, 255, 0.06);
-            width: 440px;
-            max-width: 520px;
-            flex: 1 1 auto;
-            min-height: 0;
+            background: transparent;
+            border: none;
+            width: 100%;
+            max-height: 520px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            padding: 18px 12px;
+            gap: 12px;
+            padding: 8px 0;
             scrollbar-width: thin;
-            scrollbar-color: var(--its-scroll-thumb) var(--its-scroll-track);
+            scrollbar-color: #e5e7eb transparent;
           }
 
           .its-tiles-scroll::-webkit-scrollbar {
             width: 6px;
           }
           .its-tiles-scroll::-webkit-scrollbar-track {
-            background: var(--its-scroll-track);
-            border-radius: 999px;
+            background: transparent;
           }
           .its-tiles-scroll::-webkit-scrollbar-thumb {
-            background: var(--its-scroll-thumb);
+            background: #d1d5db;
             border-radius: 999px;
+          }
+          .its-tiles-scroll::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
           }
 
           .its-tile {
             display: flex;
             align-items: center;
-            padding: 15px 22px;
-            font-size: 0.98rem;
+            padding: 18px 20px;
+            font-size: 1rem;
             font-weight: 500;
-            border-radius: 18px;
-            margin: 0 4px 14px 4px;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(63, 239, 200, 0.16),
-                transparent 55%
-              ),
-              linear-gradient(
-                135deg,
-                rgba(36, 50, 99, 0.92),
-                rgba(17, 24, 56, 0.96)
-              );
-            color: #f3fbff;
+            border-radius: 16px;
+            background: transparent;
+            color: #111827;
             gap: 16px;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
-            border: 1px solid rgba(107, 185, 255, 0.16);
-            transition:
-              background 0.2s ease-out,
-              transform 0.16s ease-out,
-              box-shadow 0.16s ease-out;
+            border: 2px solid #f3f4f6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
           }
 
-          .its-tile:last-child {
-            margin-bottom: 2px;
+          .its-tile.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateX(4px);
+          }
+
+          .its-tile.active .its-tile-icon-wrap {
+            background: #3b82f6;
           }
 
           .its-tile-icon-wrap {
-            width: 38px;
-            height: 38px;
-            border-radius: 14px;
-            background:
-              radial-gradient(
-                circle at 0 0,
-                rgba(66, 243, 204, 0.3),
-                transparent 65%
-              ),
-              linear-gradient(145deg, rgba(23, 36, 91, 0.9), rgba(15, 30, 86, 0.98));
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f9fafb;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
           .its-tile-icon {
-            min-width: 30px;
-            min-height: 30px;
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
           }
 
           .its-tile-label {
-            color: #e8f3ff;
-            letter-spacing: 0.01em;
-            word-break: break-word;
+            color: #374151;
+            letter-spacing: -0.01em;
+            flex: 1;
           }
 
-          .its-tile:hover {
-            background: linear-gradient(135deg, #1fd7c8, #3f80ff);
-            transform: translateY(-2px);
-            box-shadow: 0 16px 40px rgba(17, 230, 202, 0.35);
+          .its-tile:hover:not(.active) {
+            border-color: #93c5fd;
+            background: #f0f9ff;
           }
 
           .its-arrow-btn {
-            border: none;
-            background:
-              radial-gradient(
-                circle at 30% 0,
-                rgba(255, 255, 255, 0.22),
-                transparent 55%
-              ),
-              linear-gradient(145deg, #111a40, #080f25);
-            color: var(--its-cyan);
-            font-size: 1.4rem;
-            width: 36px;
-            height: 36px;
+            border: 2px solid #e5e7eb;
+            background: #ffffff;
+            color: #6b7280;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin: 2px 0;
             cursor: pointer;
-            box-shadow:
-              0 8px 24px rgba(2, 4, 18, 0.9),
-              0 0 0 1px rgba(111, 190, 255, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition:
-              background 0.16s ease-out,
-              color 0.16s ease-out,
-              transform 0.12s ease-out;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
           }
 
           .its-arrow-btn:hover {
-            background: linear-gradient(145deg, #33e5d0, #4f7bff);
-            color: #050815;
-            transform: translateY(-1px);
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #ffffff;
+            transform: scale(1.05);
           }
 
           .its-image-panel {
-            flex: 1 1 0;
-            height: 100%;
-            max-height: 100%;
+            flex: 1;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 8px 6px;
             min-width: 0;
           }
 
           .its-image-frame {
-            background:
-              radial-gradient(
-                circle at 10% 0,
-                rgba(85, 234, 219, 0.18),
-                transparent 55%
-              ),
-              linear-gradient(135deg, #121b38, #070b1a);
+            background: #1e293b;
             border-radius: 24px;
-            padding: 16px 16px 18px;
-            box-shadow:
-              0 28px 90px rgba(0, 0, 0, 0.95),
-              0 0 0 1px rgba(82, 128, 255, 0.48);
+            padding: 20px;
             width: 100%;
-            max-width: 980px;
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
+            max-width: 1000px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
           }
 
           .its-image-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
+            padding: 0 4px;
           }
 
           .its-image-tag {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.16em;
-            color: #a8c0ff;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            font-weight: 600;
           }
 
           .its-image-status-dot {
-            width: 9px;
-            height: 9px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #25f2c6;
-            box-shadow: 0 0 12px rgba(37, 242, 198, 0.9);
+            background: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          }
+
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.6;
+            }
           }
 
           .its-image-inner {
-            border-radius: 18px;
+            border-radius: 16px;
             overflow: hidden;
-            background: #020412;
-            flex: 1 1 auto;
-            min-height: 0;
+            background: #ffffff;
+            position: relative;
+            width: 100%;
+          }
+
+          .its-image-inner.transitioning {
+            animation: imageTransition 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          @keyframes imageTransition {
+            0% {
+              opacity: 1;
+              transform: scale(1);
+            }
+            50% {
+              opacity: 0.3;
+              transform: scale(0.95);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+
+          .its-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
           }
 
           .its-main-image {
-            display: block;
-            width: 100%;
-            height: 100%;
             object-fit: contain;
+            object-position: center;
           }
 
-          @media (max-width: 1300px) {
-            .its-hero-inner {
-              flex-direction: column;
-              align-items: stretch;
-              gap: 18px;
+          /* TABLET */
+          @media (max-width: 1200px) {
+            .its-content-grid {
+              gap: 50px;
             }
             .its-tiles-panel {
-              max-width: 100%;
-              height: 55%;
-            }
-            .its-image-panel {
-              height: 45%;
-            }
-            .its-tiles-scroll {
-              width: 100%;
-              max-width: 100%;
+              flex: 0 0 360px;
+              max-width: 360px;
             }
           }
 
-          @media (max-width: 800px) {
+          /* MOBILE LAYOUT */
+          @media (max-width: 968px) {
             .its-hero {
-              padding: 20px 14px;
+              padding: 60px 20px 40px;
             }
-            .its-tiles-panel {
-              height: 52%;
+
+            .its-hero-inner {
+              gap: 40px;
             }
-            .its-image-panel {
-              height: 48%;
-            }
+
             .its-main-heading {
-              font-size: 1.6rem;
+              font-size: 2.25rem;
             }
+
             .its-sub-copy {
-              font-size: 0.94rem;
+              font-size: 1rem;
+            }
+
+            .its-content-grid {
+              flex-direction: column;
+              gap: 40px;
+            }
+
+            .its-tiles-panel {
+              order: 2;
+              flex: 0 0 auto;
+              max-width: 100%;
+              width: 100%;
+            }
+
+            .its-image-panel {
+              order: 1;
+              width: 100%;
+            }
+
+            .its-image-wrapper {
+              aspect-ratio: 4 / 3;
+            }
+
+            /* HORIZONTAL SCROLL ON MOBILE */
+            .its-tiles-shell {
+              flex-direction: row;
+              width: 100%;
+              gap: 16px;
+            }
+
+            .its-tiles-scroll {
+              flex-direction: row;
+              overflow-x: auto;
+              overflow-y: hidden;
+              max-height: none;
+              padding: 12px 0;
+              gap: 12px;
+              scrollbar-width: thin;
+              scrollbar-color: #d1d5db transparent;
+            }
+
+            .its-tiles-scroll::-webkit-scrollbar {
+              height: 6px;
+              width: auto;
+            }
+
+            .its-tile {
+              flex-shrink: 0;
+              min-width: 280px;
+              padding: 16px 18px;
+            }
+
+            .its-tile.active {
+              transform: translateY(-4px);
+            }
+
+            .its-arrow-btn {
+              display: none;
+            }
+
+            /* MOBILE IMAGE SLIDE TRANSITION */
+            .its-image-inner.transitioning {
+              animation: imageSlideTransition 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            @keyframes imageSlideTransition {
+              0% {
+                opacity: 1;
+                transform: translateX(0);
+              }
+              50% {
+                opacity: 0;
+                transform: translateX(-30px);
+              }
+              100% {
+                opacity: 1;
+                transform: translateX(0);
+              }
             }
           }
 
-          @media (max-width: 520px) {
-            .its-tiles-panel {
-              height: 55%;
+          @media (max-width: 640px) {
+            .its-main-heading {
+              font-size: 1.875rem;
             }
-            .its-tiles-scroll {
-              padding-inline: 10px;
+
+            .its-sub-copy {
+              font-size: 0.95rem;
             }
+
             .its-tile {
-              padding: 13px 16px;
+              min-width: 260px;
+              padding: 14px 16px;
+            }
+
+            .its-tile-icon-wrap {
+              width: 44px;
+              height: 44px;
+            }
+
+            .its-tile-icon {
+              width: 26px;
+              height: 26px;
+            }
+
+            .its-image-frame {
+              padding: 16px;
+            }
+
+            .its-image-wrapper {
+              aspect-ratio: 1 / 1;
             }
           }
         `}</style>

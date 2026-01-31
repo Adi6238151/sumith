@@ -18,7 +18,11 @@ const customSectionHeaderQuery = `
 const itsBusHeroQuery = `
   *[_type=="itsBusHero"][0]{
     tilesTitle,
-    features[]{ label, "icon": icon.asset->url },
+    features[]{
+      label,
+      "icon": icon.asset->url,
+      "image": image.asset->url
+    },
     "image": image.asset->url,
     seo
   }
@@ -41,7 +45,7 @@ const qualityOfLifeTechnologyQuery = `
     title,
     tabs[]{
       tabTitle,
-      "image": image.asset->url,   // <-- resolve to URL
+      "image": image.asset->url,
       listItems
     },
     seo{
@@ -81,13 +85,13 @@ export default async function TransitBusITSPage() {
           images={busSolutionImageRowData?.images || []}
           seo={busSolutionImageRowData?.seo}
         />
-            {qualityOfLifeTechnologyData && (
-              <QualityOfLifeTechnology
-                title={qualityOfLifeTechnologyData.title}
-                tabs={qualityOfLifeTechnologyData.tabs}
-              />
-            )}
-
+        
+        {qualityOfLifeTechnologyData && (
+          <QualityOfLifeTechnology
+            title={qualityOfLifeTechnologyData.title}
+            tabs={qualityOfLifeTechnologyData.tabs}
+          />
+        )}
       </main>
 
       <Footer />
