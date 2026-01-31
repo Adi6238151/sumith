@@ -14,15 +14,46 @@ async function getProduct(slug) {
     "sections": sections[]{
       _key,
       _type,
+      
+      // Common fields (all section types)
       title,
+      heading,
       description,
-      image,
-      position, // 'left' or 'right'
-      items[]   // for specs
+      position,
+      
+      // Image field (for feature sections)
+      image {
+        asset -> {
+          _id,
+          url
+        }
+      },
+      
+      // Spec section fields
+      items,
+      specs,
+      
+      // Feature section fields
+      bulletPoints,
+      features,
+      
+      // 3D Viewer Section fields
+      modelScale,
+      autoRotate,
+      backgroundColor,
+      modelFile {
+        asset -> {
+          _id,
+          _ref,
+          url,
+          originalFilename,
+          extension
+        }
+      }
     }
   }`;
   
-  // Added revalidate: 0 to disable cache and see updates immediately
+  // Disable cache to see updates immediately
   return client.fetch(query, { slug }, { next: { revalidate: 0 } });
 }
 
@@ -42,6 +73,9 @@ export default async function ProductDetailPage({ params }) {
       </div>
     );
   }
+
+  // ✅ Debug log to see what data we're getting
+  console.log('Product sections:', JSON.stringify(product.sections, null, 2));
 
   return (
     <div className="bg-white min-h-screen">

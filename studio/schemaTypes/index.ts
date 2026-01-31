@@ -46,6 +46,7 @@ import { product } from "./products/product";
 import solution from './products/solution'
 import { featureSection } from "./products/featureSection";
 import { specSection } from "./products/specSection";
+import viewer3DSection from './products/viewer3DSection';
 // Services
 import servicesHero from './services/heroSection'
 
@@ -91,6 +92,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     solution,
     featureSection,
     specSection,
+    viewer3DSection,
 
     // Contact
     emailSettings,

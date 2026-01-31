@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ProductFeatureSection from "@/components/products/sections/ProductFeatureSection";
 import ProductSpecsSection from "@/components/products/sections/ProductSpecsSection";
+import Product3DViewerSection from "@/components/products/sections/Product3DViewerSection";
 import styles from "./ProductPageClient.module.css";
 
 export default function ProductPageClient({ product }) {
@@ -14,6 +15,16 @@ export default function ProductPageClient({ product }) {
 
   const featureSections = product.sections?.filter(s => s._type === "featureSection") || [];
   const specSections = product.sections?.filter(s => s._type === "specSection") || [];
+  const viewer3DSections = product.sections?.filter(s => s._type === "viewer3DSection") || [];
+
+  // Dynamic navigation tabs based on available sections
+  const navigationTabs = [
+    "features",
+    ...(viewer3DSections.length > 0 ? ["3d-view"] : []),
+    "specifications",
+    "ordering",
+    "trackers"
+  ];
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -30,10 +41,8 @@ export default function ProductPageClient({ product }) {
       const currentScrollY = window.scrollY;
       
       if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
-        // Scrolling down - hide main nav, sub-nav goes to top
         setIsMainNavVisible(false);
       } else {
-        // Scrolling up - show main nav, sub-nav goes below it
         setIsMainNavVisible(true);
       }
       
@@ -60,14 +69,14 @@ export default function ProductPageClient({ product }) {
       });
     }, observerOptions);
 
-    const sections = ["features", "specifications", "ordering", "trackers"];
-    sections.forEach(id => {
+    // Observe all navigation sections
+    navigationTabs.forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [navigationTabs]);
 
   return (
     <>
@@ -118,7 +127,7 @@ export default function ProductPageClient({ product }) {
         }}
       >
         <div className={styles.navContainer}>
-          {["features", "specifications", "ordering", "trackers"].map((tab) => (
+          {navigationTabs.map((tab) => (
             <button
               key={tab}
               onClick={() => scrollToSection(tab)}
@@ -134,7 +143,7 @@ export default function ProductPageClient({ product }) {
                 }
               }}
             >
-              {tab}
+              {tab === "3d-view" ? "3D View" : tab}
               {activeTab === tab && (
                 <span className={styles.navIndicator} />
               )}
@@ -157,11 +166,23 @@ export default function ProductPageClient({ product }) {
           ))}
         </div>
 
+        {/* 3D Viewer Section */}
+        {viewer3DSections.length > 0 && (
+          <div id="3d-view" className={styles.section}>
+            {viewer3DSections.map((section) => (
+              <Product3DViewerSection 
+                key={`viewer3d-${section._key}`} 
+                data={section} 
+              />
+            ))}
+          </div>
+        )}
+
         {/* Specifications */}
         {specSections.length > 0 && (
           <div id="specifications" className={styles.section}>
             {specSections.map((section) => (
-               <ProductSpecsSection key={section._key} data={section} />
+               <ProductSpecsSection key={`spec-${section._key}`} data={section} />
             ))}
           </div>
         )}

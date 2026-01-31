@@ -117,17 +117,17 @@ export const product = defineType({
 
     /* -----------------------------------------------------
      *  DETAIL PAGE (ADVANCED PAGE BUILDER)
-     *  This powers the new tabbed/scrolling layout.
+     *  ✅ SINGLE sections field with ALL section types
      * ----------------------------------------------------- */
     defineField({
       name: "sections",
       title: "Detail Page Sections (Page Builder)",
-      description: "Add sections here to build the full detail page (Features, Specs, etc.)",
+      description: "Add sections here to build the full detail page (Features, Specs, 3D Viewer, etc.)",
       type: "array",
       of: [
-        // Make sure 'featureSection' and 'specSection' are registered in schemaTypes/index.ts
         defineArrayMember({ type: "featureSection" }),
         defineArrayMember({ type: "specSection" }),
+        defineArrayMember({ type: "viewer3DSection" }), // ✅ Added 3D viewer
         // defineArrayMember({ type: "orderingSection" }),
         // defineArrayMember({ type: "trackersSection" }),
       ],
