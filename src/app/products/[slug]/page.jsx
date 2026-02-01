@@ -6,52 +6,61 @@ import StickySidebar from "@/components/StickySidebar";
 
 async function getProduct(slug) {
   const query = `*[_type == "product" && slug.current == $slug][0]{
-    _id,
-    name,
-    slug,
-    intro,
-    image,
-    "sections": sections[]{
-      _key,
-      _type,
-      
-      // Common fields (all section types)
-      title,
-      heading,
-      description,
-      position,
-      
-      // Image field (for feature sections)
-      image {
-        asset -> {
-          _id,
-          url
-        }
-      },
-      
-      // Spec section fields
-      items,
-      specs,
-      
-      // Feature section fields
-      bulletPoints,
-      features,
-      
-      // 3D Viewer Section fields
-      modelScale,
-      autoRotate,
-      backgroundColor,
-      modelFile {
-        asset -> {
-          _id,
-          _ref,
-          url,
-          originalFilename,
-          extension
-        }
+  _id,
+  name,
+  slug,
+  intro,
+  image,
+  "sections": sections[] {
+    _key,
+    _type,
+
+    // Common fields
+    title,
+    heading,
+    description,
+    position,
+
+    // Image field
+    image {
+      asset -> {
+        _id,
+        url
+      }
+    },
+
+    // Spec section
+    items,
+    specs,
+
+    // Feature section
+    bulletPoints,
+    features,
+
+    // 3D Viewer Section fields (UPDATED)
+    heroTitle,
+    heroSubtitle,
+    altTitle,
+    altSubtitle,
+    useAlternateText,
+    orderNowUrl,
+    productVideoUrl,
+
+    modelScale,
+    autoRotate,
+    backgroundColor,
+    modelFile {
+      asset -> {
+        _id,
+        _ref,
+        url,
+        originalFilename,
+        extension
       }
     }
-  }`;
+  }
+}`;
+
   
   // Disable cache to see updates immediately
   return client.fetch(query, { slug }, { next: { revalidate: 0 } });

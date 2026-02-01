@@ -151,7 +151,6 @@
     padding: 1rem 0 !important;
   }
 }
-/* Back Button Styles */
 .backButton {
   display: inline-flex;
   align-items: center;
@@ -170,7 +169,12 @@
   white-space: nowrap;
   margin-bottom: 2rem;
 }
-
+/* ✅ MOBILE FIX */
+@media (max-width: 640px) {
+  .backButton {
+    margin-top: 1.5rem; /* adjust if needed */
+  }
+}
 .backButton::before {
   content: '';
   position: absolute;

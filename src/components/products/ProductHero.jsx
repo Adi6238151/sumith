@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -11,253 +12,291 @@ export default function ProductHero({ hero }) {
     title = "",
     subtitle = "",
     heroImage,
-    backgroundColor = "#020824", // dark navy
   } = hero;
 
-  const heroImgUrl = heroImage ? urlFor(heroImage).width(2000).url() : null;
+  const heroImgUrl = heroImage
+    ? urlFor(heroImage).width(2600).url()
+    : null;
+
+  const bgRef = useRef(null);
+
+  /* =========================
+     Subtle Parallax
+  ========================= */
+  useEffect(() => {
+    if (!bgRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) return;
+
+    const handleScroll = () => {
+      const offset = Math.min(window.scrollY * 0.15, 28);
+      if (bgRef.current) {
+        bgRef.current.style.transform = `translateY(${offset}px)`;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  /* =========================
+     Scroll CTA
+  ========================= */
+  const handleScrollDown = () => {
+    window.scrollBy({
+      top: window.innerHeight * 0.8,
+      behavior: "smooth",
+    });
+  };
 
   return (
-    <>
-      <section className="product-hero" style={{ backgroundColor }}>
-        <div className="product-hero-shell">
-          <div className="product-hero-inner">
-            {/* LEFT: copy */}
-            <div className="product-hero-copy">
-              {label && <div className="product-hero-label">{label}</div>}
-              {title && <h1 className="product-hero-title">{title}</h1>}
-              {subtitle && <p className="product-hero-subtitle">{subtitle}</p>}
-            </div>
-
-            {/* CENTER: arrow */}
-            <div className="product-hero-arrow">
-              <div className="product-hero-arrow-inner" />
-            </div>
-
-            {/* RIGHT: direct background image */}
-            <div className="product-hero-visual">
-              {heroImgUrl && (
-                <div className="product-hero-image">
-                  <Image
-                    src={heroImgUrl}
-                    alt={title || "Product hero"}
-                    fill
-                    priority
-                    sizes="(min-width: 1440px) 1100px, (min-width: 768px) 70vw, 100vw"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+    <section className="product-hero">
+      {/* Background */}
+      {heroImgUrl && (
+        <div ref={bgRef} className="hero-bg">
+          <Image
+            src={heroImgUrl}
+            alt={title || "Hero background"}
+            fill
+            priority
+            sizes="100vw"
+          />
         </div>
-      </section>
+      )}
+
+      {/* Overlay */}
+      <div className="hero-overlay" />
+
+      {/* Content */}
+      <div className="hero-content">
+        {label && <span className="hero-label">{label}</span>}
+        {title && (
+          <h1 className="hero-title">
+            {title}
+            <span className="hero-underline" />
+          </h1>
+        )}
+        {subtitle && <p className="hero-subtitle">{subtitle}</p>}
+      </div>
+
+      {/* Scroll Indicator */}
+      <button
+        className="scroll-indicator"
+        onClick={handleScrollDown}
+        aria-label="Scroll down"
+      >
+        <span className="scroll-dot" />
+        <span className="scroll-text">Scroll</span>
+      </button>
 
       <style jsx>{`
+        /* ========================= */
+        /* ROOT */
+        /* ========================= */
         .product-hero {
-          width: 100%;
-          color: #ffffff;
-          padding-top: 120px;
-          padding-bottom: 0px;
           position: relative;
-          overflow: hidden;
-        }
-
-        .product-hero-shell {
-          max-width: 1920px;
-          margin: 0 auto;
-          padding-inline: min(5vw, 72px);
-        }
-
-        .product-hero-inner {
+          width: 100%;
+          min-height: 100svh;
           display: grid;
-          grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1.7fr);
-          align-items: center;
-          position: relative;
+          place-items: center;
+          overflow: hidden;
+          color: #ffffff;
         }
 
-        /* TEXT */
-        .product-hero-copy {
-          padding-top: 20px;
-          padding-bottom: 20px;
-          padding-right: 3vw;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          position: relative;
-          z-index: 2;
+        /* ========================= */
+        /* BACKGROUND */
+        /* ========================= */
+        .hero-bg {
+          position: absolute;
+          inset: -28px 0 0 0;
+          z-index: 0;
+          will-change: transform;
         }
 
-        .product-hero-label {
-          font-size: 0.78rem;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          color: #a4afc6;
-          margin-bottom: 16px;
-          font-weight: 500;
-        }
-
-        .product-hero-title {
-          font-size: clamp(2.4rem, 3.2vw, 3.1rem);
-          line-height: 1.15;
-          font-weight: 400;
-          margin: 0;
-        }
-
-        .product-hero-subtitle {
-          font-size: 1.08rem;
-          max-width: 32rem;
-          color: #cfd5eb;
-          margin-top: 20px;
-          line-height: 1.5;
-        }
-
-        /* ARROW */
-        .product-hero-arrow {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding-inline: min(3vw, 32px);
-          z-index: 2;
-        }
-
-        .product-hero-arrow-inner {
-          width: 70px;
-          height: 120px;
-          background: linear-gradient(135deg, #38a8ff 0%, #1b72ff 100%);
-          clip-path: polygon(0 0, 100% 50%, 0 100%);
-          box-shadow: 0 0 26px rgba(56, 168, 255, 0.55);
-        }
-
-        /* IMAGE - Direct Background Placement */
-        .product-hero-visual {
-          position: relative;
-          display: flex;
-          align-items: stretch;
-          min-height: 280px;
-        }
-
-        .product-hero-image {
-          position: relative;
-          width: 100%;
-          flex: 1;
-        }
-
-        .product-hero-image :global(img) {
+        .hero-bg :global(img) {
           object-fit: cover;
           object-position: center;
+          filter: saturate(1.12) contrast(1.08) brightness(1.08);
         }
 
-        /* DESKTOP TWEAKS */
-        @media (min-width: 1600px) {
-          .product-hero {
-            padding-top: 100px;
-            padding-bottom: 100px;
-          }
+        /* ========================= */
+        /* OVERLAY (lighter) */
+        /* ========================= */
+        .hero-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          background:
+            radial-gradient(
+              55% 55% at 50% 45%,
+              rgba(2, 8, 36, 0.25),
+              rgba(2, 8, 36, 0.78)
+            ),
+            linear-gradient(
+              to bottom,
+              rgba(2, 8, 36, 0.65),
+              rgba(2, 8, 36, 0.85)
+            );
+        }
 
-          .product-hero-visual {
-            min-height: 320px;
+        /* ========================= */
+        /* CONTENT */
+        /* ========================= */
+        .hero-content {
+          position: relative;
+          z-index: 2;
+          max-width: 820px;
+          padding-inline: 20px;
+          text-align: center;
+          animation: heroFadeUp 1.1s ease-out forwards;
+        }
+
+        .hero-label {
+          display: inline-block;
+          margin-bottom: 18px;
+          font-size: 0.72rem;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.8);
+        }
+
+        .hero-title {
+          position: relative;
+          font-size: clamp(2.6rem, 5vw, 3.8rem);
+          line-height: 1.12;
+          font-weight: 400;
+          margin: 0;
+          text-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Animated underline */
+        .hero-underline {
+          display: block;
+          height: 3px;
+          width: 72px;
+          margin: 20px auto 0;
+          background: linear-gradient(90deg, #38a8ff, #1b72ff);
+          border-radius: 2px;
+          animation: underlineGrow 1s ease-out forwards;
+        }
+
+        .hero-subtitle {
+          margin-top: 22px;
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.9);
+          max-width: 36rem;
+          margin-inline: auto;
+        }
+
+        /* ========================= */
+        /* SCROLL INDICATOR */
+        /* ========================= */
+        .scroll-indicator {
+          position: absolute;
+          bottom: 24px;
+          z-index: 3;
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.85);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          animation: scrollFloat 2.2s ease-in-out infinite;
+        }
+
+        .scroll-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #ffffff;
+        }
+
+        .scroll-text {
+          font-size: 0.7rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+        }
+
+        /* ========================= */
+        /* ANIMATIONS */
+        /* ========================= */
+        @keyframes heroFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(18px);
+            filter: blur(4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
           }
         }
 
-        /* TABLET */
-        @media (max-width: 1024px) {
-          .product-hero {
-            padding-top: 60px;
-            padding-bottom: 60px;
+        @keyframes underlineGrow {
+          from {
+            width: 0;
+            opacity: 0;
           }
-
-          .product-hero-shell {
-            padding-inline: 24px;
-          }
-
-          .product-hero-inner {
-            grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1.4fr);
-          }
-
-          .product-hero-visual {
-            min-height: 240px;
-          }
-
-          .product-hero-arrow-inner {
-            width: 60px;
-            height: 100px;
+          to {
+            width: 72px;
+            opacity: 1;
           }
         }
 
-        /* MOBILE: stack vertically */
+        @keyframes scrollFloat {
+          0% {
+            transform: translateY(0);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateY(-6px);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 0.6;
+          }
+        }
+
+        /* ========================= */
+        /* MOBILE */
+        /* ========================= */
         @media (max-width: 768px) {
-          .product-hero {
-            padding-top: 40px;
-            padding-bottom: 40px;
+          .hero-title {
+            font-size: clamp(2.2rem, 7vw, 2.7rem);
           }
 
-          .product-hero-shell {
-            padding-inline: 16px;
+          .hero-subtitle {
+            font-size: 1rem;
+            max-width: 22rem;
           }
 
-          .product-hero-inner {
-            grid-template-columns: 1fr;
-            gap: 24px;
-          }
-
-          .product-hero-arrow {
-            display: none;
-          }
-
-          .product-hero-copy {
-            padding: 20px 0;
-            text-align: center;
-          }
-
-          .product-hero-title {
-            font-size: clamp(2rem, 6vw, 2.4rem);
-          }
-
-          .product-hero-subtitle {
-            font-size: 0.98rem;
-            max-width: none;
-          }
-
-          .product-hero-visual {
-            min-height: 200px;
-            margin-inline: -16px;
-          }
-
-          .product-hero-image {
-            border-radius: 16px;
-            overflow: hidden;
+          .hero-underline {
+            width: 56px;
           }
         }
 
+        /* ========================= */
         /* VERY SMALL */
+        /* ========================= */
         @media (max-width: 480px) {
-          .product-hero {
-            padding-top: 32px;
-            padding-bottom: 32px;
+          .hero-title {
+            font-size: 2rem;
           }
 
-          .product-hero-shell {
-            padding-inline: 12px;
-          }
-
-          .product-hero-copy {
-            padding: 16px 0;
-          }
-
-          .product-hero-title {
-            font-size: 1.8rem;
-          }
-
-          .product-hero-subtitle {
-            font-size: 0.9rem;
-          }
-
-          .product-hero-visual {
-            min-height: 180px;
-            margin-inline: -12px;
+          .hero-subtitle {
+            font-size: 0.95rem;
           }
         }
       `}</style>
-    </>
+    </section>
   );
 }

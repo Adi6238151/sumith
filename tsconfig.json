@@ -38,11 +38,15 @@
     "noEmit": true
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-, "studio/schemaTypes/products/product.js", "src/components/Services/Hero.jsx", "studio/schemaTypes/products/solution.js"  ],
+  "src",
+  "**/*.ts",
+  "**/*.tsx",
+  ".next/types/**/*.ts",
+  ".next/dev/types/**/*.ts",
+  "studio/schemaTypes/products/product.js",
+  "src/components/Services/Hero.jsx",
+  "studio/schemaTypes/products/solution.js"
+],
   "exclude": [
     "node_modules"
   ]

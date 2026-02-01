@@ -1,74 +1,153 @@
-import { defineType, defineField } from 'sanity';
+import { defineType, defineField } from "sanity";
 
 export default defineType({
-  name: 'viewer3DSection',
-  title: '3D Viewer Section',
-  type: 'object',
+  name: "viewer3DSection",
+  title: "3D Viewer Section",
+  type: "object",
   fields: [
+    /* ─────────────────────────────
+       Layout Control
+    ───────────────────────────── */
     defineField({
-      name: 'title',
-      title: 'Section Title',
-      type: 'string',
-      initialValue: '360° Product View',
+      name: "useHeroLayout",
+      title: "Use Hero-style Layout (Teltonika)",
+      type: "boolean",
+      description:
+        "Enable Teltonika-style hero layout (title + subtitle + buttons on left, 3D model on right)",
+      initialValue: true,
+    }),
+
+    /* ─────────────────────────────
+       Text Content
+    ───────────────────────────── */
+    defineField({
+      name: "title",
+      title: "Main Title",
+      type: "string",
+      initialValue: "TELTONIKA DASHCAM",
       validation: (Rule) => Rule.required(),
     }),
+
     defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
+      name: "description",
+      title: "Subtitle / Description",
+      type: "text",
       rows: 3,
-      initialValue: 'Rotate, zoom, and explore the product in 3D',
+      initialValue: "Road video monitoring solution",
     }),
+
     defineField({
-      name: 'modelFile',
-      title: '3D Model File (GLB format)',
-      type: 'file',
-      description: '⚠️ Upload GLB file only. Convert STEP to GLB first using online converters.',
+      name: "alternateTitle",
+      title: "Alternate Title (Generic View)",
+      type: "string",
+      initialValue: "360° Product View",
+      hidden: ({ parent }) => parent?.useHeroLayout,
+    }),
+
+    defineField({
+      name: "alternateDescription",
+      title: "Alternate Description (Generic View)",
+      type: "text",
+      rows: 3,
+      initialValue: "Rotate, zoom, and explore the product in 3D",
+      hidden: ({ parent }) => parent?.useHeroLayout,
+    }),
+
+    /* ─────────────────────────────
+       Buttons
+    ───────────────────────────── */
+    defineField({
+      name: "primaryButton",
+      title: "Primary Button (ORDER NOW)",
+      type: "object",
+      fields: [
+        defineField({
+          name: "label",
+          type: "string",
+          initialValue: "ORDER NOW",
+        }),
+        defineField({
+          name: "url",
+          type: "url",
+          title: "Button Link",
+        }),
+      ],
+      hidden: ({ parent }) => !parent?.useHeroLayout,
+    }),
+
+    defineField({
+      name: "secondaryButton",
+      title: "Secondary Button (PRODUCT VIDEO)",
+      type: "object",
+      fields: [
+        defineField({
+          name: "label",
+          type: "string",
+          initialValue: "PRODUCT VIDEO",
+        }),
+        defineField({
+          name: "url",
+          type: "url",
+          title: "Video URL (YouTube / MP4)",
+        }),
+      ],
+      hidden: ({ parent }) => !parent?.useHeroLayout,
+    }),
+
+    /* ─────────────────────────────
+       3D Model Settings
+    ───────────────────────────── */
+    defineField({
+      name: "modelFile",
+      title: "3D Model File (GLB format)",
+      type: "file",
+      description:
+        "⚠️ Upload GLB/GLTF only. Convert STEP to GLB before uploading.",
       options: {
-        accept: '.glb,.gltf', // This already restricts file types
+        accept: ".glb,.gltf",
       },
-      validation: (Rule) => Rule.required(), // ✅ Simplified validation - just check if file exists
+      validation: (Rule) => Rule.required(),
     }),
+
     defineField({
-      name: 'modelScale',
-      title: 'Model Scale',
-      type: 'number',
-      description: 'Adjust the size of the 3D model (default: 1)',
+      name: "modelScale",
+      title: "Model Scale",
+      type: "number",
       initialValue: 1,
       validation: (Rule) => Rule.min(0.1).max(10),
     }),
+
     defineField({
-      name: 'autoRotate',
-      title: 'Enable Auto Rotation',
-      type: 'boolean',
-      description: 'Automatically rotate the model',
+      name: "autoRotate",
+      title: "Enable Auto Rotation",
+      type: "boolean",
       initialValue: true,
     }),
+
     defineField({
-      name: 'backgroundColor',
-      title: 'Background Color',
-      type: 'string',
-      description: 'Background color for the 3D viewer (optional)',
+      name: "backgroundColor",
+      title: "Background Color",
+      type: "string",
       options: {
         list: [
-          { title: 'Light Gray', value: '#f8fafc' },
-          { title: 'White', value: '#ffffff' },
-          { title: 'Dark', value: '#1e293b' },
-          { title: 'Blue Gradient', value: 'gradient-blue' },
+          { title: "White", value: "#ffffff" },
+          { title: "Light Gray", value: "#f8fafc" },
+          { title: "Dark", value: "#1e293b" },
         ],
       },
-      initialValue: '#f8fafc',
+      initialValue: "#ffffff",
     }),
   ],
+
   preview: {
     select: {
-      title: 'title',
-      fileName: 'modelFile.asset.originalFilename',
+      title: "title",
+      fileName: "modelFile.asset.originalFilename",
     },
     prepare({ title, fileName }) {
       return {
-        title: title || '3D Viewer Section',
-        subtitle: fileName ? `📦 ${fileName}` : 'No model uploaded',
+        title: title || "3D Viewer Section",
+        subtitle: fileName ? `📦 ${fileName}` : "No model uploaded",
       };
     },
   },
