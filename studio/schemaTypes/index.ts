@@ -50,6 +50,11 @@ import viewer3DSection from './products/viewer3DSection';
 // Services
 import servicesHero from './services/heroSection'
 
+// Careers
+import jobPosting from './careers/jobPosting'
+import jobApplication from './careers/jobApplication'
+import customUser from './careers/customUser'
+
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
     heroSection,
@@ -100,5 +105,9 @@ export const schema: { types: SchemaTypeDefinition[] } = {
 
     // Services
     servicesHero,
+    // Careers
+    jobPosting,
+    jobApplication,
+    customUser,
   ],
 }

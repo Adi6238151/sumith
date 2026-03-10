@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description: "India's pioneering ITMS manufacturer since 2010. Smart & Intelligent Solutions for a Smarter Future.",
 };
 
+import AuthProvider from "@/components/providers/AuthProvider";
+
 export default function RootLayout({
   children,
 }: {
@@ -33,9 +35,11 @@ export default function RootLayout({
           backgroundColor: "#0f1624", // safer base background
         }}
       >
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <AuthProvider>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </AuthProvider>
       </body>
     </html>
   );
