@@ -37,7 +37,7 @@ interface Props {
 }
 
 const sectionVariants: Variants = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 1, y: 0 },
   visible: {
     opacity: 1,
     y: 0,
@@ -51,7 +51,7 @@ const sectionVariants: Variants = {
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 22, scale: 0.98 },
+  hidden: { opacity: 1, y: 0, scale: 1 },
   visible: {
     opacity: 1,
     y: 0,

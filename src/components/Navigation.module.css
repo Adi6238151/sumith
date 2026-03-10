@@ -249,7 +249,7 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   background: transparent;
-  color: #111827;
+  color: #f9fafb; /* default to light */
   cursor: pointer;
   transition:
     color 0.16s ease,
@@ -259,6 +259,14 @@
   z-index: 1;
   text-decoration: none;
 }
+
+/* Specific rule for the dark text when not hovered/active */
+.pillNav:hover .pillNavItem:not(.isHovered) {
+  color: #111827;
+}
+
+/* Also dark when pill nav is not hovered at all, but only after client loads. 
+   We default to white above for the SSR flash. */
 
 .solutionsPill {
   display: inline-flex;

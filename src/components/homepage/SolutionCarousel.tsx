@@ -128,8 +128,9 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
             align-items: center;
             position: relative;
 
-            opacity: 0;
-            transform: translateY(48px) scale(0.98);
+            /* Default to visible so it doesn't flash if JS is slow, CSS will animate it in if we want */
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
             transition:
               opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
@@ -137,14 +138,13 @@ export default function SolutionStack({ slides }: SolutionStackProps) {
 
           .solution-row.image-right {
             grid-template-areas: "content image";
-            transform: translate3d(-32px, 48px, 0) scale(0.98);
           }
 
           .solution-row.image-left {
             grid-template-areas: "image content";
-            transform: translate3d(32px, 48px, 0) scale(0.98);
           }
 
+          /* Keeping the class for backward compatibility, but it defaults visible now */
           .solution-row.solution-row--visible {
             opacity: 1;
             transform: translate3d(0, 0, 0) scale(1);
