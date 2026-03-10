@@ -24,6 +24,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",
+    "reactflow": "^11.11.4",
     "resend": "^6.7.0",
     "sanity": "^4.10.3",
     "sanity-plugin-seofields": "^1.0.10",

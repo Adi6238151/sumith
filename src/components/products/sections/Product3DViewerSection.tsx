@@ -54,6 +54,30 @@ interface Product3DViewerSectionProps {
    Component
 ──────────────────────────────── */
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "model-viewer": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      > & {
+          src?: string;
+          crossorigin?: string;
+          "auto-rotate"?: boolean;
+          "rotation-per-second"?: string;
+          "camera-controls"?: boolean;
+          "camera-orbit"?: string;
+          "interaction-prompt"?: string;
+          exposure?: string;
+          "environment-image"?: string;
+          "shadow-intensity"?: string;
+          "shadow-softness"?: string;
+          onError?: (e: React.SyntheticEvent<HTMLElement, Event>) => void;
+      };
+    }
+  }
+}
+
 export default function Product3DViewerSection({
   data,
 }: Product3DViewerSectionProps) {
@@ -99,15 +123,17 @@ export default function Product3DViewerSection({
           <model-viewer
             ref={modelRef}
             src={modelUrl}
-            environment-image="neutral"
             auto-rotate
             rotation-per-second="20deg"
             camera-controls
             camera-orbit="25deg 90deg"
             interaction-prompt="auto"
-            exposure="1"
-            shadow-intensity="1"
+            exposure="1.2"
+            environment-image="neutral"
+            shadow-intensity="1.5"
+            shadow-softness="1"
             style={{ width: "100%", height: "100%" }}
+            onError={(e: React.SyntheticEvent<HTMLElement, Event>) => console.error("Model Viewer Error:", e)}
           />
         </div>
       </div>

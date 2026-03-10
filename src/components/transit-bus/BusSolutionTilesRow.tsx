@@ -185,7 +185,7 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
           .solution-title {
             font-size: 2.5rem;
             font-weight: 800;
-            color: #0f172a;
+            color: #ffffff;
             margin: 0 0 20px 0;
             line-height: 1.2;
             letter-spacing: -0.02em;
@@ -201,7 +201,7 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
 
           .solution-description {
             font-size: 1.125rem;
-            color: #475569;
+            color: #cbd5e1;
             line-height: 1.8;
             margin: 0;
             font-weight: 400;
@@ -243,7 +243,7 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             transform: scale(1) translateY(0);
           }
 
-          /* ✨ Image sits DIRECTLY on white background - no wrapper overlays */
+          /* ✨ Image sits DIRECTLY on dark background with subtle glow - no wrapper overlays */
           .solution-image {
             width: 100%;
             height: auto; /* ⚡ Automatic height based on aspect ratio */
@@ -251,11 +251,11 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             object-fit: contain; /* ⚡ Shows full image, preserves aspect ratio [web:26] */
             border-radius: 20px;
             
-            /* 🎯 Shadow applied directly to image, not wrapper [web:31] */
+            /* 🎯 Enhanced glowing shadow for dark theme */
             box-shadow:
-              0 2px 8px rgba(0, 0, 0, 0.04),
-              0 12px 40px rgba(0, 0, 0, 0.08),
-              0 0 0 1px rgba(0, 0, 0, 0.02);
+              0 4px 20px rgba(0, 0, 0, 0.5),
+              0 12px 40px rgba(37, 99, 235, 0.15),
+              0 0 0 1px rgba(255, 255, 255, 0.05);
             
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             
@@ -267,9 +267,9 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
           .image-wrapper:hover .solution-image {
             transform: translateY(-12px) scale(1.02);
             box-shadow:
-              0 4px 12px rgba(0, 0, 0, 0.06),
-              0 24px 60px rgba(37, 99, 235, 0.12),
-              0 0 0 1px rgba(59, 130, 246, 0.08);
+              0 8px 30px rgba(0, 0, 0, 0.6),
+              0 24px 60px rgba(37, 99, 235, 0.3),
+              0 0 0 1px rgba(59, 130, 246, 0.3);
           }
 
           /* Subtle accent glow on hover - positioned behind image */
@@ -279,7 +279,7 @@ export default function BusSolutionImageRow({ images, seo }: BusSolutionImageRow
             inset: -20px;
             background: radial-gradient(
               circle at center,
-              rgba(59, 130, 246, 0.08) 0%,
+              rgba(59, 130, 246, 0.15) 0%,
               transparent 70%
             );
             opacity: 0;
