@@ -87,7 +87,7 @@ export default async function CareersPage() {
 
       <Footer />
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .careers-main {
           min-height: 100vh;
           background: #f8fafc;
@@ -313,7 +313,7 @@ export default async function CareersPage() {
           background: #0f172a;
           color: white;
         }
-      `}</style>
+      `}} />
     </>
   );
 }

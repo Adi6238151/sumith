@@ -87,7 +87,7 @@ export default async function JobDetailsPage({ params }: { params: { slug: strin
 
       <Footer />
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .job-main {
           min-height: 100vh;
           background: #f8fafc;
@@ -240,7 +240,7 @@ export default async function JobDetailsPage({ params }: { params: { slug: strin
             font-size: 32px;
           }
         }
-      `}</style>
+      `}} />
     </>
   );
 }
