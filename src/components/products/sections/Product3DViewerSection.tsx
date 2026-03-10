@@ -128,9 +128,9 @@ export default function Product3DViewerSection({
             camera-controls
             camera-orbit="25deg 90deg"
             interaction-prompt="auto"
-            exposure="1.2"
+            exposure="1.0"
             environment-image="neutral"
-            shadow-intensity="1.5"
+            shadow-intensity="1"
             shadow-softness="1"
             style={{ width: "100%", height: "100%" }}
             onError={(e: React.SyntheticEvent<HTMLElement, Event>) => console.error("Model Viewer Error:", e)}
