@@ -332,7 +332,20 @@ export default function SumithTMSBenefits({ benefitsData }: Props) {
                       }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      {IconComponent && <IconComponent className="icon" />}
+                      <div style={{ position: "relative" }}>
+                        {IconComponent && (
+                          <IconComponent 
+                            className="icon" 
+                            size={42} 
+                            style={{ 
+                              width: "2.6rem", 
+                              height: "2.6rem", 
+                              marginBottom: "0.8rem", 
+                              color: "#2a9cf3" 
+                            }} 
+                          />
+                        )}
+                      </div>
                       <div className="benefit-title">{f.title}</div>
                       <div className="benefit-desc">{f.desc}</div>
                     </motion.article>

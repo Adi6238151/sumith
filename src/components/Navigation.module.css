@@ -25,7 +25,9 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.18);
-  transition: visibility 0.22s, opacity 0.22s;
+  transition:
+    visibility 0.22s,
+    opacity 0.22s;
   z-index: 2001;
 }
 
@@ -179,7 +181,9 @@
   box-shadow: 0 1px 0 0 #1f2933;
   z-index: 1010;
   font-family: "Montserrat", Arial, sans-serif;
-  transition: top 0.4s cubic-bezier(0.2, 0.82, 0.42, 1), box-shadow 0.22s;
+  transition:
+    top 0.4s cubic-bezier(0.2, 0.82, 0.42, 1),
+    box-shadow 0.22s;
 }
 
 .megaNavbar.hidden {
@@ -227,7 +231,8 @@
   padding: 6px;
   border-radius: 999px;
   background: radial-gradient(circle at top, #f5f5f5, #d2d2d2);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
   --pill-highlight-left: 0px;
   --pill-highlight-width: 0px;
@@ -246,7 +251,9 @@
   background: transparent;
   color: #111827;
   cursor: pointer;
-  transition: color 0.16s ease, transform 0.16s ease,
+  transition:
+    color 0.16s ease,
+    transform 0.16s ease,
     text-shadow 0.16s ease;
   white-space: nowrap;
   z-index: 1;
@@ -271,8 +278,12 @@
 }
 
 .pillNavItem.isHovered {
-  color: #f9fafb;
+  color: #f9fafb !important;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.pillNavItem.isHovered .downArrowPill {
+  border-color: #f9fafb !important;
 }
 
 .pillNavItem:hover {
@@ -289,7 +300,8 @@
   transform: translateX(var(--pill-highlight-left));
   width: var(--pill-highlight-width);
   opacity: var(--pill-highlight-opacity);
-  transition: transform 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12),
+  transition:
+    transform 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12),
     width 0.26s cubic-bezier(0.22, 0.9, 0.25, 1.12);
   pointer-events: none;
 }
@@ -364,7 +376,9 @@
 .sectionItem:hover {
   color: #fbbf24;
   transform: translateX(3px);
-  transition: transform 0.16s ease, color 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    color 0.16s ease;
 }
 
 .bulletIcon {
@@ -379,15 +393,15 @@
     padding-left: 5vw;
     padding-right: 5vw;
   }
-  
+
   .logoImg {
     width: 120px !important;
   }
-  
+
   .pillNav {
     gap: 4px;
   }
-  
+
   .pillNavItem {
     padding: 8px 20px;
     font-size: 0.96rem;
@@ -400,19 +414,19 @@
     height: 56px;
     gap: 10px;
   }
-  
+
   .logoImg {
     width: 90px !important;
   }
-  
+
   .pillNavWrapper {
     display: none;
   }
-  
+
   .megaDropdown {
     display: none !important;
   }
-  
+
   .hamburger {
     display: flex;
   }
@@ -422,7 +436,7 @@
   .navbarInner {
     padding: 0 8px;
   }
-  
+
   .sidebar {
     max-width: 100%;
   }

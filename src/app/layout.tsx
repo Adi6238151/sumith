@@ -24,6 +24,8 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body
         className="antialiased"
+        suppressHydrationWarning
+
         style={{
           margin: 0,
           padding: 0,

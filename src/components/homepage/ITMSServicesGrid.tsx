@@ -267,7 +267,13 @@ export default function ITMSServicesGrid({
                   className={`product-tile${isSelected ? " selected" : ""}`}
                 >
                   <div style={{ position: "relative" }}>
-                    {Icon && <Icon className="icon" />}
+                    {Icon && (
+                      <Icon 
+                        className="icon" 
+                        size={40} 
+                        style={{ width: "2.8rem", height: "2.8rem", marginBottom: "0.6rem", color: "#258be7" }} 
+                      />
+                    )}
                     {p.badge && <span className="badge">{p.badge}</span>}
                   </div>
                   <div className="tile-label">{p.name}</div>
