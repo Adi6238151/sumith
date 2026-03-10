@@ -5,10 +5,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function PortalLogin() {
+export default function PortalRegister() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,17 +19,41 @@ export default function PortalLogin() {
     setIsLoading(true);
     setError("");
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    if (res?.error) {
-      setError("Invalid email or password");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       setIsLoading(false);
-    } else {
-      router.push("/portal/dashboard");
+      return;
+    }
+
+    try {
+      const resp = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      // Automatically sign them in
+      const signInRes = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (signInRes?.error) {
+        // Unexpected login error after register, redirect to login
+        router.push("/portal/login?registered=true");
+      } else {
+        router.push("/portal/candidate");
+      }
+    } catch (err: any) {
+      setError(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -35,13 +61,26 @@ export default function PortalLogin() {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h2>Sumith Careers Portal</h2>
-          <p>Sign in to manage applications and postings.</p>
+          <h2>Create Candidate Account</h2>
+          <p>Register to apply for jobs and track your applications.</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="login-form">
+          <div className="input-group">
+            <label htmlFor="name">Full Name</label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={isLoading}
+              placeholder="John Doe"
+            />
+          </div>
+
           <div className="input-group">
             <label htmlFor="email">Email Address</label>
             <input
@@ -51,7 +90,7 @@ export default function PortalLogin() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              placeholder="hr@sumith.in"
+              placeholder="applicant@domain.com"
             />
           </div>
 
@@ -64,17 +103,30 @@ export default function PortalLogin() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
+              minLength={6}
+            />
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={isLoading}
+              minLength={6}
             />
           </div>
 
           <button type="submit" className="login-btn" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Creating Account..." : "Register"}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>Don't have an account? <Link href="/portal/register">Register as Candidate</Link></p>
-          <p style={{ marginTop: '8px' }}><Link href="/portal/forgot-password">Forgot your password?</Link></p>
+          <p>Already have an account? <Link href="/portal/login">Sign In</Link></p>
           <Link href="/careers" style={{ display: 'block', marginTop: '16px' }}>← Back to Careers Page</Link>
         </div>
       </div>
@@ -128,7 +180,7 @@ export default function PortalLogin() {
         .login-form {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
         }
 
         .input-group {
@@ -144,7 +196,7 @@ export default function PortalLogin() {
         }
 
         input {
-          padding: 12px 16px;
+          padding: 10px 16px;
           border: 1px solid #d1d5db;
           border-radius: 8px;
           font-size: 16px;
@@ -167,7 +219,7 @@ export default function PortalLogin() {
           border: none;
           cursor: pointer;
           transition: background-color 0.2s;
-          margin-top: 8px;
+          margin-top: 12px;
         }
 
         .login-btn:hover {
@@ -182,11 +234,12 @@ export default function PortalLogin() {
         .login-footer {
           margin-top: 24px;
           text-align: center;
+          font-size: 14px;
+          color: #4b5563;
         }
 
         .login-footer a {
           color: #2563eb;
-          font-size: 14px;
           font-weight: 500;
           text-decoration: none;
         }

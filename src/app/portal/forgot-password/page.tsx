@@ -1,15 +1,12 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function PortalLogin() {
-  const router = useRouter();
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,26 +14,54 @@ export default function PortalLogin() {
     setIsLoading(true);
     setError("");
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
+    try {
+      const resp = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    if (res?.error) {
-      setError("Invalid email or password");
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        throw new Error(data.error || "Failed to send reset link");
+      }
+
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
-    } else {
-      router.push("/portal/dashboard");
     }
   };
+
+  if (success) {
+    return (
+      <div className="login-container">
+        <div className="login-box success-state">
+          <h2>Check Your Email</h2>
+          <p>If an account exists with <strong>{email}</strong>, we have sent a password reset link.</p>
+          <div className="login-footer">
+            <Link href="/portal/login">← Back to Sign In</Link>
+          </div>
+        </div>
+        <style jsx>{`
+          .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f3f4f6; padding: 24px; }
+          .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); width: 100%; max-width: 440px; text-align: center; }
+          h2 { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 16px; }
+          p { color: #4b5563; line-height: 1.6; margin-bottom: 32px; }
+          .login-footer a { color: #2563eb; font-weight: 500; text-decoration: none; }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h2>Sumith Careers Portal</h2>
-          <p>Sign in to manage applications and postings.</p>
+          <h2>Reset Password</h2>
+          <p>Enter your email address to receive a secure password reset link.</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -51,31 +76,17 @@ export default function PortalLogin() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              placeholder="hr@sumith.in"
-            />
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
+              placeholder="applicant@domain.com"
             />
           </div>
 
           <button type="submit" className="login-btn" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Sending Link..." : "Send Reset Link"}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>Don't have an account? <Link href="/portal/register">Register as Candidate</Link></p>
-          <p style={{ marginTop: '8px' }}><Link href="/portal/forgot-password">Forgot your password?</Link></p>
-          <Link href="/careers" style={{ display: 'block', marginTop: '16px' }}>← Back to Careers Page</Link>
+          <Link href="/portal/login">← Back to Sign In</Link>
         </div>
       </div>
 

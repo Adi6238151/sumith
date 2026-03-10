@@ -28,6 +28,7 @@ export default function ApplyPage({ params }: { params: { slug: string } }) {
             <p>You must be signed in as a Candidate to apply for positions.</p>
             <div className="auth-actions">
               <Link href="/portal/login" className="btn-primary">Sign In</Link>
+              <Link href="/portal/register" className="btn-secondary">Create Account</Link>
             </div>
           </div>
         </main>
@@ -37,7 +38,9 @@ export default function ApplyPage({ params }: { params: { slug: string } }) {
           .apply-container { max-width: 600px; margin: 0 auto; background: white; padding: 60px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.04); }
           h2 { font-size: 28px; color: #0f172a; margin-bottom: 16px; }
           p { color: #64748b; margin-bottom: 32px; }
+          .auth-actions { display: flex; gap: 16px; justify-content: center; }
           .btn-primary { background: #2563eb; color: white; padding: 14px 32px; border-radius: 8px; font-weight: 600; text-decoration: none; }
+          .btn-secondary { background: white; color: #0b1f8f; border: 1px solid #0b1f8f; padding: 14px 32px; border-radius: 8px; font-weight: 600; text-decoration: none; }
         `}</style>
       </>
     );

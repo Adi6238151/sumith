@@ -54,6 +54,7 @@ import servicesHero from './services/heroSection'
 import jobPosting from './careers/jobPosting'
 import jobApplication from './careers/jobApplication'
 import customUser from './careers/customUser'
+import passwordResetToken from './careers/passwordResetToken'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -109,5 +110,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     jobPosting,
     jobApplication,
     customUser,
+    passwordResetToken,
   ],
 }
+
