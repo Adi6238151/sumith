@@ -1,0 +1,274 @@
+.heroSection {
+  padding: 8rem 0rem !important;
+  text-align: center !important;
+  background-color: white !important;
+  margin: 0 !important;
+}
+
+.heroTitle {
+  font-size: clamp(32px, 5vw, 48px) !important;
+  font-weight: 900 !important;
+  color: #00205B !important;
+  margin: 0 0 1rem 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  letter-spacing: normal !important;
+}
+
+.heroDescription {
+  font-size: 18px !important;
+  color: #6b7280 !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  line-height: 1.6 !important;
+  font-weight: 400 !important;
+}
+
+.stickyNav {
+  position: sticky !important;
+  /* Remove: top: 80px !important; */
+  z-index: 90 !important;
+  background-color: white !important;
+  border-top: 1px solid #e5e7eb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Rest of the CSS remains the same */
+
+
+.navContainer {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 0 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4rem !important;
+  box-sizing: border-box !important;
+}
+
+.navButton {
+  padding: 1.125rem 0 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  position: relative !important;
+  text-transform: capitalize !important;
+  font-size: 16px !important;
+  transition: color 0.2s ease !important;
+  outline: none !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+}
+
+.navButton {
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+}
+
+.navButtonActive {
+  font-weight: 600 !important;
+  color: #111827 !important;
+}
+
+.navIndicator {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background-color: #2563eb !important;
+  border-radius: 999px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.contentWrapper {
+  background-color: white !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.section {
+  scroll-margin-top: 140px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.placeholderSection {
+  min-height: 50vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  scroll-margin-top: 140px !important;
+  padding: 4rem 2rem !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.placeholderOrdering {
+  background-color: white !important;
+}
+
+.placeholderTrackers {
+  background-color: #f9fafb !important;
+}
+
+.placeholderText {
+  color: #9ca3af !important;
+  font-size: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    padding: 3rem 1.5rem !important;
+  }
+
+  .heroTitle {
+    font-size: clamp(28px, 6vw, 36px) !important;
+  }
+
+  .heroDescription {
+    font-size: 16px !important;
+  }
+
+  .navContainer {
+    gap: 2rem !important;
+    padding: 0 1rem !important;
+  }
+
+  .navButton {
+    font-size: 14px !important;
+    padding: 1rem 0 !important;
+  }
+}
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  color: #374151;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-bottom: 2rem;
+}
+/* ✅ MOBILE FIX */
+@media (max-width: 640px) {
+  .backButton {
+    margin-top: 1.5rem; /* adjust if needed */
+  }
+}
+.backButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.backButton:hover::before {
+  left: 100%;
+}
+
+.backButton:hover {
+  background: #f9fafb;
+  border-color: #3b82f6;
+  color: #1f2937;
+  transform: translateX(-4px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.backButton:active {
+  transform: translateX(-2px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.backIcon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.backButton:hover .backIcon {
+  transform: translateX(-3px);
+}
+
+.backText {
+  letter-spacing: 0.01em;
+  text-transform: capitalize;
+}
+
+/* Hero Title Container - constrains width and centers */
+.heroTitleContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+  padding: 0 3rem;
+}
+
+/* Hero Title - center-aligned with word wrap */
+.heroTitle {
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .heroTitleContainer {
+    max-width: 1000px;
+    padding: 0 2.5rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .heroTitleContainer {
+    max-width: 800px;
+    padding: 0 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .backButton {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .backIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .heroTitleContainer {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitleContainer {
+    padding: 0 0.5rem;
+  }
+}

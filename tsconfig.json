@@ -1,27 +1,53 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "Preserve",
+    "moduleDetection": "force",
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/studio/*": [
+        "./studio/*"
+      ],
+      "@/studio/sanity.config": [
+        "./studio/sanity.config.ts"
+      ]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "noEmit": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+  "src",
+  "**/*.ts",
+  "**/*.tsx",
+  ".next/types/**/*.ts",
+  ".next/dev/types/**/*.ts",
+  "studio/schemaTypes/products/product.js",
+  "src/components/Services/Hero.jsx",
+  "studio/schemaTypes/products/solution.js"
+],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -18,43 +18,17 @@ export default {
         {
           type: 'object',
           fields: [
-            {
-              name: 'city',
-              title: 'City/Country',
-              type: 'string',
-              validation: (Rule) => Rule.required()
-            },
-            {
-              name: 'companyName',
-              title: 'Company Name',
-              type: 'string'
-            },
-            {
-              name: 'addressLine1',
-              title: 'Address Line 1',
-              type: 'string'
-            },
-            {
-              name: 'addressLine2',
-              title: 'Address Line 2',
-              type: 'string'
-            },
-            {
-              name: 'addressLine3',
-              title: 'Address Line 3',
-              type: 'string'
-            },
-            {
-              name: 'addressLine4',
-              title: 'Address Line 4',
-              type: 'string'
-            }
+            { name: 'city', title: 'City/Country', type: 'string', validation: (Rule) => Rule.required() },
+            { name: 'companyName', title: 'Company Name', type: 'string' },
+            { name: 'addressLine1', title: 'Address Line 1', type: 'string' },
+            { name: 'addressLine2', title: 'Address Line 2', type: 'string' },
+            { name: 'addressLine3', title: 'Address Line 3', type: 'string' },
+            { name: 'addressLine4', title: 'Address Line 4', type: 'string' },
+            { name: 'email', title: 'Email', type: 'string', validation: (Rule) => Rule.email() },
+            { name: 'phone', title: 'Phone', type: 'string' }
           ],
           preview: {
-            select: {
-              title: 'city',
-              subtitle: 'companyName'
-            }
+            select: { title: 'city', subtitle: 'companyName' }
           }
         }
       ],
@@ -73,18 +47,8 @@ export default {
             {
               type: 'object',
               fields: [
-                {
-                  name: 'label',
-                  title: 'Label',
-                  type: 'string',
-                  validation: (Rule) => Rule.required()
-                },
-                {
-                  name: 'href',
-                  title: 'URL',
-                  type: 'string',
-                  validation: (Rule) => Rule.required()
-                },
+                { name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required() },
+                { name: 'href', title: 'URL', type: 'string', validation: (Rule) => Rule.required() },
                 {
                   name: 'count',
                   title: 'Count (Optional)',
@@ -93,10 +57,7 @@ export default {
                 }
               ],
               preview: {
-                select: {
-                  title: 'label',
-                  subtitle: 'href'
-                }
+                select: { title: 'label', subtitle: 'href' }
               }
             }
           ]
@@ -109,18 +70,8 @@ export default {
             {
               type: 'object',
               fields: [
-                {
-                  name: 'label',
-                  title: 'Label',
-                  type: 'string',
-                  validation: (Rule) => Rule.required()
-                },
-                {
-                  name: 'href',
-                  title: 'URL',
-                  type: 'string',
-                  validation: (Rule) => Rule.required()
-                },
+                { name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required() },
+                { name: 'href', title: 'URL', type: 'string', validation: (Rule) => Rule.required() },
                 {
                   name: 'count',
                   title: 'Count (Optional)',
@@ -136,10 +87,7 @@ export default {
                 }
               ],
               preview: {
-                select: {
-                  title: 'label',
-                  subtitle: 'href'
-                }
+                select: { title: 'label', subtitle: 'href' }
               }
             }
           ]
@@ -155,41 +103,46 @@ export default {
           name: 'facebook',
           title: 'Facebook URL',
           type: 'url',
-          validation: (Rule) => Rule.uri({
-            scheme: ['http', 'https']
-          })
+          validation: (Rule) =>
+            Rule.uri({
+              scheme: ['http', 'https']
+            })
         },
         {
           name: 'instagram',
           title: 'Instagram URL',
           type: 'url',
-          validation: (Rule) => Rule.uri({
-            scheme: ['http', 'https']
-          })
+          validation: (Rule) =>
+            Rule.uri({
+              scheme: ['http', 'https']
+            })
         },
         {
           name: 'twitter',
           title: 'Twitter/X URL',
           type: 'url',
-          validation: (Rule) => Rule.uri({
-            scheme: ['http', 'https']
-          })
+          validation: (Rule) =>
+            Rule.uri({
+              scheme: ['http', 'https']
+            })
         },
         {
           name: 'linkedin',
           title: 'LinkedIn URL',
           type: 'url',
-          validation: (Rule) => Rule.uri({
-            scheme: ['http', 'https']
-          })
+          validation: (Rule) =>
+            Rule.uri({
+              scheme: ['http', 'https']
+            })
         },
         {
           name: 'behance',
           title: 'Behance URL',
           type: 'url',
-          validation: (Rule) => Rule.uri({
-            scheme: ['http', 'https']
-          })
+          validation: (Rule) =>
+            Rule.uri({
+              scheme: ['http', 'https']
+            })
         }
       ]
     },
@@ -197,7 +150,7 @@ export default {
       name: 'copyright',
       title: 'Copyright Text',
       type: 'string',
-      initialValue: '© 2027 Sumith Electronics.',
+      initialValue: 'Copyright ©2026 Sumith Electronics Pvt Ltd. All Rights Reserved.',
       validation: (Rule) => Rule.required()
     },
     {
@@ -208,24 +161,11 @@ export default {
         {
           type: 'object',
           fields: [
-            {
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required()
-            },
-            {
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required()
-            }
+            { name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required() },
+            { name: 'href', title: 'URL', type: 'string', validation: (Rule) => Rule.required() }
           ],
           preview: {
-            select: {
-              title: 'label',
-              subtitle: 'href'
-            }
+            select: { title: 'label', subtitle: 'href' }
           }
         }
       ],
@@ -237,32 +177,33 @@ export default {
       type: 'object',
       description: 'SEO settings for footer structured data',
       fields: [
+        { name: 'organizationName', title: 'Organization Name', type: 'string', initialValue: 'Sumith Electronics' },
+        { name: 'organizationDescription', title: 'Organization Description', type: 'text', rows: 3 },
+        { name: 'foundingYear', title: 'Founding Year', type: 'string' },
+        { name: 'email', title: 'Contact Email', type: 'string' },
+        { name: 'phone', title: 'Contact Phone', type: 'string' }
+      ]
+    },
+    // NEW: footer video (Earth zoom)
+    {
+      name: 'footerVideo',
+      title: 'Footer Earth Zoom Video',
+      type: 'object',
+      fields: [
         {
-          name: 'organizationName',
-          title: 'Organization Name',
+          name: 'file',
+          title: 'Video File',
+          type: 'file',
+          options: {
+            accept: 'video/mp4,video/webm'
+          },
+          description: 'Upload a 16:9 video that zooms from Earth to the office location.'
+        },
+        {
+          name: 'alt',
+          title: 'Video Description',
           type: 'string',
-          initialValue: 'Sumith Electronics'
-        },
-        {
-          name: 'organizationDescription',
-          title: 'Organization Description',
-          type: 'text',
-          rows: 3
-        },
-        {
-          name: 'foundingYear',
-          title: 'Founding Year',
-          type: 'string'
-        },
-        {
-          name: 'email',
-          title: 'Contact Email',
-          type: 'string'
-        },
-        {
-          name: 'phone',
-          title: 'Contact Phone',
-          type: 'string'
+          description: 'Short description for accessibility / SEO.'
         }
       ]
     }
@@ -271,7 +212,7 @@ export default {
     prepare() {
       return {
         title: 'Footer Settings'
-      }
+      };
     }
   }
-}
+};

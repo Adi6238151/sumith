@@ -1,0 +1,83 @@
+.section {
+  position: relative;
+  height: 2400px; /* artificial scroll height */
+  background: #f3f5f9;
+}
+
+.stickyWrapper {
+  position: sticky;
+  top: 120px;
+  height: 80vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.hero {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: 600;
+  letter-spacing: -1px;
+}
+
+.gradient {
+  background: linear-gradient(90deg,#4f70ff,#7b8cff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark {
+  color: #1c2340;
+}
+
+.hero p {
+  margin-top: 24px;
+  font-size: 18px;
+  color: #5c6482;
+}
+
+.button {
+  margin-top: 30px;
+  padding: 14px 26px;
+  border-radius: 30px;
+  background: #e2e6f6;
+  border: none;
+}
+
+.installCard,
+.reliabilityCard,
+.chartCard {
+  position: absolute;
+  width: 420px;
+  border-radius: 20px;
+  background: #1e2235;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.12),
+    0 15px 30px rgba(0,0,0,0.08);
+  transition: transform 0.1s linear;
+}
+
+.installCard {
+  left: 0;
+  top: 260px;
+  height: 260px;
+}
+
+.reliabilityCard {
+  right: 0;
+  top: 260px;
+  height: 260px;
+}
+
+.chartCard {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 620px;
+  height: 240px;
+}

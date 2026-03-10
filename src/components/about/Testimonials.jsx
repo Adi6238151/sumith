@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Testimonials({ title, testimonials }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const sectionRef = useRef(null);
 
   if (!testimonials || testimonials.length === 0) return null;
 
@@ -11,7 +12,7 @@ export default function Testimonials({ title, testimonials }) {
     if (isAnimating) return;
     setIsAnimating(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+      setCurrentIndex(prev => (prev === 0 ? testimonials.length - 1 : prev - 1));
       setIsAnimating(false);
     }, 300);
   };
@@ -20,24 +21,60 @@ export default function Testimonials({ title, testimonials }) {
     if (isAnimating) return;
     setIsAnimating(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+      setCurrentIndex(prev => (prev === testimonials.length - 1 ? 0 : prev + 1));
       setIsAnimating(false);
     }, 300);
   };
 
   const currentTestimonial = testimonials[currentIndex];
 
+  useEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+
+    const titleEl = root.querySelector(".test-title");
+    const boxEl = root.querySelector(".test-box");
+    if (!titleEl && !boxEl) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          const el = entry.target;
+          if (entry.isIntersecting) {
+            if (el.classList.contains("test-title")) {
+              el.classList.add("test-title--visible");
+            } else if (el.classList.contains("test-box")) {
+              el.classList.add("test-box--visible");
+            }
+          } else {
+            if (el.classList.contains("test-title")) {
+              el.classList.remove("test-title--visible");
+            } else if (el.classList.contains("test-box")) {
+              el.classList.remove("test-box--visible");
+            }
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    if (titleEl) observer.observe(titleEl);
+    if (boxEl) observer.observe(boxEl);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
-      <section className="testimonials">
+      <section className="testimonials" ref={sectionRef}>
         {title && <h2 className="test-title">{title}</h2>}
         <div className="test-container">
           <button className="test-nav test-prev" onClick={handlePrev} aria-label="Previous">
             ←
           </button>
-          
+
           <div className="test-box">
-            <div className={`test-content ${isAnimating ? 'fade-out' : 'fade-in'}`}>
+            <div className={`test-content ${isAnimating ? "fade-out" : "fade-in"}`}>
               <p className="test-quote">{currentTestimonial.quote}</p>
               <div className="test-author">
                 <div className="test-name">{currentTestimonial.name}</div>
@@ -66,6 +103,15 @@ export default function Testimonials({ title, testimonials }) {
           text-align: center;
           margin-bottom: 50px;
           font-family: "Montserrat", Arial, sans-serif;
+          opacity: 0;
+          transform: translateY(20px);
+          transition:
+            opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .test-title--visible {
+          opacity: 1;
+          transform: translateY(0);
         }
         .test-container {
           max-width: 1200px;
@@ -83,6 +129,21 @@ export default function Testimonials({ title, testimonials }) {
           min-height: 280px;
           display: flex;
           align-items: center;
+          opacity: 0;
+          transform: translateY(22px) scale(0.97);
+          transition:
+            opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+            border-color 0.3s ease,
+            box-shadow 0.3s ease;
+        }
+        .test-box--visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        .test-box:hover {
+          border-color: #ffc107;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
         }
         .test-content {
           text-align: center;

@@ -14,9 +14,7 @@ import safetyTabSection from './metro-rail/safetyTabSection'
 import passengerDisplaySection from './metro-rail/passengerDisplaySection'
 import AirportSectionHeader from './Airport/AirportSectionHeader'
 import footerSettings from './footer/FooterSettings'
-
-
-
+import indiaPresence from "./indiaPresence"
 
 // About Page Schemas
 import aboutPage from './about/AboutHero'
@@ -29,16 +27,28 @@ import aboutCoreValues from './about/AboutCoreValues'
 import aboutTechPartners from './about/AboutTechPartners'
 import aboutAwards from './about/AboutAwards'
 import aboutLeadership from './about/AboutLeadership'
+import aboutTimeline from "./about/aboutTimeline"
 
-//Products
-import { blockContent } from './products/blockContent'
-import { product } from './products/product'
 
-//contact
+// Products
+//import { blockContent } from './products/blockContent'
+//import { product } from './products/product'
+//import { solutionCard } from './products/solutionCard'
+//import { solutionCardsContainer } from './products/solutionCardsContainer'
+
+// Contact
 import emailSettings from './contact/emailSettings'
 import contactTopic from './contact/contactTopic'
 
-
+//products
+import productHero from "./products/productHero"
+import { product } from "./products/product";
+import solution from './products/solution'
+import { featureSection } from "./products/featureSection";
+import { specSection } from "./products/specSection";
+import viewer3DSection from './products/viewer3DSection';
+// Services
+import servicesHero from './services/heroSection'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -56,6 +66,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     safetyTabSection,
     passengerDisplaySection,
     AirportSectionHeader,
+    indiaPresence,
+
     // About page schemas
     aboutPage,
     aboutStats,
@@ -68,12 +80,25 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     aboutAwards,
     aboutLeadership,
     footerSettings,
+    aboutTimeline,
+
     // Products
+    //product,
+    //blockContent,
+    //solutionCard,
+    //solutionCardsContainer,
+    productHero,
     product,
-    blockContent,
+    solution,
+    featureSection,
+    specSection,
+    viewer3DSection,
+
     // Contact
     emailSettings,
     contactTopic,
 
+    // Services
+    servicesHero,
   ],
 }

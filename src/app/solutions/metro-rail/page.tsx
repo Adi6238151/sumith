@@ -4,8 +4,12 @@ import MetroRailSectionHeader from "@/components/metro-rail/MetroRailSectionHead
 import ScopeOfWorkTiles from "@/components/metro-rail/ScopeOfWorkTiles";
 import SafetyTabsSection from "@/components/metro-rail/SafetyTabsSection";
 import PassengerDisplaySection from "@/components/metro-rail/PassengerDisplaySection";
+import MeterOperations from "@/components/MeterOperations/MeterOperations";
 import { sanity } from "@/lib/sanity.client";
 
+/* ---------------------------
+   Sanity Queries
+---------------------------- */
 
 const metroRailSectionHeaderQuery = `
   *[_type=="metroRailSectionHeader"][0]{
@@ -16,6 +20,7 @@ const metroRailSectionHeaderQuery = `
     seo
   }
 `;
+
 const scopeOfWorkTilesQuery = `
   *[_type=="scopeOfWorkTiles"][0]{
     heading,
@@ -23,7 +28,6 @@ const scopeOfWorkTilesQuery = `
     seo
   }
 `;
-
 
 const safetyTabsSectionQuery = `
   *[_type=="safetyTabSection"][0]{
@@ -37,7 +41,6 @@ const safetyTabsSectionQuery = `
   }
 `;
 
-
 const passengerDisplaySectionQuery = `
   *[_type=="passengerDisplaySection"][0]{
     heading,
@@ -50,17 +53,22 @@ const passengerDisplaySectionQuery = `
   }
 `;
 
+/* ---------------------------
+   Page Component
+---------------------------- */
 
 export default async function MetroRailSolutionPage() {
   const headerData = await sanity.fetch(metroRailSectionHeaderQuery);
   const scopeOfWorkData = await sanity.fetch(scopeOfWorkTilesQuery);
   const safetyTabsData = await sanity.fetch(safetyTabsSectionQuery);
-  const passengerDisplaySectionData = await sanity.fetch(passengerDisplaySectionQuery);
-
+  const passengerDisplaySectionData = await sanity.fetch(
+    passengerDisplaySectionQuery
+  );
 
   return (
     <>
       <Navigation />
+
       <main
         style={{
           background: "#171f2e",
@@ -68,10 +76,12 @@ export default async function MetroRailSolutionPage() {
           width: "100%",
           paddingTop: "110px",
           paddingBottom: "80px",
-          overflowX: "hidden"
+          overflowX: "hidden",
         }}
       >
-        {/* MetroRailSectionHeader */}
+        {/* ---------------------------
+            Metro Rail Header Section
+        ---------------------------- */}
         <MetroRailSectionHeader
           seo={headerData?.seo}
           heading={headerData?.heading}
@@ -80,22 +90,26 @@ export default async function MetroRailSolutionPage() {
           image={headerData?.image}
         />
 
-
-        {/* ScopeOfWorkTiles */}
+        {/* ---------------------------
+            Scope Of Work Tiles
+        ---------------------------- */}
         <ScopeOfWorkTiles
           heading={scopeOfWorkData?.heading}
           tiles={scopeOfWorkData?.tiles || []}
           seo={scopeOfWorkData?.seo}
         />
-        
-        {/* SafetyTabsSection */}
+
+        {/* ---------------------------
+            Safety Tabs Section
+        ---------------------------- */}
         <SafetyTabsSection
           tabs={safetyTabsData?.tabs || []}
           seo={safetyTabsData?.seo}
         />
 
-
-        {/* PassengerDisplaySection */}
+        {/* ---------------------------
+            Passenger Display Section
+        ---------------------------- */}
         <PassengerDisplaySection
           heading={passengerDisplaySectionData?.heading}
           description={passengerDisplaySectionData?.description}
@@ -103,9 +117,13 @@ export default async function MetroRailSolutionPage() {
           seo={passengerDisplaySectionData?.seo}
         />
 
+        {/* ---------------------------
+            Meter Operations Section (NEW)
+        ---------------------------- */}
+        <MeterOperations />
 
-        {/* Add further CMS-powered sections/components below */}
       </main>
+
       <Footer />
     </>
   );

@@ -1,7 +1,10 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import styles from "./Navigation.module.css";
 
 const dropdownSections = [
   {
@@ -10,32 +13,33 @@ const dropdownSections = [
     items: [
       { label: "Bus", icon: "/icons/bullet-bus.png" },
       { label: "Metro/Rail", icon: "/icons/bullet-metro.png" },
-      // Changed here: set Airport link to /solutions/AirportSolutions
-      { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
+      // ❌ TEMPORARILY DISABLED
+      // { label: "Airport", icon: "/icons/bullet-airport.png", href: "/solutions/Airport/page" },
     ],
   },
-  {
-    title: "DIGITAL SIGNAGE",
-    icon: "/icons/digital-signage-icon.png",
-    items: [
-      { label: "Variable Message Display", icon: "/icons/bullet-vmd.png" },
-      { label: "ETA", icon: "/icons/bullet-eta.png" },
-    ],
-  },
-
-  {
-    title: "R&D",
-    icon: "/icons/rd-icon.png",
-    items: [
-      { label: "IOT Hardware & Communication system", icon: "/icons/bullet-iot.png" },
-      { label: "Custom IOT software & system integration", icon: "/icons/bullet-software.png" },
-    ],
-  },
+  // ❌ TEMPORARILY DISABLED - DIGITAL SIGNAGE
+  // {
+  //   title: "DIGITAL SIGNAGE",
+  //   icon: "/icons/digital-signage-icon.png",
+  //   items: [
+  //     { label: "Variable Message Display", icon: "/icons/bullet-vmd.png" },
+  //     { label: "ETA", icon: "/icons/bullet-eta.png" },
+  //   ],
+  // },
+  // ❌ TEMPORARILY DISABLED - R&D
+  // {
+  //   title: "R&D",
+  //   icon: "/icons/rd-icon.png",
+  //   items: [
+  //     { label: "IOT Hardware & Communication system", icon: "/icons/bullet-iot.png" },
+  //     { label: "Custom IOT software & system integration", icon: "/icons/bullet-software.png" },
+  //   ],
+  // },
 ];
 
 const navLinks = [
   { label: "About us", href: "/about-us" },
-  { label: "Products", href: "/solutions/products" },
+  { label: "Products", href: "/products" },
   { label: "Insights", href: "/insights" },
   { label: "Careers", href: "/careers" },
   { label: "Contact us", href: "/contact-us" },
@@ -48,6 +52,25 @@ export default function Navigation() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const navRef = useRef<HTMLDivElement | null>(null);
+
+  const pathname = usePathname();
+
+  const getActiveIndexFromPath = () => {
+    if (pathname === "/") return 0;
+    if (pathname.startsWith("/solutions") && !pathname.startsWith("/solutions/products")) {
+      return 0;
+    }
+    const idx = navLinks.findIndex(
+      (l) => pathname === l.href || pathname.startsWith(l.href + "/"),
+    );
+    return idx === -1 ? navLinks.length : idx + 1;
+  };
+
+  const [activeIndex, setActiveIndex] = useState<number>(() => getActiveIndexFromPath());
+  const [hoverIndex, setHoverIndex] = useState<number | null>(activeIndex);
+
+  const pillRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([]);
+  const pillNavRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (sidebar) return;
@@ -65,8 +88,7 @@ export default function Navigation() {
   }, [lastScrollY, sidebar]);
 
   useEffect(() => {
-    if (sidebar) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    document.body.style.overflow = sidebar ? "hidden" : "";
   }, [sidebar]);
 
   useEffect(() => {
@@ -88,37 +110,76 @@ export default function Navigation() {
     }
   }, [sidebar]);
 
+  useEffect(() => {
+    const next = getActiveIndexFromPath();
+    setActiveIndex(next);
+    setHoverIndex(next);
+  }, [pathname]);
+
+  useEffect(() => {
+    const indexToShow = hoverIndex ?? activeIndex;
+    if (indexToShow == null || !pillNavRef.current) return;
+
+    const pill = pillRefs.current[indexToShow];
+    const container = pillNavRef.current;
+    if (!pill || !container) return;
+
+    const pillRect = pill.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const width = pillRect.width;
+    const left = pillRect.left - containerRect.left;
+
+    container.style.setProperty("--pill-highlight-width", `${width}px`);
+    container.style.setProperty("--pill-highlight-left", `${left}px`);
+    container.style.setProperty("--pill-highlight-opacity", "1");
+  }, [hoverIndex, activeIndex]);
+
   return (
     <>
-      <nav className={`mega-navbar${isVisible ? " visible" : " hidden"}`} ref={navRef}>
-        {/* Mobile Sidebar overlay */}
-        <div className={`sidebar-overlay${sidebar ? " active" : ""}`} onClick={() => setSidebar(false)} />
-        {/* Mobile Sidebar */}
-        <aside className={`sidebar${sidebar ? " open" : ""}`}>
-          <div className="sidebar-header">
-            <Link href="/" tabIndex={sidebar ? 0 : -1} onClick={() => setSidebar(false)} style={{display: "inline-block"}}>
+      <nav className={`${styles.megaNavbar}${isVisible ? ` ${styles.visible}` : ` ${styles.hidden}`}`} ref={navRef}>
+        <div
+          className={`${styles.sidebarOverlay}${sidebar ? ` ${styles.active}` : ""}`}
+          onClick={() => setSidebar(false)}
+        />
+        <aside className={`${styles.sidebar}${sidebar ? ` ${styles.open}` : ""}`}>
+          <div className={styles.sidebarHeader}>
+            <Link
+              href="/"
+              tabIndex={sidebar ? 0 : -1}
+              onClick={() => setSidebar(false)}
+              style={{ display: "inline-block" }}
+            >
               <Image
                 src="/logos/sumith-logo.png"
                 width={120}
                 height={36}
                 alt="Sumith Electronics Logo"
-                className="sidebar-logo"
+                className={styles.sidebarLogo}
                 priority
               />
             </Link>
-            <button className="close-btn" aria-label="Close sidebar" onClick={() => setSidebar(false)}>
+            <button
+              className={styles.closeBtn}
+              aria-label="Close sidebar"
+              onClick={() => setSidebar(false)}
+            >
               <span>&#10005;</span>
             </button>
           </div>
-          <div className="sidebar-links">
-            <button className="sidebar-link sidebar-dropdown" onClick={() => setAccordion((v) => !v)}>
+
+          <div className={styles.sidebarLinks}>
+            <button
+              className={`${styles.sidebarLink} ${styles.sidebarDropdown}`}
+              onClick={() => setAccordion((v) => !v)}
+            >
               <span>SOLUTIONS</span>
-              <span className={`arrow${accordion ? " open" : ""}`}>▼</span>
+              <span className={`${styles.arrow}${accordion ? ` ${styles.arrowOpen}` : ""}`}>▲</span>
             </button>
-            <div className={`sidebar-dropdown-content${accordion ? " show" : ""}`}>
+            <div className={`${styles.sidebarDropdownContent}${accordion ? ` ${styles.show}` : ""}`}>
               {dropdownSections.map((section) => (
-                <div className="sidebar-dropdown-section" key={section.title}>
-                  <div className="sidebar-dropdown-title">
+                <div className={styles.sidebarDropdownSection} key={section.title}>
+                  <div className={styles.sidebarDropdownTitle}>
                     <Image src={section.icon} alt="" width={22} height={22} /> {section.title}
                   </div>
                   <ul>
@@ -129,7 +190,12 @@ export default function Navigation() {
                             href="/solutions/transit-bus"
                             tabIndex={accordion ? 0 : -1}
                             onClick={() => setSidebar(false)}
-                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              color: "inherit",
+                              textDecoration: "none",
+                            }}
                           >
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
@@ -139,18 +205,12 @@ export default function Navigation() {
                             href="/solutions/metro-rail"
                             tabIndex={accordion ? 0 : -1}
                             onClick={() => setSidebar(false)}
-                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
-                          >
-                            <Image src={item.icon} alt="" width={14} height={14} />
-                            <span>{item.label}</span>
-                          </Link>
-                        ) : item.label === "Airport" && item.href ? (
-                          // Airport links to /solutions/AirportSolutions
-                          <Link
-                            href={item.href}
-                            tabIndex={accordion ? 0 : -1}
-                            onClick={() => setSidebar(false)}
-                            style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              color: "inherit",
+                              textDecoration: "none",
+                            }}
                           >
                             <Image src={item.icon} alt="" width={14} height={14} />
                             <span>{item.label}</span>
@@ -167,109 +227,169 @@ export default function Navigation() {
                 </div>
               ))}
             </div>
+
             {navLinks.map((item) => (
-              <Link className="sidebar-link" key={item.label} href={item.href} tabIndex={sidebar ? 0 : -1} onClick={() => setSidebar(false)}>
+              <Link
+                className={styles.sidebarLink}
+                key={item.label}
+                href={item.href}
+                tabIndex={sidebar ? 0 : -1}
+                onClick={() => setSidebar(false)}
+              >
                 {item.label}
               </Link>
             ))}
           </div>
         </aside>
 
-        <div className="navbar-inner">
-          {/* Hamburger */}
-          <button className="hamburger" aria-label="Open menu" onClick={() => setSidebar(true)}>
+        <div className={styles.navbarInner}>
+          <button
+            className={styles.hamburger}
+            aria-label="Open menu"
+            onClick={() => setSidebar(true)}
+          >
             <span />
             <span />
             <span />
           </button>
-          {/* Logo (mobile: center, desktop: left) */}
-          <div className="logo">
-            <Link href="/" style={{display: "inline-block"}}>
+
+          <div className={styles.logo}>
+            <Link href="/" style={{ display: "inline-block" }}>
               <Image
                 src="/logos/sumith-logo.png"
                 width={150}
                 height={44}
                 alt="Sumith Electronics Logo"
-                className="logo-img"
+                className={styles.logoImg}
                 priority
               />
             </Link>
           </div>
-          {/* Desktop menu */}
-          <div className="navbar-links">
-            <span
-              className="navbar-link main-dropdown"
-              tabIndex={0}
-              onMouseEnter={() => setOpen(true)}
-              onClick={() => setOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={open}
-              aria-label="Solutions"
-            >
-              Solutions
-              <span className="down-arrow" />
-            </span>
-            {navLinks.map((item) => (
-              <Link className="navbar-link" href={item.href} key={item.label}>
-                {item.label}
-              </Link>
-            ))}
+
+          <div className={styles.pillNavWrapper}>
+            <div className={styles.pillNav} ref={pillNavRef}>
+              <button
+                ref={(el: HTMLButtonElement | null) => {
+                  pillRefs.current[0] = el;
+                }}
+                className={`${styles.pillNavItem} ${styles.solutionsPill}${
+                  (hoverIndex ?? activeIndex) === 0 ? ` ${styles.isHovered}` : ""
+                }`}
+                onMouseEnter={() => {
+                  setOpen(true);
+                  setHoverIndex(0);
+                }}
+                onFocus={() => {
+                  setOpen(true);
+                  setHoverIndex(0);
+                }}
+                onMouseLeave={() => setHoverIndex(null)}
+                onBlur={() => setHoverIndex(null)}
+                onClick={() => setOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={open}
+                aria-label="Solutions"
+              >
+                Solutions
+                <span className={styles.downArrowPill} />
+              </button>
+
+              {navLinks.map((item, idx) => {
+                const pillIndex = idx + 1;
+                const isCurrent = (hoverIndex ?? activeIndex) === pillIndex;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`${styles.pillNavItem}${isCurrent ? ` ${styles.isHovered}` : ""}`}
+                    ref={(el: HTMLAnchorElement | null) => {
+                      pillRefs.current[pillIndex] = el;
+                    }}
+                    onMouseEnter={() => setHoverIndex(pillIndex)}
+                    onFocus={() => setHoverIndex(pillIndex)}
+                    onMouseLeave={() => setHoverIndex(null)}
+                    onBlur={() => setHoverIndex(null)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+
+              <span className={styles.pillNavHighlight} aria-hidden="true" />
+            </div>
           </div>
         </div>
 
-        {/* Desktop mega-dropdown */}
         <div
-          className="mega-dropdown"
+          className={styles.megaDropdown}
           style={{ display: open ? "flex" : "none" }}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
           {dropdownSections.map((section) => (
-            <div className="dropdown-section" key={section.title}>
-              <div className="section-header">
+            <div className={styles.dropdownSection} key={section.title}>
+              <div className={styles.sectionHeader}>
                 <Image
                   src={section.icon}
                   alt=""
                   width={40}
                   height={40}
-                  className="section-icon"
+                  className={styles.sectionIcon}
                 />
-                <span className="section-title">{section.title}</span>
+                <span className={styles.sectionTitle}>{section.title}</span>
               </div>
-              <ul className="section-items">
+              <ul className={styles.sectionItems}>
                 {section.items.map((item) => (
-                  <li className="section-item" key={item.label}>
+                  <li className={styles.sectionItem} key={item.label}>
                     {item.label === "Bus" ? (
                       <Link
                         href="/solutions/transit-bus"
                         onClick={() => setOpen(false)}
-                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "inherit",
+                          textDecoration: "none",
+                        }}
                       >
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className={styles.bulletIcon}
+                        />
                         <span>{item.label}</span>
                       </Link>
                     ) : item.label === "Metro/Rail" ? (
                       <Link
                         href="/solutions/metro-rail"
                         onClick={() => setOpen(false)}
-                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "inherit",
+                          textDecoration: "none",
+                        }}
                       >
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
-                        <span>{item.label}</span>
-                      </Link>
-                    ) : item.label === "Airport" && item.href ? (
-                      // Airport links to /solutions/AirportSolutions
-                      <Link
-                        href="/solutions/Airport"
-                        onClick={() => setOpen(false)}
-                        style={{display: "flex", alignItems: "center", color: "inherit", textDecoration: "none"}}
-                      >
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className={styles.bulletIcon}
+                        />
                         <span>{item.label}</span>
                       </Link>
                     ) : (
                       <>
-                        <Image src={item.icon} alt="" width={16} height={16} className="bullet-icon" />
+                        <Image
+                          src={item.icon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className={styles.bulletIcon}
+                        />
                         <span>{item.label}</span>
                       </>
                     )}
@@ -280,361 +400,6 @@ export default function Navigation() {
           ))}
         </div>
       </nav>
-      <style jsx global>{`
-        /* (PASTE ALL YOUR ORIGINAL CSS FROM PREVIOUS CODE HERE) */
-        /* Hamburger styles */
-        .hamburger {
-          display: none;
-          flex-direction: column;
-          gap: 3px;
-          background: transparent;
-          border: none;
-          outline: none;
-          cursor: pointer;
-          width: 36px;
-          height: 36px;
-          margin-right: 16px;
-        }
-        .hamburger span {
-          display: block;
-          width: 29px;
-          height: 3.5px;
-          border-radius: 2px;
-          background: #112445;
-        }
-        /* Sidebar Overlay */
-        .sidebar-overlay {
-          visibility: hidden;
-          opacity: 0;
-          position: fixed;
-          left: 0; top: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.18);
-          transition: visibility 0.22s, opacity 0.22s;
-          z-index: 2001;
-        }
-        .sidebar-overlay.active {
-          visibility: visible;
-          opacity: 1;
-        }
-        /* Sidebar */
-        .sidebar {
-          position: fixed;
-          top: 0;
-          left: -320px;
-          height: 100vh;
-          width: 298px;
-          max-width: 92vw;
-          background: #fff;
-          box-shadow: 3px 0 15px rgba(30,40,68,0.13);
-          z-index: 2002;
-          transition: left 0.28s cubic-bezier(.2,.6,.3,1);
-          display: flex;
-          flex-direction: column;
-        }
-        .sidebar.open {
-          left: 0;
-        }
-        .sidebar-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 17px 10px 18px;
-          border-bottom: 1px solid #eff0f1;
-        }
-        .sidebar-logo {
-          width: 110px !important;
-          height: auto;
-        }
-        .close-btn {
-          font-size: 1.6rem;
-          border: none;
-          background: transparent;
-          color: #1753a6;
-          cursor: pointer;
-        }
-        .sidebar-links {
-          display: flex;
-          flex-direction: column;
-          padding: 13px 6px 13px 18px;
-          gap: 7px;
-        }
-        .sidebar-link {
-          background: none;
-          border: none;
-          outline: none;
-          font-size: 1.13rem;
-          font-weight: 600;
-          color: #172c44;
-          letter-spacing: 0.015em;
-          text-align: left;
-          text-decoration: none;
-          cursor: pointer;
-          padding: 11px 0;
-          transition: color 0.18s;
-          display: flex;
-          align-items: center;
-        }
-        .sidebar-link:hover, .sidebar-link:focus {
-          color: #43b724;
-        }
-        .sidebar-dropdown {
-          justify-content: space-between;
-        }
-        .arrow {
-          transition: transform 0.17s;
-          font-size: 1.16em;
-          color: #43b724;
-          display: inline-block;
-          margin-left: 6px;
-          vertical-align: middle;
-        }
-        .arrow.open {
-          transform: rotate(180deg);
-        }
-        .sidebar-dropdown-content {
-          max-height: 0; 
-          overflow: hidden;
-          transition: max-height 0.32s;
-          background: #f7f8fb;
-          border-radius: 7px;
-          margin: 0 0 10px 0;
-        }
-        .sidebar-dropdown-content.show {
-          max-height: 800px;
-          padding: 13px 0 2px 9px;
-          box-shadow: 0 1.5px 8px rgba(50,68,98,0.08);
-          border: 1px solid #eff0f2;
-        }
-        .sidebar-dropdown-section {
-          margin-bottom: 7px;
-        }
-        .sidebar-dropdown-title {
-          color: #27304d;
-          font-size: 0.97rem;
-          font-weight: 600;
-          display: flex;
-          gap: 8px;
-          margin-bottom: 5px;
-          align-items: center;
-        }
-        .sidebar-dropdown-section ul {
-          list-style: none;
-          margin: 0;
-          padding: 0 0 2px 0;
-        }
-        .sidebar-dropdown-section li {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.98rem;
-          font-weight: 500;
-          color: #4b5f79;
-          padding: 4px 0 2px 2px;
-        }
-        /* Normal navbar styles */
-        .mega-navbar {
-          width: 100%;
-          background: #fff;
-          position: fixed;
-          top: 0;
-          left: 0;
-          box-shadow: 0 1px 0 0 #eaeaea;
-          z-index: 1010;
-          font-family: "Montserrat", Arial, sans-serif;
-          transition: top 0.4s cubic-bezier(0.2,0.82,0.42,1), box-shadow 0.22s;
-        }
-        .mega-navbar.hidden {
-          top: -110px;
-        }
-        .mega-navbar.visible {
-          top: 0;
-        }
-        .navbar-inner {
-          max-width: 1550px;
-          margin: 0 auto;
-          height: 96px;
-          display: flex;
-          align-items: center;
-          gap: 48px;
-          padding: 0 48px;
-          position: relative;
-        }
-        .logo {
-          flex: 1 1 auto;
-          text-align: left;
-        }
-        .logo-img {
-          width: 150px !important;
-          height: auto;
-        }
-        .navbar-links {
-          display: flex;
-          gap: 38px;
-          align-items: center;
-          flex: 2 1 750px;
-          justify-content: center;
-        }
-        .navbar-link {
-          font-size: 1.18rem;
-          font-weight: 700;
-          color: #142241;
-          letter-spacing: 0.02em;
-          text-transform: upperlowercase;
-          background: none;
-          border: none;
-          cursor: pointer;
-          position: relative;
-          text-decoration: none;
-          transition: color 0.18s;
-          padding: 0 3px;
-        }
-        .navbar-link:hover,
-        .navbar-link:focus {
-          color: #43b724;
-        }
-        .main-dropdown {
-          display: flex;
-          align-items: center;
-        }
-        .down-arrow {
-          display: inline-block;
-          margin-left: 8px;
-          width: 18px;
-          height: 18px;
-          color: #43b724;
-          font-weight: bold;
-          font-size: 1rem;
-          position: relative;
-        }
-        .down-arrow:after {
-          content: '';
-          display: block;
-          border: solid #43b724;
-          border-width: 0 0 4px 4px;
-          width: 13px;
-          height: 13px;
-          margin-top: 0;
-          transform: rotate(-45deg) translateY(2px);
-        }
-        .mega-dropdown {
-          width: 100%;
-          left: 0;
-          position: absolute;
-          background: #f8fbf9;
-          box-shadow: 0 11px 35px rgba(46, 49, 91, 0.07);
-          top: 100%;
-          padding: 34px 38px 34px 38px;
-          display: flex;
-          flex-direction: row;
-          gap: 22px;
-          z-index: 1011;
-        }
-        .dropdown-section {
-          min-width: 215px;
-          padding: 0 16px 0 0;
-          display: flex;
-          flex-direction: column;
-        }
-        .dropdown-section:not(:last-child) {
-          border-right: 1.5px solid #e9ecee;
-        }
-        .section-header {
-          display: flex;
-          align-items: center;
-          gap: 13px;
-          margin-bottom: 18px;
-        }
-        .section-title {
-          text-transform: uppercase;
-          color: #1e2c44;
-          font-size: 1.09rem;
-          font-weight: 700;
-          letter-spacing: 0.035em;
-        }
-        .section-icon {
-          width: 33px;
-          height: 33px;
-          object-fit: contain;
-        }
-        .section-items {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-        .section-item {
-          display: flex;
-          align-items: center;
-          font-size: 1.01rem;
-          font-weight: 500;
-          color: #637391;
-          padding: 0 0 13px 0;
-          gap: 8px;
-        }
-        .section-item:last-child {
-          padding-bottom: 0;
-        }
-        .bullet-icon {
-          width: 16px;
-          height: 16px;
-          object-fit: contain;
-        }
-        @media (max-width: 1050px) {
-          .navbar-inner,
-          .mega-dropdown {
-            padding-left: 5vw;
-            padding-right: 5vw;
-          }
-          .logo-img { width: 120px !important;}
-          .navbar-link {font-size: 1rem;}
-        }
-        @media (max-width: 900px) {
-          .navbar-inner {
-            padding: 0 6px;
-            height: 56px;
-            gap: 9px;
-          }
-          .logo-img {
-            width: 80px !important;
-          }
-          .navbar-links {
-            gap: 13px;
-          }
-          .mega-dropdown {
-            flex-direction: column;
-            gap: 0;
-            top: 92px;
-            padding-bottom: 18px;
-          }
-          .dropdown-section {
-            border-right: 0;
-            border-bottom: 1.5px solid #e9ecee;
-            min-width: 0;
-            margin-bottom: 20px;
-          }
-        }
-        @media (max-width: 800px) {
-          .navbar-inner {
-            padding: 0 2px;
-            gap: 3px;
-          }
-        }
-        @media (max-width: 680px) {
-          .navbar-links {
-            display: none !important;
-          }
-          .hamburger {
-            display: flex;
-          }
-          .logo {
-            justify-content: center;
-            flex: 1 1 auto;
-            text-align: center;
-          }
-          .mega-dropdown {
-            display: none !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

@@ -1,340 +1,495 @@
-'use client'
+"use client";
 
-import { useState, useEffect, type CSSProperties } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import Image from 'next/image'
+import Image from "next/image";
+import Head from "next/head";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
-type HeroStat = {
-  number: string | number
-  label: string
-}
-
-type HeroBackground = {
-  asset?: { url?: string }
-}
+type HeroStat = { number: string | number; label: string };
+type HeroBackground = { asset?: { url?: string } };
 
 type HeroData = {
-  solutions?: string[]
-  backgroundImage?: HeroBackground
-  badge?: string
-  headline?: string
-  description?: string
-  button1Text?: string
-  button2Text?: string
-  stats?: HeroStat[]
-}
+  solutions?: string[];
+  backgroundImage?: HeroBackground;
+  badge?: string;
+  headline?: string;
+  description?: string;
+  button1Text?: string;
+  button2Text?: string;
+  stats?: HeroStat[];
+};
 
 export default function HeroSection({ heroData }: { heroData?: HeroData }) {
-  const router = useRouter()
-  const solutions = heroData?.solutions || []
-  const [currentSolution, setCurrentSolution] = useState(0)
+  const router = useRouter();
 
+  const solutions = heroData?.solutions ?? [];
+  const [currentSolution, setCurrentSolution] = useState(0);
+
+  const [typedHeadline, setTypedHeadline] = useState("");
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+
+  // rotate subline – depend only on length so dependency array size is stable
   useEffect(() => {
     if (!solutions.length) return;
-    const interval = setInterval(() => {
-      setCurrentSolution(prev => (prev + 1) % solutions.length)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [solutions.length])
+    setCurrentSolution(0);
+    const interval = window.setInterval(() => {
+      setCurrentSolution(prev => (prev + 1) % solutions.length);
+    }, 3000);
+    return () => window.clearInterval(interval);
+  }, [solutions.length]);
 
-  const styles: Record<string, CSSProperties> = {
-    container: {
-      position: 'relative',
-      minHeight: '100vh',
-      width: '100%',
-      overflow: 'hidden',
-      fontFamily: 'Inter, -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif'
-    },
-    overlay: {
-      position: 'absolute',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(30,57,138,0.7)',
-      zIndex: 10
-    },
-    mainContent: {
-      position: 'relative',
-      zIndex: 20,
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '14vh 0 0 0',
-      width: '100vw',
-    },
-    contentWrapper: {
-      width: '100%',
-      maxWidth: "calc(100vw - 8cm)",
-      margin: "0 auto",
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
-    },
-    badge: {
-      display: 'inline-block',
-      backgroundColor: '#f97316',
-      color: '#fff',
-      padding: '0.7em 1.7em',
-      borderRadius: '999px',
-      fontSize: '1.08rem',
-      fontWeight: '700',
-      marginBottom: '1.9rem',
-      boxShadow: '0px 2px 10px 0 rgba(0,0,0,.08)'
-    },
-    orangeText: {
-      color: '#fb923c',
-      fontWeight: 800,
-    },
-    solutionText: {
-      fontSize: '1.5rem',
-      color: '#fff',
-      marginBottom: '1.7rem',
-      minHeight: '2.12rem',
-      fontWeight: 600,
-      background: 'rgba(0,0,0,0.13)',
-      borderRadius: '0.28em',
-      padding: '0 0.7em',
-      textAlign: 'center',
-      fontFamily: 'inherit'
-    },
-    description: {
-      fontSize: '1.18rem',
-      color: '#dbeafe',
-      marginBottom: '2.2rem',
-      lineHeight: 1.7,
-      maxWidth: '900px',
-      textAlign: 'center',
-      fontWeight: 400
-    },
-    buttonContainer: {
-      display: 'flex',
-      gap: '2.3rem',
-      marginBottom: '3.4rem',
-      width: '100%',
-      justifyContent: 'center',
-      flexWrap: 'wrap'
-    },
-    statsGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '2.7rem',
-      width: '100%',
-      maxWidth: "calc(100vw - 8cm)",
-      margin: "0 auto",
-      justifyItems: "center"
-    },
-    statItem: {
-      textAlign: 'center'
-    },
-    statNumber: {
-      fontSize: '2.45rem',
-      fontWeight: '700',
-      color: '#fb923c',
-      marginBottom: '0.17rem',
-      fontFamily: 'inherit',
-      textAlign: "center"
-    },
-    statLabel: {
-      fontSize: '1.05rem',
-      color: '#bfdbfe',
-      fontWeight: 500,
-      textAlign: "center"
-    },
-    scrollIndicator: {
-      position: 'absolute',
-      bottom: '2.2rem',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      color: 'white',
-      zIndex: 23,
-      textAlign: 'center',
-      fontWeight: 500,
-      fontSize: '1.08rem'
-    },
-    scrollIcon: {
-      width: '1.7rem',
-      height: '2.5rem',
-      border: '2px solid white',
-      borderRadius: '9999px',
-      display: 'flex',
-      justifyContent: 'center',
-      margin: '0 auto'
-    },
-    scrollDot: {
-      width: '0.29rem',
-      height: '0.84rem',
-      backgroundColor: 'white',
-      borderRadius: '9999px',
-      marginTop: '0.57rem'
+  // scroll‑based typewriter for headline
+  useEffect(() => {
+    const node = headingRef.current;
+    const fullText = heroData?.headline?.trim() || "";
+
+    if (!fullText || !node) {
+      setTypedHeadline(fullText);
+      return;
     }
-  }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0];
+        const el = entry.target as HTMLElement & {
+          _typingInterval?: number | null;
+        };
+
+        if (entry.isIntersecting) {
+          let index = 0;
+          setTypedHeadline("");
+          if (el._typingInterval) window.clearInterval(el._typingInterval);
+
+          const intervalId = window.setInterval(() => {
+            index += 1;
+            setTypedHeadline(fullText.slice(0, index));
+            if (index >= fullText.length) {
+              window.clearInterval(intervalId);
+              el._typingInterval = null;
+            }
+          }, 60);
+
+          el._typingInterval = intervalId;
+        } else {
+          if (el._typingInterval) {
+            window.clearInterval(el._typingInterval);
+            el._typingInterval = null;
+          }
+          setTypedHeadline("");
+        }
+      },
+      { root: null, threshold: 0.4 }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      const el = node as HTMLElement & { _typingInterval?: number | null };
+      if (el && el._typingInterval) window.clearInterval(el._typingInterval);
+      observer.disconnect();
+    };
+  }, [heroData?.headline]);
 
   const backgroundImgUrl =
-    heroData?.backgroundImage?.asset?.url ||
-    "/backgrounds/hero-bg.jpg"
+    heroData?.backgroundImage?.asset?.url || "/backgrounds/hero-bg.jpg";
+
+  const containerStyles: CSSProperties = {
+    position: "relative",
+    width: "100%",
+    overflow: "hidden",
+    fontFamily:
+      'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  };
 
   return (
-    <div style={styles.container}>
+    <section style={containerStyles}>
       <style jsx>{`
-        @media (max-width: 1100px) {
-          .main-heading { font-size: 2.2rem; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr);}
-        }
-        @media (max-width: 700px) {
-          .main-heading { font-size: 1.42rem;}
-          .solution-text { font-size: 0.97rem;}
-          .stat-number { font-size: 1.09rem;}
-          .stats-grid { gap: 0.5rem; }
-        }
-        .modern-btn-primary:hover {
-          background: #ea580c;
-          box-shadow: 0 12px 46px 0 #ea580c33, 0 1px 8px #ea580c12;
+        .hero-root {
+          position: relative;
+          width: 100%;
           color: #fff;
-          filter: brightness(1.07);
-          text-shadow: 0 8px 24px #fff2, 0 1px 2px #ea580c66;
-          transform: translateY(-4px) scale(1.04);
         }
-        .modern-btn-outline:hover {
-          background: #fff;
-          color: #fb7e19;
-          border-color: #fb7e19;
-          box-shadow: 0 1px 12px #fff8, 0 2px 10px #fb7e1930;
+
+        .hero-bg-wrapper {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .hero-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.7);
+        }
+
+        .hero-main {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 4.2rem 1.25rem 3.4rem;
+          min-height: 100dvh;
+        }
+
+        .hero-content {
+          max-width: 70rem;
+          width: 100%;
+          margin-inline: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 1.4rem;
+          text-align: center;
+          align-items: center;
+        }
+
+        .hero-badge {
+          align-self: center;
+          background: #f97316;
+          color: #fff;
+          padding: 0.4rem 1.4rem;
+          border-radius: 999px;
+          font-weight: 700;
+          font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Fixed width + stable height for heading */
+        .hero-heading {
           font-weight: 800;
-          transform: translateY(-4px) scale(1.04);
+          letter-spacing: -0.02em;
+          font-size: clamp(2rem, 5vw, 3.2rem);
+          line-height: 1.18;
+          max-width: 18ch;
+          min-height: 3.6em;
+          margin-inline: auto;
         }
-        .modern-btn:active {
-          transform: scale(0.97);
-          box-shadow: 0 2px 6px #ea580c22;
+
+        @media (max-width: 480px) {
+          .hero-heading {
+            max-width: 16ch;
+            font-size: 2.1rem;
+          }
         }
-        .gradient-animate {
+
+        .hero-heading span {
           background: linear-gradient(
             110deg,
             #23fc60 0%,
             #20bbfd 33%,
             #22fcab 55%,
             #2893f5 80%,
-            #23fc60 100%
+            #23fc60 50%
           );
           background-size: 200% 200%;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
           color: transparent;
-          animation: run-hero-gradient 3.4s linear infinite alternate;
-          font-weight: 800;
-          text-shadow: 0 2px 8px rgba(32,160,176,.12);
-          text-align: center;
-          font-size: 4.3rem;
-          line-height: 1.08;
-          margin-bottom: 1rem;
-          letter-spacing: -0.01em;
+          animation: hero-gradient 3.4s linear infinite alternate;
         }
-        @keyframes run-hero-gradient {
-          0% { background-position: 0% 60%; }
-          100% { background-position: 100% 40%; }
+
+        .hero-caret {
+          display: inline-block;
+          width: 2px;
+          height: 1em;
+          margin-left: 0.2rem;
+          background: #f9fafb;
+          animation: hero-blink 0.8s steps(1) infinite;
+        }
+
+        /* Vertical word-roll subline (long text friendly) */
+        .hero-subline-wrapper {
+          margin-top: 0.4rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          font-size: clamp(0.95rem, 2.4vw, 1.3rem);
+          font-weight: 600;
+          color: #e5edff;
+          gap: 0.25rem;
+          max-width: 26rem;
+        }
+
+        .hero-subline-label {
+          opacity: 0.9;
+          white-space: nowrap;
+        }
+
+        .hero-subline-viewport {
+          position: relative;
+          height: 1.6em; /* tall enough so ADAS text is not clipped */
+          overflow: hidden;
+          display: inline-block;
+          min-width: 10rem;
+        }
+
+        .hero-subline-track {
+          display: flex;
+          flex-direction: column;
+          transform: translateY(0);
+          transition: transform 600ms cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .hero-subline-item {
+          height: 1.6em; /* match viewport height */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 0.25rem;
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        @media (max-width: 480px) {
+          .hero-subline-viewport {
+            min-width: 100%;
+          }
+          .hero-subline-wrapper {
+            max-width: 20rem;
+          }
+        }
+
+        .hero-description {
+          font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+          line-height: 1.7;
+          max-width: 48rem;
+          margin-inline: auto;
+          color: #f5f7f5;
+          font-weight: 500;
+        }
+
+        .hero-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 0.4rem;
+        }
+
+        .hero-btn {
+          min-height: 44px;
+          padding: 0.95rem 2.4rem;
+          border-radius: 999px;
+          font-weight: 700;
+          font-size: clamp(0.95rem, 2.4vw, 1.05rem);
+          border: 0;
+          cursor: pointer;
+          transition: transform 0.18s ease-out, box-shadow 0.18s ease-out,
+            background 0.18s ease-out, color 0.18s ease-out,
+            border-color 0.18s ease-out;
+        }
+
+        .hero-btn-primary {
+          background: #fb7e19;
+          color: #fff;
+          box-shadow: 0 10px 26px rgba(251, 126, 25, 0.25);
+        }
+
+        .hero-btn-primary:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 16px 34px rgba(251, 126, 25, 0.35);
+        }
+
+        .hero-btn-outline {
+          background: transparent;
+          color: #fff;
+          border: 2px solid #fff;
+        }
+
+        .hero-btn-outline:hover {
+          background: #fff;
+          color: #fb7e19;
+          box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35);
+        }
+
+        .hero-stats {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1.4rem 2rem;
+          margin-top: 2rem;
+          justify-items: center;
+        }
+
+        .hero-stat-item {
+          min-height: 44px;
+        }
+
+        .hero-stat-number {
+          font-size: clamp(1.4rem, 3vw, 1.9rem);
+          font-weight: 700;
+          color: #fb923c;
+        }
+
+        .hero-stat-label {
+          font-size: clamp(0.82rem, 2vw, 0.95rem);
+          color: #d1ddff;
+        }
+
+        .hero-scroll {
+          margin-top: 2.2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          font-size: clamp(0.85rem, 2vw, 0.95rem);
+          text-align: center;
+        }
+
+        .scroll-shell {
+          width: 1.7rem;
+          height: 2.6rem;
+          border-radius: 999px;
+          border: 2px solid #e5edff;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          padding-top: 0.45rem;
+        }
+
+        .scroll-dot {
+          width: 0.28rem;
+          height: 0.8rem;
+          border-radius: 999px;
+          background: #e5edff;
+        }
+
+        @media (min-width: 768px) {
+          .hero-main {
+            padding: 5.5rem 2.5rem 4.2rem;
+          }
+
+          .hero-stats {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            max-width: 42rem;
+            margin-inline: auto;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .hero-main {
+            padding-top: 6rem;
+          }
+        }
+
+        @keyframes hero-gradient {
+          0% {
+            background-position: 0% 60%;
+          }
+          100% {
+            background-position: 100% 40%;
+          }
+        }
+
+        @keyframes hero-blink {
+          0%,
+          50% {
+            opacity: 1;
+          }
+          50.01%,
+          100% {
+            opacity: 0;
+          }
         }
       `}</style>
 
-      <Image
-        src={backgroundImgUrl}
-        alt="Hero Background"
-        fill
-        priority
-        className="object-cover"
-        style={{ objectPosition: 'center', zIndex: 1 }}
-      />
+      <div className="hero-root">
+        <div className="hero-bg-wrapper">
+          <Image
+            src={backgroundImgUrl}
+            alt="Hero background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="hero-overlay" />
+        </div>
 
-      <div style={styles.overlay}></div>
+        <div className="hero-main">
+          <div className="hero-content">
+            {heroData?.badge && (
+              <span className="hero-badge">{heroData.badge}</span>
+            )}
 
-      <div style={styles.mainContent}>
-        <div style={styles.contentWrapper}>
-          <span style={styles.badge}>
-            {heroData?.badge}
-          </span>
-          <h1 className="main-heading gradient-animate">
-            {heroData?.headline}
-          </h1>
-          <motion.div
-            className="solution-text"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            key={currentSolution}
-            style={styles.solutionText}
-            transition={{ duration: 0.5 }}
-          >
-            {solutions[currentSolution] || ""}
-          </motion.div>
-          <div style={styles.description}>
-            {heroData?.description}
-          </div>
-          <div className="button-container" style={styles.buttonContainer}>
-            <button
-              onClick={() => router.push('/solutions/products')}
-              className="modern-btn modern-btn-primary"
-              style={{
-                background: '#fb7e19',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '24px',
-                fontWeight: 700,
-                fontSize: '1.48rem',
-                fontStyle: 'italic',
-                padding: '1.1em 2.9em',
-                boxShadow: '0 8px 28px rgba(251,126,25,0.10)',
-                outline: 'none',
-                transition: 'all 0.18s cubic-bezier(.46,1.5,.58,1)',
-                cursor: 'pointer',
-                minWidth: '285px'
-              }}>
-              {heroData?.button1Text}
-            </button>
-            <button
-              className="modern-btn modern-btn-outline"
-              style={{
-                background: 'transparent',
-                color: '#fff',
-                border: '3px solid #fff',
-                borderRadius: '24px',
-                fontWeight: 700,
-                fontSize: '1.48rem',
-                fontStyle: 'italic',
-                padding: '1.1em 2.9em',
-                boxShadow: 'none',
-                outline: 'none',
-                cursor: 'pointer',
-                minWidth: '285px',
-                transition: 'all 0.17s cubic-bezier(.46,1.5,.58,1)'
-              }}>
-              {heroData?.button2Text}
-            </button>
-          </div>
-          <div className="stats-grid" style={styles.statsGrid}>
-            {(heroData?.stats || []).map((stat, idx) => (
-              <div style={styles.statItem} key={idx}>
-                <div className="stat-number" style={styles.statNumber}>{stat.number}</div>
-                <div style={styles.statLabel}>{stat.label}</div>
+            <h1 ref={headingRef} className="hero-heading">
+              <span>{typedHeadline}</span>
+              <span className="hero-caret" aria-hidden="true" />
+            </h1>
+
+            {solutions.length > 0 && (
+              <div className="hero-subline-wrapper">
+                <span className="hero-subline-label">
+                  Intelligent transit for
+                </span>
+                <span className="hero-subline-viewport">
+                  <span
+                    className="hero-subline-track"
+                    style={{
+                      transform: `translateY(-${currentSolution * 1.6}em)`,
+                    }}
+                  >
+                    {solutions.map((text, idx) => (
+                      <span key={idx} className="hero-subline-item">
+                        {text}
+                      </span>
+                    ))}
+                  </span>
+                </span>
               </div>
-            ))}
+            )}
+
+            {heroData?.description && (
+              <p className="hero-description">{heroData.description}</p>
+            )}
+
+            <div className="hero-actions">
+              {heroData?.button1Text && (
+                <button
+                  className="hero-btn hero-btn-primary"
+                  onClick={() => router.push("/solutions/products")}
+                >
+                  {heroData.button1Text}
+                </button>
+              )}
+              {heroData?.button2Text && (
+                <button className="hero-btn hero-btn-outline">
+                  {heroData.button2Text}
+                </button>
+              )}
+            </div>
+
+            {(heroData?.stats || [])?.length > 0 && (
+              <div className="hero-stats">
+                {heroData!.stats!.map((stat, idx) => (
+                  <div className="hero-stat-item" key={idx}>
+                    <div className="hero-stat-number">{stat.number}</div>
+                    <div className="hero-stat-label">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <motion.div
+              className="hero-scroll"
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <span>Scroll to explore</span>
+              <div className="scroll-shell">
+                <motion.div
+                  className="scroll-dot"
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
-      <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        style={styles.scrollIndicator}
-      >
-        <div>
-          <div style={{ marginBottom: '0.38rem', fontSize: '0.96rem' }}>Scroll to explore</div>
-          <div style={styles.scrollIcon}>
-            <motion.div
-              animate={{ y: [0, 16, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              style={styles.scrollDot}
-            ></motion.div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  )
+    </section>
+  );
 }

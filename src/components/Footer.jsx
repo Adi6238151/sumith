@@ -1,11 +1,15 @@
 "use client";
+
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sanity } from "@/lib/sanity.client";
 
 export default function Footer() {
   const [footerData, setFooterData] = useState(null);
+  const [typedText, setTypedText] = useState("");
+  const headingRef = useRef(null);
 
+  // Fetch footer data from Sanity
   useEffect(() => {
     const fetchFooter = async () => {
       const query = `*[_type == "footerSettings"][0]{
@@ -16,7 +20,9 @@ export default function Footer() {
           addressLine1,
           addressLine2,
           addressLine3,
-          addressLine4
+          addressLine4,
+          email,
+          phone
         },
         navigationLinks{
           primaryLinks[]{
@@ -51,54 +57,79 @@ export default function Footer() {
           phone
         }
       }`;
+
       const data = await sanity.fetch(query);
       setFooterData(data);
     };
+
     fetchFooter();
   }, []);
 
-  // Generate SEO Schema
-  const generateSchema = () => {
-    if (!footerData?.seo) return null;
+  // Typewriter effect that runs every time the heading enters the viewport
+  useEffect(() => {
+    if (!footerData?.heading || !headingRef.current) return;
 
-    const organizationSchema = {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": footerData.seo.organizationName,
-      "description": footerData.seo.organizationDescription,
-      "foundingDate": footerData.seo.foundingYear,
-      "email": footerData.seo.email,
-      "telephone": footerData.seo.phone,
-      "address": footerData.locations?.map(location => ({
-        "@type": "PostalAddress",
-        "addressLocality": location.city,
-        "streetAddress": `${location.addressLine1 || ''}, ${location.addressLine2 || ''}`.trim(),
-        "addressCountry": location.city?.includes("Singapore") ? "SG" : 
-                         location.city?.includes("Hyderabad") || location.city?.includes("India") ? "IN" : 
-                         location.city?.includes("Bali") || location.city?.includes("Indonesia") ? "ID" : ""
-      })),
-      "sameAs": [
-        footerData.socialLinks?.facebook,
-        footerData.socialLinks?.instagram,
-        footerData.socialLinks?.twitter,
-        footerData.socialLinks?.linkedin,
-        footerData.socialLinks?.behance
-      ].filter(Boolean)
+    const fullText = footerData.heading;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        const el = entry.target;
+
+        // If element enters viewport: start typing
+        if (entry.isIntersecting) {
+          let index = 0;
+
+          // Clear any previous text
+          setTypedText("");
+
+          // Clear any existing interval
+          if (el._typingInterval) {
+            clearInterval(el._typingInterval);
+          }
+
+          const intervalId = setInterval(() => {
+            index += 1;
+            setTypedText(fullText.slice(0, index));
+            if (index === fullText.length) {
+              clearInterval(intervalId);
+              el._typingInterval = null;
+            }
+          }, 80); // speed
+
+          el._typingInterval = intervalId;
+        } else {
+          // When it leaves: clear interval and reset text
+          if (el._typingInterval) {
+            clearInterval(el._typingInterval);
+            el._typingInterval = null;
+          }
+          setTypedText("");
+        }
+      },
+      {
+        root: null,
+        threshold: 0.4,
+      }
+    );
+
+    observer.observe(headingRef.current);
+
+    return () => {
+      const el = headingRef.current;
+      if (el && el._typingInterval) {
+        clearInterval(el._typingInterval);
+      }
+      observer.disconnect();
     };
+  }, [footerData?.heading]);
 
-    return organizationSchema;
-  };
+  if (!footerData) return <FooterSkeleton />;
 
-  // Static fallback while loading
-  if (!footerData) {
-    return <FooterSkeleton />;
-  }
-
-  const schema = generateSchema();
+  const schema = generateSchema(footerData);
 
   return (
     <>
-      {/* SEO Schema */}
       {schema && (
         <script
           type="application/ld+json"
@@ -110,7 +141,12 @@ export default function Footer() {
         <div className="footer-container">
           {/* Main Heading */}
           <div className="footer-hero">
-            <h2 className="footer-title">{footerData.heading}</h2>
+            <h2 className="footer-title footer-title-typing" ref={headingRef}>
+              <span className="footer-title-text">{typedText}</span>
+              <span className="footer-caret" aria-hidden="true">
+                |
+              </span>
+            </h2>
           </div>
 
           <div className="footer-content">
@@ -125,6 +161,51 @@ export default function Footer() {
                     {location.addressLine2 && <p>{location.addressLine2}</p>}
                     {location.addressLine3 && <p>{location.addressLine3}</p>}
                     {location.addressLine4 && <p>{location.addressLine4}</p>}
+                    {location.email && (
+                      <div className="contact-item">
+                        <span className="contact-icon-wrapper">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                          </svg>
+                        </span>
+                        <a
+                          href={`mailto:${location.email}`}
+                          className="contact-link"
+                        >
+                          {location.email}
+                        </a>
+                      </div>
+                    )}
+                    {location.phone && (
+                      <div className="contact-item">
+                        <span className="contact-icon-wrapper">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                          </svg>
+                        </span>
+                        <a
+                          href={`tel:${location.phone}`}
+                          className="contact-link"
+                        >
+                          {location.phone}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -133,22 +214,26 @@ export default function Footer() {
             {/* Navigation Links */}
             <div className="footer-nav">
               <div className="nav-column">
-                {footerData.navigationLinks?.primaryLinks?.map((link, index) => (
-                  <Link key={index} href={link.href} className="nav-link">
-                    {link.label}
-                    {link.count && <sup>{link.count}</sup>}
-                  </Link>
-                ))}
+                {footerData.navigationLinks?.primaryLinks?.map(
+                  (link, index) => (
+                    <Link key={index} href={link.href} className="nav-link">
+                      {link.label}
+                      {link.count && <sup>{link.count}</sup>}
+                    </Link>
+                  )
+                )}
               </div>
 
               <div className="nav-column">
-                {footerData.navigationLinks?.secondaryLinks?.map((link, index) => (
-                  <Link key={index} href={link.href} className="nav-link">
-                    {link.label}
-                    {link.count && <sup>{link.count}</sup>}
-                    {link.showArrow && <span className="arrow">→</span>}
-                  </Link>
-                ))}
+                {footerData.navigationLinks?.secondaryLinks?.map(
+                  (link, index) => (
+                    <Link key={index} href={link.href} className="nav-link">
+                      {link.label}
+                      {link.count && <sup>{link.count}</sup>}
+                      {link.showArrow && <span className="arrow">→</span>}
+                    </Link>
+                  )
+                )}
               </div>
             </div>
 
@@ -228,7 +313,7 @@ export default function Footer() {
 
       <style jsx>{`
         .footer {
-          background: #0a0a0a;
+          background: radial-gradient(circle at top left, #141414 0%, #050505 50%, #000 100%);
           color: #e0e0e0;
           padding: 80px 24px 40px;
           font-family: "Montserrat", Arial, sans-serif;
@@ -247,7 +332,30 @@ export default function Footer() {
           letter-spacing: -0.02em;
           line-height: 1.1;
           margin: 0;
+          opacity: 1;
+          transform: translateY(0);
         }
+        .footer-title-text {
+          display: inline-block;
+          white-space: nowrap;
+        }
+        .footer-caret {
+          display: inline-block;
+          margin-left: 4px;
+          width: 2px;
+          animation: blink 0.8s steps(1) infinite;
+        }
+        @keyframes blink {
+          0%,
+          50% {
+            opacity: 1;
+          }
+          50.01%,
+          100% {
+            opacity: 0;
+          }
+        }
+
         .footer-content {
           display: grid;
           grid-template-columns: 1fr 1fr 0.5fr;
@@ -258,6 +366,10 @@ export default function Footer() {
           display: flex;
           flex-direction: column;
           gap: 50px;
+        }
+        .location {
+          border-left: 1px solid #222;
+          padding-left: 18px;
         }
         .location-title {
           font-size: 1rem;
@@ -275,6 +387,36 @@ export default function Footer() {
         .location-details p {
           margin: 0;
         }
+
+        .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 8px;
+        }
+        .contact-icon-wrapper {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          color: #999;
+          flex-shrink: 0;
+        }
+        .contact-icon-wrapper svg {
+          display: block;
+        }
+        .contact-link {
+          color: #999;
+          text-decoration: none;
+          transition: color 0.3s ease;
+          font-size: 0.9rem;
+          line-height: 1;
+        }
+        .contact-link:hover {
+          color: #ffc107;
+        }
+
         .footer-nav {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -289,7 +431,7 @@ export default function Footer() {
           font-size: 0.95rem;
           color: #ccc;
           text-decoration: none;
-          transition: color 0.3s ease;
+          transition: color 0.3s ease, transform 0.2s ease;
           font-weight: 400;
           display: flex;
           align-items: center;
@@ -302,6 +444,7 @@ export default function Footer() {
         }
         .nav-link:hover {
           color: #ffc107;
+          transform: translateY(-1px);
         }
         .arrow {
           font-size: 1.1rem;
@@ -310,6 +453,7 @@ export default function Footer() {
         .nav-link:hover .arrow {
           transform: translateX(5px);
         }
+
         .footer-social {
           display: flex;
           flex-direction: column;
@@ -320,12 +464,14 @@ export default function Footer() {
           font-size: 0.95rem;
           color: #ccc;
           text-decoration: none;
-          transition: color 0.3s ease;
+          transition: color 0.3s ease, transform 0.2s ease;
           font-weight: 400;
         }
         .social-link:hover {
           color: #ffc107;
+          transform: translateY(-1px);
         }
+
         .footer-bottom {
           display: flex;
           justify-content: space-between;
@@ -351,6 +497,7 @@ export default function Footer() {
         .footer-link:hover {
           color: #ffc107;
         }
+
         @media (max-width: 1024px) {
           .footer-content {
             grid-template-columns: 1fr 1fr;
@@ -403,6 +550,44 @@ export default function Footer() {
   );
 }
 
+// Schema generator (plain JS)
+function generateSchema(footerData) {
+  if (!footerData?.seo) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: footerData.seo.organizationName,
+    description: footerData.seo.organizationDescription,
+    foundingDate: footerData.seo.foundingYear,
+    email: footerData.seo.email,
+    telephone: footerData.seo.phone,
+    address: footerData.locations?.map((location) => ({
+      "@type": "PostalAddress",
+      addressLocality: location.city,
+      streetAddress: `${location.addressLine1 || ""}, ${
+        location.addressLine2 || ""
+      }`.trim(),
+      addressCountry: location.city?.includes("Singapore")
+        ? "SG"
+        : location.city?.includes("Hyderabad") ||
+          location.city?.includes("India")
+        ? "IN"
+        : location.city?.includes("Bali") ||
+          location.city?.includes("Indonesia")
+        ? "ID"
+        : "",
+    })),
+    sameAs: [
+      footerData.socialLinks?.facebook,
+      footerData.socialLinks?.instagram,
+      footerData.socialLinks?.twitter,
+      footerData.socialLinks?.linkedin,
+      footerData.socialLinks?.behance,
+    ].filter(Boolean),
+  };
+}
+
 // Loading skeleton
 function FooterSkeleton() {
   return (
@@ -421,7 +606,7 @@ function FooterSkeleton() {
       </footer>
       <style jsx>{`
         .footer {
-          background: #0a0a0a;
+          background: radial-gradient(circle at top left, #141414 0%, #050505 50%, #000 100%);
           padding: 80px 24px 40px;
         }
         .footer-container {
@@ -448,7 +633,8 @@ function FooterSkeleton() {
           animation: pulse 1.5s ease-in-out infinite;
         }
         @keyframes pulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 1;
           }
           50% {
