@@ -249,7 +249,7 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   background: transparent;
-  color: #f9fafb; /* default to light */
+  color: #111827; /* default to dark */
   cursor: pointer;
   transition:
     color 0.16s ease,
