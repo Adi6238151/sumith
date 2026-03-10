@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "My Website",
-  description: "Built with Next.js and Sanity",
+  title: "Sumith Electronics",
+  description: "India's pioneering ITMS manufacturer since 2010. Smart & Intelligent Solutions for a Smarter Future.",
 };
 
 export default function RootLayout({
