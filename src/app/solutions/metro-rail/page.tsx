@@ -4,7 +4,7 @@ import MetroRailSectionHeader from "@/components/metro-rail/MetroRailSectionHead
 import ScopeOfWorkTiles from "@/components/metro-rail/ScopeOfWorkTiles";
 import SafetyTabsSection from "@/components/metro-rail/SafetyTabsSection";
 import PassengerDisplaySection from "@/components/metro-rail/PassengerDisplaySection";
-import MeterOperations from "@/components/MeterOperations/MeterOperations";
+
 import { sanity } from "@/lib/sanity.client";
 
 /* ---------------------------
@@ -116,11 +116,6 @@ export default async function MetroRailSolutionPage() {
           displays={passengerDisplaySectionData?.displays || []}
           seo={passengerDisplaySectionData?.seo}
         />
-
-        {/* ---------------------------
-            Meter Operations Section (NEW)
-        ---------------------------- */}
-        <MeterOperations />
 
       </main>
 
