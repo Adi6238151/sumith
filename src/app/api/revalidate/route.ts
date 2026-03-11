@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     console.log('🔔 Webhook received!')
     console.log('Secret provided:', secret ? 'Yes' : 'No')
     
-    if (secret !== process.env.REVALIDATE_SECRET) {
+    if (secret !== process.env.SANITY_WEBHOOK_SECRET) {
       console.log('❌ Invalid secret')
       return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
     }
