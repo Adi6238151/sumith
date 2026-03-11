@@ -286,6 +286,10 @@
   transform: rotate(-45deg) translateY(1px);
 }
 
+.isHovered {
+  outline: none;
+}
+
 .pillNavItem.isHovered {
   color: #f9fafb !important;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
