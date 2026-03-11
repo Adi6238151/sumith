@@ -59,7 +59,7 @@ export default function SolutionCard({
           className={styles.imageWrap}
           variants={{
             rest: { y: 0 },
-            hover: { y: -200 },
+            hover: { y: -140 },
           }}
           transition={{
             type: 'tween',
@@ -68,7 +68,7 @@ export default function SolutionCard({
           }}
         >
           <Image
-            src={urlFor(image).width(580).height(480).url()}
+            src={urlFor(image).width(420).height(340).url()}
             alt=""
             fill
             className={styles.image}

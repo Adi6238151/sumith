@@ -10,20 +10,22 @@
 /* ============================= */
 .card {
   position: relative;
-  height: 540px;
-  border-radius: 40px;
-  padding: 56px;
+  height: 420px;
+  border-radius: 32px;
+  padding: 40px;
   overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   text-decoration: none;
-  transition: box-shadow 0.4s ease;
-   cursor: pointer;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .card:hover {
-  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
 }
 
 /* ============================= */
@@ -32,29 +34,29 @@
 
 /* BLUE THEME */
 .blue {
-  background-color: #5fafed;     /* default */
-  color: #1782d4;                /* default text */
+  background: linear-gradient(145deg, #74bdf2, #5fafed);
+  color: #0b1f8f;                /* deeper blue text */
   transition:
-    background-color 0.3s ease,
+    background 0.3s ease,
     color 0.3s ease;
 }
 
 .card:hover.blue {
-  background-color: #1782d4;     /* hover */
+  background: linear-gradient(145deg, #1782d4, #126bb0);
   color: #ffffff;
 }
 
 /* GREEN THEME */
 .green {
-  background-color: #d9f1c9;     /* KEEP AS-IS (default) */
+  background: linear-gradient(145deg, #eefbe4, #d9f1c9);
   color: #1f7a1f;                /* default text */
   transition:
-    background-color 0.3s ease,
+    background 0.3s ease,
     color 0.3s ease;
 }
 
 .card:hover.green {
-  background-color: #36a300;     /* ✅ REQUIRED HOVER COLOR */
+  background: linear-gradient(145deg, #36a300, #2b8200);     /* ✅ REQUIRED HOVER COLOR */
   color: #ffffff;
 }
 
@@ -67,10 +69,10 @@
 }
 
 .title {
-  font-size: 38px;
-  font-weight: 500;
-  line-height: 1.15;
-  margin-bottom: 28px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 20px;
 }
 
 .cta {
@@ -94,11 +96,11 @@
 /* ============================= */
 .imageWrap {
   position: absolute;
-  width: 580px;
-  height: 480px;
+  width: 420px;
+  height: 340px;
 
-  bottom: -270px;
-  left: 20%;
+  bottom: -150px;
+  left: 30%;
   transform: translateX(-10%);
 
   overflow: visible;
@@ -119,8 +121,8 @@
   }
 
   .card {
-    height: 500px;
-    padding: 48px;
+    height: 380px;
+    padding: 36px;
   }
 
   .content {
@@ -128,9 +130,9 @@
   }
 
   .imageWrap {
-    width: 420px;
-    height: 320px;
-    bottom: -140px;
+    width: 320px;
+    height: 240px;
+    bottom: -100px;
     left: 50%;
     transform: translateX(-50%);
   }
@@ -158,8 +160,8 @@
   }
 
   .title {
-    font-size: 26px;
-    line-height: 1.25;
+    font-size: 22px;
+    line-height: 1.3;
   }
 
   .cta {
