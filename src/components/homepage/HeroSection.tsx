@@ -450,13 +450,16 @@ export default function HeroSection({ heroData }: { heroData?: HeroData }) {
               {heroData?.button1Text && (
                 <button
                   className="hero-btn hero-btn-primary"
-                  onClick={() => router.push("/solutions/products")}
+                  onClick={() => router.push("/products")}
                 >
                   {heroData.button1Text}
                 </button>
               )}
               {heroData?.button2Text && (
-                <button className="hero-btn hero-btn-outline">
+                <button 
+                  className="hero-btn hero-btn-outline"
+                  onClick={() => router.push("/products")}
+                >
                   {heroData.button2Text}
                 </button>
               )}

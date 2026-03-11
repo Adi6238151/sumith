@@ -96,8 +96,8 @@ export default function PartnerLogos({ partners }) {
           height: auto;
           max-height: 60px;
           object-fit: contain;
-          filter: brightness(0) invert(1) blur(0.3px);
-          opacity: 0.7;
+          filter: grayscale(100%) opacity(0.85);
+          opacity: 0.85;
           transform: translateY(0) scale(0.96);
           transition:
             opacity 0.22s ease,
@@ -131,7 +131,7 @@ export default function PartnerLogos({ partners }) {
 
         .partner-item:hover .partner-logo {
           opacity: 1;
-          filter: brightness(1.1) invert(1) blur(0);
+          filter: grayscale(0%) opacity(1);
           transform: translateY(-4px) scale(1);
           box-shadow: 0 12px 26px rgba(0, 0, 0, 0.85);
         }

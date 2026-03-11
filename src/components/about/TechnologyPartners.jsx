@@ -220,7 +220,7 @@ export default function TechnologyPartners({ title, partners }) {
           object-fit: contain;
           position: relative;
           z-index: 1;
-          filter: grayscale(20%) brightness(1);
+          filter: grayscale(50%) brightness(1);
           opacity: 0.9;
           transform: scale(0.98);
           transition:

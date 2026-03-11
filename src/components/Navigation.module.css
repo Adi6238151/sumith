@@ -260,7 +260,8 @@
   text-decoration: none;
 }
 
-/* Specific rule for the dark text when not hovered/active */
+/* Specific rule for the text when not hovered/active. 
+   Default to white for the dark nav bar so it's visible on SSR. */
 .pillNav:hover .pillNavItem:not(.isHovered) {
   color: #111827;
 }
