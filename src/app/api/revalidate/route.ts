@@ -27,6 +27,13 @@ export async function POST(request: NextRequest) {
         revalidatePath('/')
         console.log('✅ Revalidated products page')
         break
+      case 'solution':
+        revalidatePath('/')
+        revalidatePath('/solutions/transit-bus')
+        revalidatePath('/solutions/metro-rail')
+        revalidatePath('/solutions/Airport')
+        console.log('✅ Revalidated solutions and homepage')
+        break
       case 'emailSettings':
         revalidatePath('/contact-us')
         console.log('✅ Revalidated contact page')
