@@ -69,6 +69,7 @@ declare global {
           "camera-orbit"?: string;
           "interaction-prompt"?: string;
           exposure?: string;
+          "tone-mapping"?: string;
           "environment-image"?: string;
           "shadow-intensity"?: string;
           "shadow-softness"?: string;
@@ -128,7 +129,8 @@ export default function Product3DViewerSection({
             camera-controls
             camera-orbit="25deg 90deg"
             interaction-prompt="auto"
-            exposure="1.0"
+            exposure="0.8"
+            tone-mapping="neutral"
             environment-image="neutral"
             shadow-intensity="1"
             shadow-softness="1"

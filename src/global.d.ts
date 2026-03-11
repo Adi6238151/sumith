@@ -17,6 +17,7 @@ declare module "react/jsx-runtime" {
         "camera-orbit"?: string;
         "interaction-prompt"?: "auto" | "none";
         exposure?: string;
+        "tone-mapping"?: "ace-filmic" | "neutral" | "agx" | "commerce";
         "shadow-intensity"?: string;
         ar?: boolean;
         "ar-modes"?: string;
